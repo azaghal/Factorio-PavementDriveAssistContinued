@@ -2,7 +2,7 @@ data:extend({
     {
         type = "item",
         name = "pda-road-sign-speed-limit",
-        icon = "__PavementDriveAssist__/graphics/icons/icon_speed_limit.png",
+        icon = "__PavementDriveAssistContinued__/graphics/icons/icon_speed_limit.png",
         icon_size = 32,
         flags = {},
         subgroup = "circuit-network",
@@ -13,7 +13,7 @@ data:extend({
     {
         type = "item",
         name = "pda-road-sign-speed-unlimit",
-        icon = "__PavementDriveAssist__/graphics/icons/icon_speed_unlimit.png",
+        icon = "__PavementDriveAssistContinued__/graphics/icons/icon_speed_unlimit.png",
         icon_size = 32,
         flags = {},
         subgroup = "circuit-network",
@@ -24,7 +24,7 @@ data:extend({
     {
         type = "item",
         name = "pda-road-sign-stop",
-        icon = "__PavementDriveAssist__/graphics/icons/stop-sign.png",
+        icon = "__PavementDriveAssistContinued__/graphics/icons/stop-sign.png",
         icon_size = 64, icon_mipmaps = 4,
         flags = {},
         subgroup = "circuit-network",
@@ -35,7 +35,7 @@ data:extend({
     {
         type = "item",
         name = "pda-road-sensor",
-        icon = "__PavementDriveAssist__/graphics/icons/road-sensor.png",
+        icon = "__PavementDriveAssistContinued__/graphics/icons/road-sensor.png",
         icon_size = 64, icon_mipmaps = 4,
         flags = {},
         subgroup = "circuit-network",

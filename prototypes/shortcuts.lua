@@ -15,7 +15,7 @@ data:extend({
 		toggleable = true,
 		icon =
 		{
-			filename = "__PavementDriveAssist__/graphics/shortcuts/cc-32px.png",
+			filename = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-32px.png",
 			priority = "extra-high-no-scale",
 			size = 32,
 			scale = 1,
@@ -23,7 +23,7 @@ data:extend({
 		},
 		small_icon =
 		{
-			filename = "__PavementDriveAssist__/graphics/shortcuts/cc-24px.png",
+			filename = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-24px.png",
 			priority = "extra-high-no-scale",
 			size = 24,
 			scale = 1,
@@ -31,7 +31,7 @@ data:extend({
 		},
 		disabled_small_icon =
 		{
-			filename = "__PavementDriveAssist__/graphics/shortcuts/cc-24px-white.png",
+			filename = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-24px-white.png",
 			priority = "extra-high-no-scale",
 			size = 24,
 			scale = 1,
@@ -48,7 +48,7 @@ data:extend({
 		style = "green",
 		icon =
 		{
-			filename = "__PavementDriveAssist__/graphics/shortcuts/set-cc-32px-white.png",
+			filename = "__PavementDriveAssistContinued__/graphics/shortcuts/set-cc-32px-white.png",
 			priority = "extra-high-no-scale",
 			size = 32,
 			scale = 1,
@@ -56,7 +56,7 @@ data:extend({
 		},
 		small_icon =
 		{
-			filename = "__PavementDriveAssist__/graphics/shortcuts/cc-24px.png",
+			filename = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-24px.png",
 			priority = "extra-high-no-scale",
 			size = 24,
 			scale = 1,
@@ -64,7 +64,7 @@ data:extend({
 		},
 		disabled_small_icon =
 		{
-			filename = "__PavementDriveAssist__/graphics/shortcuts/cc-24px-white.png",
+			filename = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-24px-white.png",
 			priority = "extra-high-no-scale",
 			size = 24,
 			scale = 1,
@@ -81,7 +81,7 @@ data:extend({
 		toggleable = true,
 		icon =
 		{
-			filename = "__PavementDriveAssist__/graphics/shortcuts/pda-32px.png",
+			filename = "__PavementDriveAssistContinued__/graphics/shortcuts/pda-32px.png",
 			priority = "extra-high-no-scale",
 			size = 32,
 			scale = 1,
@@ -89,7 +89,7 @@ data:extend({
 		},
 		small_icon =
 		{
-			filename = "__PavementDriveAssist__/graphics/shortcuts/pda-24px.png",
+			filename = "__PavementDriveAssistContinued__/graphics/shortcuts/pda-24px.png",
 			priority = "extra-high-no-scale",
 			size = 24,
 			scale = 1,
@@ -97,7 +97,7 @@ data:extend({
 		},
 		disabled_small_icon =
 		{
-			filename = "__PavementDriveAssist__/graphics/shortcuts/pda-24px-white.png",
+			filename = "__PavementDriveAssistContinued__/graphics/shortcuts/pda-24px-white.png",
 			priority = "extra-high-no-scale",
 			size = 24,
 			scale = 1,

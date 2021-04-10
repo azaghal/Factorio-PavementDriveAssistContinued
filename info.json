@@ -1,10 +1,13 @@
 {
-  "name": "PavementDriveAssist",
-  "version": "2.2.0",
-  "title": "Pavement Drive Assist",
-  "author": "Arcitos",
-  "homepage": "",
-  "description": "Introduces a driver assistance system that autonomously follows paved roads, while maintaining a preset cruise speed if desired.",
-  "factorio_version": "0.18",
-  "dependencies": ["?AsphaltRoads"]
+    "name": "PavementDriveAssistContinued",
+    "version": "2.2.0",
+    "title": "Pavement Drive Assist Continued",
+    "author": "azaghal",
+    "homepage": "https://github.com/azaghal/Factorio-PavementDriveAssistContinued",
+    "description": "Introduces a driver assistance system that autonomously follows paved roads, while maintaining a preset cruise speed if desired.",
+    "factorio_version": "0.18",
+    "dependencies": [
+        "? AsphaltRoads",
+        "! PavementDriveAssist"
+    ]
 }

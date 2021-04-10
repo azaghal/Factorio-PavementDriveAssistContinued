@@ -3,7 +3,7 @@ data:extend(
     {
         type = "technology",
         name = "Arci-pavement-drive-assistant",
-        icon = "__PavementDriveAssist__/graphics/technology/tech-pda.png",
+        icon = "__PavementDriveAssistContinued__/graphics/technology/tech-pda.png",
         icon_size = 128,
         prerequisites = {"automobilism"},
         unit =
@@ -32,7 +32,7 @@ data:extend(
     {
         type = "technology",
         name = "Arci-smart-road",
-        icon = "__PavementDriveAssist__/graphics/technology/smart-road.png",
+        icon = "__PavementDriveAssistContinued__/graphics/technology/smart-road.png",
         icon_size = 128,
         prerequisites = {"Arci-pavement-drive-assistant", "robotics", "laser", "circuit-network"},
         unit =

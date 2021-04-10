@@ -1,6 +1,6 @@
 local function void_activity_led_sprite()
     return {
-        filename = "__PavementDriveAssist__/graphics/sound/dummy.png",
+        filename = "__PavementDriveAssistContinued__/graphics/sound/dummy.png",
         width = 1,
         height = 1,
         frame_count = 1,
@@ -38,7 +38,7 @@ data:extend({
 {
     type = "constant-combinator",
     name = "pda-road-sign-speed-limit",
-    icon = "__PavementDriveAssist__/graphics/icons/icon_speed_limit.png",
+    icon = "__PavementDriveAssistContinued__/graphics/icons/icon_speed_limit.png",
     icon_size = 32,
     flags = {"placeable-neutral", "player-creation", "not-on-map", "placeable-off-grid"},
     minable = {hardness = 0.2, mining_time = 1.0, result = "pda-road-sign-speed-limit"},
@@ -68,7 +68,7 @@ data:extend({
     {
       north =
       {
-        filename = "__PavementDriveAssist__/graphics/entity/road-sign-speed-limit-n.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-n.png",
         width = 64,
         height = 64,
         frame_count = 1,
@@ -76,7 +76,7 @@ data:extend({
       },
       east =
       {
-        filename = "__PavementDriveAssist__/graphics/entity/road-sign-speed-limit-e.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-e.png",
         width = 64,
         height = 64,
         frame_count = 1,
@@ -84,7 +84,7 @@ data:extend({
       },
       south =
       {
-        filename = "__PavementDriveAssist__/graphics/entity/road-sign-speed-limit-s.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-s.png",
         width = 64,
         height = 64,
         frame_count = 1,
@@ -92,7 +92,7 @@ data:extend({
       },
       west =
       {
-        filename = "__PavementDriveAssist__/graphics/entity/road-sign-speed-limit-w.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-w.png",
         width = 64,
         height = 64,
         frame_count = 1,
@@ -146,7 +146,7 @@ data:extend({
 {
     type = "constant-combinator",
     name = "pda-road-sign-speed-unlimit",
-    icon = "__PavementDriveAssist__/graphics/icons/icon_speed_unlimit.png",
+    icon = "__PavementDriveAssistContinued__/graphics/icons/icon_speed_unlimit.png",
     icon_size = 32,
     flags = {"placeable-neutral", "player-creation", "not-on-map", "placeable-off-grid"},
     minable = {hardness = 0.2, mining_time = 1.0, result = "pda-road-sign-speed-limit"},
@@ -176,7 +176,7 @@ data:extend({
     {
       north =
       {
-        filename = "__PavementDriveAssist__/graphics/entity/road-sign-speed-unlimit-n.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-n.png",
         width = 64,
         height = 64,
         frame_count = 1,
@@ -184,7 +184,7 @@ data:extend({
       },
       east =
       {
-        filename = "__PavementDriveAssist__/graphics/entity/road-sign-speed-unlimit-e.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-e.png",
         width = 64,
         height = 64,
         frame_count = 1,
@@ -192,7 +192,7 @@ data:extend({
       },
       south =
       {
-        filename = "__PavementDriveAssist__/graphics/entity/road-sign-speed-unlimit-n.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-n.png",
         width = 64,
         height = 64,
         frame_count = 1,
@@ -200,7 +200,7 @@ data:extend({
       },
       west =
       {
-        filename = "__PavementDriveAssist__/graphics/entity/road-sign-speed-unlimit-e.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-e.png",
         width = 64,
         height = 64,
         frame_count = 1,
@@ -248,7 +248,7 @@ vehicleSensor.item_slot_count = 4
 vehicleSensor.sprites = {
     north =
     {
-      filename = "__PavementDriveAssist__/graphics/entity/road-sensor-n.png",
+      filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-n.png",
       width = 96,
       height = 96,
       frame_count = 1,
@@ -256,7 +256,7 @@ vehicleSensor.sprites = {
       hr_version =
       {
         scale = 0.5,
-        filename = "__PavementDriveAssist__/graphics/entity/hr-road-sensor-n.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-n.png",
         width = 192,
         height = 192,
         frame_count = 1,
@@ -265,7 +265,7 @@ vehicleSensor.sprites = {
     },
     east =
     {
-      filename = "__PavementDriveAssist__/graphics/entity/road-sensor-e.png",
+      filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-e.png",
       width = 96,
       height = 96,
       frame_count = 1,
@@ -273,7 +273,7 @@ vehicleSensor.sprites = {
       hr_version =
       {
         scale = 0.5,
-        filename = "__PavementDriveAssist__/graphics/entity/hr-road-sensor-e.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-e.png",
         width = 192,
         height = 192,
         frame_count = 1,
@@ -282,7 +282,7 @@ vehicleSensor.sprites = {
     },
     west =
     {
-      filename = "__PavementDriveAssist__/graphics/entity/road-sensor-w.png",
+      filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-w.png",
       width = 96,
       height = 96,
       frame_count = 1,
@@ -290,7 +290,7 @@ vehicleSensor.sprites = {
       hr_version =
       {
         scale = 0.5,
-        filename = "__PavementDriveAssist__/graphics/entity/hr-road-sensor-w.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-w.png",
         width = 192,
         height = 192,
         frame_count = 1,
@@ -299,7 +299,7 @@ vehicleSensor.sprites = {
     },
     south =
     {
-      filename = "__PavementDriveAssist__/graphics/entity/road-sensor-s.png",
+      filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-s.png",
       width = 96,
       height = 96,
       frame_count = 1,
@@ -307,7 +307,7 @@ vehicleSensor.sprites = {
       hr_version =
       {
         scale = 0.5,
-        filename = "__PavementDriveAssist__/graphics/entity/hr-road-sensor-s.png",
+        filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-s.png",
         width = 192,
         height = 192,
         frame_count = 1,
@@ -341,10 +341,10 @@ vehicleSensor.circuit_wire_connection_points = {
 local road_sign_stop = table.deepcopy(data.raw["constant-combinator"]["pda-road-sign-speed-limit"])
 road_sign_stop.name = "pda-road-sign-stop"
 road_sign_stop.minable.result = "pda-road-sign-stop"
-road_sign_stop.sprites.north.filename = "__PavementDriveAssist__/graphics/entity/road-sign-stop-n.png"
-road_sign_stop.sprites.east.filename = "__PavementDriveAssist__/graphics/entity/road-sign-stop-e.png"
-road_sign_stop.sprites.south.filename = "__PavementDriveAssist__/graphics/entity/road-sign-stop-s.png"
-road_sign_stop.sprites.west.filename = "__PavementDriveAssist__/graphics/entity/road-sign-stop-w.png"
+road_sign_stop.sprites.north.filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-stop-n.png"
+road_sign_stop.sprites.east.filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-stop-e.png"
+road_sign_stop.sprites.south.filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-stop-s.png"
+road_sign_stop.sprites.west.filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-stop-w.png"
 
 data:extend({
     vehicleSensor,
