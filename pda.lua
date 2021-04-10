@@ -1,5 +1,6 @@
--- Copyright (2019) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly.
--- Provided under MIT license. See license.txt for details.
+-- Copyright (c) 2016 sillyfly
+-- Copyright (c) 2019 Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly.
+-- Provided under MIT license. See LICENSE for details.
 
 require "modgui"
 require "config"
@@ -228,13 +229,13 @@ end
 -- some (including this) mod was modified, added or removed from the game
 function pda.on_configuration_changed(data)
     init_global()
-    if data.mod_changes ~= nil and data.mod_changes["PavementDriveAssist"] ~= nil and data.mod_changes["PavementDriveAssist"].old_version == nil then
+    if data.mod_changes ~= nil and data.mod_changes["PavementDriveAssistContinued"] ~= nil and data.mod_changes["PavementDriveAssistContinued"].old_version == nil then
         -- anounce installation
-        notification({"DA-notification-midgame-update", {"DA-prefix"}, data.mod_changes["PavementDriveAssist"].new_version})
-    elseif data.mod_changes ~= nil and data.mod_changes["PavementDriveAssist"] ~= nil and data.mod_changes["PavementDriveAssist"].old_version ~= nil then
+        notification({"DA-notification-midgame-update", {"DA-prefix"}, data.mod_changes["PavementDriveAssistContinued"].new_version})
+    elseif data.mod_changes ~= nil and data.mod_changes["PavementDriveAssistContinued"] ~= nil and data.mod_changes["PavementDriveAssistContinued"].old_version ~= nil then
         -- anounce update
-        local oldver = data.mod_changes["PavementDriveAssist"].old_version
-        local newver = data.mod_changes["PavementDriveAssist"].new_version
+        local oldver = data.mod_changes["PavementDriveAssistContinued"].old_version
+        local newver = data.mod_changes["PavementDriveAssistContinued"].new_version
         notification({"DA-notification-new-version", {"DA-prefix"}, oldver, newver})
         -- 2.1.2 update
         for index, force in pairs(game.forces) do
@@ -317,7 +318,7 @@ function pda.set_cruise_control_limit(event)
                 PDA_Modgui.create_cc_limit_gui(player)
                 -- if cruise control is active, load the current limit
                 if global.cruise_control[player.index] == true then
-                    player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = mpt_to_kmph(global.cruise_control_limit[player.index])
+                    player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = tostring(mpt_to_kmph(global.cruise_control_limit[player.index]))
                 else
                     player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = ""
                 end
@@ -601,7 +602,7 @@ local function register_to_road_sensor(sign, player_index, velocity)
             end
         end
     else
-        for _, s in pairs(signals.parameters.parameters) do
+        for _, s in pairs(signals.parameters) do
             if find[s.signal.name] then
                 found[s.signal.name] = s.count
                 find[s.signal.name] = false
@@ -725,7 +726,7 @@ local function update_road_sensor_data(sign_uid)
             end
         end
     else
-        for _, s in pairs(signals.parameters.parameters) do
+        for _, s in pairs(signals.parameters) do
             if find[s.signal.name] then
                 found[s.signal.name] = s.count
                 find[s.signal.name] = false
@@ -1074,18 +1075,19 @@ function pda.on_placed_sign(event)
                 if p ~= nil then
                     limit = game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value
                 end
-                e.get_or_create_control_behavior().parameters = {parameters={{index = 1, count = limit, signal = {type="virtual", name="signal-L"}}}}
+                e.get_or_create_control_behavior().parameters = {{index = 1, count = limit, signal = {type="virtual", name="signal-L"}}}
             end
         elseif e.name == "pda-road-sensor" then
             create_sign_logic_table(e)
             local limit = p ~= nil and game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value or settings.global["PDA-setting-server-limit-sign-speed"].value
             local params = e.get_or_create_control_behavior().parameters
-            e.get_or_create_control_behavior().parameters = {parameters={
-                {index = 1, count = 0, signal = {type="virtual", name="signal-V"}},
-                {index = 2, count = (params.parameters[2].signal.name == "signal-C" and params.parameters[2].count) or -1, signal = {type="virtual", name="signal-C"}},
-                {index = 3, count = (params.parameters[3].signal.name == "signal-S" and params.parameters[3].count) or 0, signal = {type="virtual", name="signal-S"}},
-                {index = 4, count = (params.parameters[4].signal.name == "signal-L" and params.parameters[4].count) or limit, signal = {type="virtual", name="signal-L"}}
-            }}
+            e.get_or_create_control_behavior().parameters =
+                {
+                    {index = 1, count = 0, signal = {type="virtual", name="signal-V"}},
+                    {index = 2, count = (params[2].signal.name == "signal-C" and params[2].count) or -1, signal = {type="virtual", name="signal-C"}},
+                    {index = 3, count = (params[3].signal.name == "signal-S" and params[3].count) or 0, signal = {type="virtual", name="signal-S"}},
+                    {index = 4, count = (params[4].signal.name == "signal-L" and params[4].count) or limit, signal = {type="virtual", name="signal-L"}}
+                }
         end
     end
 end

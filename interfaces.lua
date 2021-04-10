@@ -1,5 +1,7 @@
--- Copyright (2017) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly.
--- Provided under MIT license. See license.txt for details.
+-- Copyright (c) 2016 sillyfly
+-- Copyright (c) 2017 Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly.
+-- Provided under MIT license. See LICENSE for details.
+
 -- This is the interface script.
 
 require "pda"
