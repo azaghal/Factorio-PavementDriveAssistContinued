@@ -1,5 +1,6 @@
 -- Copyright (c) 2016 sillyfly
 -- Copyright (c) 2019 Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly.
+-- Copyright (c) 2021 Branko Majic
 -- Provided under MIT license. See LICENSE for details.
 
 require "modgui"
@@ -229,13 +230,13 @@ end
 -- some (including this) mod was modified, added or removed from the game
 function pda.on_configuration_changed(data)
     init_global()
-    if data.mod_changes ~= nil and data.mod_changes["PavementDriveAssistContinued"] ~= nil and data.mod_changes["PavementDriveAssistContinued"].old_version == nil then
+    if data.mod_changes ~= nil and data.mod_changes["PavementDriveAssist"] ~= nil and data.mod_changes["PavementDriveAssist"].old_version == nil then
         -- anounce installation
-        notification({"DA-notification-midgame-update", {"DA-prefix"}, data.mod_changes["PavementDriveAssistContinued"].new_version})
-    elseif data.mod_changes ~= nil and data.mod_changes["PavementDriveAssistContinued"] ~= nil and data.mod_changes["PavementDriveAssistContinued"].old_version ~= nil then
+        notification({"DA-notification-midgame-update", {"DA-prefix"}, data.mod_changes["PavementDriveAssist"].new_version})
+    elseif data.mod_changes ~= nil and data.mod_changes["PavementDriveAssist"] ~= nil and data.mod_changes["PavementDriveAssist"].old_version ~= nil then
         -- anounce update
-        local oldver = data.mod_changes["PavementDriveAssistContinued"].old_version
-        local newver = data.mod_changes["PavementDriveAssistContinued"].new_version
+        local oldver = data.mod_changes["PavementDriveAssist"].old_version
+        local newver = data.mod_changes["PavementDriveAssist"].new_version
         notification({"DA-notification-new-version", {"DA-prefix"}, oldver, newver})
         -- 2.1.2 update
         for index, force in pairs(game.forces) do
