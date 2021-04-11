@@ -1,4 +1,4 @@
--- Copyright (2017) Arcitos, based on work of sillyfly. Provided under MIT license. See license.txt for details. 
+-- Copyright (2018) Arcitos, based on work of sillyfly. Provided under MIT license. See license.txt for details. 
 
 -- ###  ADVANCED SETTINGS  ###
 
@@ -31,16 +31,20 @@ hs_length_extension = 2
 scores = {
 	-- These are the tiles in the base game. Vehicles will try to avoid hazard zones.
 	["stone-path"] = 0.5, ["concrete"] = 1, 
+    ["refined-concrete"] = 1.25,
     ["hazard-concrete-left"] = 0.2, ["hazard-concrete-right"] = 0.2,
+    ["refined-hazard-concrete-right"] = 0.3, ["refined-hazard-concrete-right"] = 0.3,
+
     -- "Asphalt Roads" mod tiles. Vehicles will try to not cross lane marking tiles and avoid red hazard zones.
-    ["Arci-asphalt"] = 1.25, 
-    ["Arci-asphalt-hazard-white-left"] = 1.25, ["Arci-asphalt-hazard-white-right"] = 1.25, 
-    ["Arci-asphalt-hazard-yellow-left"] = 1.25, ["Arci-asphalt-hazard-yellow-right"] = 1.25, 
+    ["Arci-asphalt"] = 1.5, 
+    ["Arci-asphalt-hazard-white-left"] = 1.5, ["Arci-asphalt-hazard-white-right"] = 1.5, 
+    ["Arci-asphalt-hazard-yellow-left"] = 1.5, ["Arci-asphalt-hazard-yellow-right"] = 1.5, 
     ["Arci-asphalt-hazard-red-left"] = -0.25, ["Arci-asphalt-hazard-red-right"] = -0.25, 
-    ["Arci-asphalt-hazard-blue-left"] = 1.25, ["Arci-asphalt-hazard-blue-right"] = 1.25, 
-    ["Arci-asphalt-hazard-green-left"] = 1.25, ["Arci-asphalt-hazard-green-right"] = 1.25, 
-    ["Arci-asphalt-zebra-crossing-horizontal"] = 1.25, ["Arci-asphalt-zebra-crossing-vertical"] = 1.25,     
-    ["Arci-asphalt-triangle-white-up"] = 1.25, ["Arci-asphalt-triangle-white-left"] = 1.25, ["Arci-asphalt-triangle-white-down"] = 1.25, ["Arci-asphalt-triangle-white-right"] = 1.25,
+    ["Arci-asphalt-hazard-blue-left"] = 1.5, ["Arci-asphalt-hazard-blue-right"] = 1.5, 
+    ["Arci-asphalt-hazard-green-left"] = 1.5, ["Arci-asphalt-hazard-green-right"] = 1.5, 
+    ["Arci-asphalt-zebra-crossing-horizontal"] = 1.5, ["Arci-asphalt-zebra-crossing-vertical"] = 1.5,     
+    ["Arci-asphalt-triangle-white-up"] = 1.5, ["Arci-asphalt-triangle-white-left"] = 1.5, 
+    ["Arci-asphalt-triangle-white-down"] = 1.5, ["Arci-asphalt-triangle-white-right"] = 1.5,
 
     ["Arci-marking-white-straight-vertical"] = 0.4,    ["Arci-marking-white-diagonal-right"] = 0.4,
     ["Arci-marking-white-straight-horizontal"] = 0.4,  ["Arci-marking-white-diagonal-left"] = 0.4,
@@ -89,7 +93,7 @@ scores = {
     ["diamond-plate"] = 0.5, ["rusty-metal"] = 0.5, ["rusty-grate"] = 0.5, 
     ["arrow-grate"] = 1.25, ["arrow-grate-left"] = 1.25, ["arrow-grate-right"] = 1.25, 
     ["arrow-grate-down"] = 1.25, ["circuit-floor"] = 0.5, ["gravel"] = 0.4, 
-    ["asphalt"] = 1.25, ["alien-metal"] = 0.5, ["metal-scraps"] = 0.5, 
+    ["asphalt"] = 1.5, ["alien-metal"] = 0.5, ["metal-scraps"] = 0.5, 
     ["hexagonb"] = 0.5, ["fast-arrow-grate"] = 1.25, ["fast-arrow-grate-left"] = 1.25,
     ["fast-arrow-grate-right"] = 1.25, ["fast-arrow-grate-down"] = 1.25, ["express-arrow-grate"] = 1.25,
     ["express-arrow-grate-left"] = 1.25, ["express-arrow-grate-right"] = 1.25, ["express-arrow-grate-down"] = 1.25,

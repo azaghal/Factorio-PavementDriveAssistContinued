@@ -123,6 +123,13 @@ If you like this mod and you've created a translation of your own, please do not
 
 ### Changelog
 
+  2.1.6 (2018-03-03)
+
+- Added tile detection support for refined concrete and refined hazard concrete
+- Fixed a crash that occurred if a player crossed a speed limit sign without first setting a cruise control limit
+- Fixed the faulty speed limit sign behavior: Signs will now only be read if the player has cruise control activated. 
+- Fixed an error that occurred whenever other mods tried to insert dummy characters (without a player index) into vehicles. 
+
   2.1.5 (2018-01-03)
 
 - Fixed issue with inactive driving assistant in multiplayer

@@ -1,4 +1,4 @@
--- Copyright (2017) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
+-- Copyright (2018) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
 -- Provided under MIT license. See license.txt for details. 
 
 require "math"
@@ -79,40 +79,42 @@ function pda.on_player_driving_changed_state(event)
     -- if player.vehicle ~= nil and player.vehicle.valid and    player.vehicle.get_driver() == player then
 
     local player = game.players[event.player_index]
-    -- put player at last position in list of players in vehicles
-    -- conditions: 
-    -- 1: player is within a vehicle
-    -- 2: the vehicle is a valid entity
-    -- 3: the entered vehicle is of type "car"
-    -- 4: the vehicle is not blacklisted
-    -- 5: the player ist the driver of the vehicle (the return value of "get_driver()" is double checked for type "LuaEntity" and type "LuaPlayer" respectively)
-    if (player.vehicle ~= nil) and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil and (player.vehicle.get_driver() == player or player.vehicle.get_driver().player == player) then 
-        -- insert player (or multiple instances of the same player, if benchmark_level > 1) in list
-        for i = 1, benchmark_level do
-            table.insert(global.players_in_vehicles, player.index)
-        end
-    else
-        -- remove player from list. 
-        for i=#global.players_in_vehicles, 1, -1 do
-            if global.players_in_vehicles[i] == player.index then
-                -- reset emergency brake state and scores (e.g. if the vehicle got destroyed, its no longer necessary)
-                global.emergency_brake_active[player.index] = false
-                global.last_score[player.index] = 0
-                table.remove(global.players_in_vehicles, i)                
+    if player ~= nil then
+        -- put player at last position in list of players in vehicles
+        -- conditions: 
+        -- 1: player is within a vehicle
+        -- 2: the vehicle is a valid entity
+        -- 3: the entered vehicle is of type "car"
+        -- 4: the vehicle is not blacklisted
+        -- 5: the player ist the driver of the vehicle (the return value of "get_driver()" is double checked for type "LuaEntity" and type "LuaPlayer" respectively)
+        if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil and (player.vehicle.get_driver() == player or player.vehicle.get_driver().player == player) then 
+            -- insert player (or multiple instances of the same player, if benchmark_level > 1) in list
+            for i = 1, benchmark_level do
+                table.insert(global.players_in_vehicles, player.index)
             end
-        end
-        -- reset emergency brake
-        global.emergency_brake_active[event.player_index] = false
-    end
-    if #global.players_in_vehicles > 0 then
-        if debug then
-            for i=1, #global.players_in_vehicles, 1 do
-                notification(tostring(i..".: Player index"..global.players_in_vehicles[i].." ("..game.players[players_in_vehicles[i]].name..")"))
+        else
+            -- remove player from list. 
+            for i=#global.players_in_vehicles, 1, -1 do
+                if global.players_in_vehicles[i] == player.index then
+                    -- reset emergency brake state and scores (e.g. if the vehicle got destroyed, its no longer necessary)
+                    global.emergency_brake_active[player.index] = false
+                    global.last_score[player.index] = 0
+                    table.remove(global.players_in_vehicles, i)                
+                end
             end
+            -- reset emergency brake
+            global.emergency_brake_active[event.player_index] = false
         end
-    else
-        if debug then
-            notification("List empty.")
+        if #global.players_in_vehicles > 0 then
+            if debug then
+                for i=1, #global.players_in_vehicles, 1 do
+                    notification(tostring(i..".: Player index"..global.players_in_vehicles[i].." ("..game.players[players_in_vehicles[i]].name..")"))
+                end
+            end
+        else
+            if debug then
+                notification("List empty.")
+            end
         end
     end
 end
@@ -309,45 +311,47 @@ local function manage_drive_assistant(index)
         end
         
         -- sign detection
-        if game.surfaces[player.surface.index].count_entities_filtered{area = {{px-1, py-1},{px+1, py+1}}, type="constant-combinator"} > 0 then
-            local sign_scanner = game.surfaces[player.surface.index].find_entities_filtered{area = {{px-1, py-1},{px+1, py+1}}, type="constant-combinator"}             
-            for i = 1, #sign_scanner do
-                -- speed limit sign
-                if sign_scanner[i].name == "pda-road-sign-speed-limit" then                    
-                    local sign = sign_scanner[i].get_or_create_control_behavior()
-                    local network = nil
-                    local sign_value = 0
-                    -- wire priority: red wire > green wire > not connected
-                    -- signal priority: lexicographic order (0,1,2,...,9,A,B,C,... ,Y,Z)
-                    -- the signal of the sign itself is part of its circuit networks! Additional signals of the same type on this networks will be cummulated (e.g. a "L=60" on the sign and a signal "L=30" on the red network will add up to "L=90")
-                    network_red = sign.get_circuit_network(defines.wire_type.red)
-                    network_green = sign.get_circuit_network(defines.wire_type.green)
-                    -- 1st: check if a red wire is connected (with >=1 signals, including the one of the sign itself)
-                    if network_red ~= nil and network_red.signals ~= nil and #network_red.signals > 0 then
-                        local networksignal = network_red.signals[1]   
-                        if networksignal.signal ~= nil then sign_value = networksignal.count end
-                    -- 2nd: if there is no res wire, check if a green wire is connected (with >=1 signals, including the one of the sign itself)
-                    elseif network_green ~= nil and network_green.signals ~= nil and #network_green.signals > 0 then
-                        local networksignal = network_green.signals[1]   
-                        if networksignal.signal ~= nil then sign_value = networksignal.count end
-                    -- 3rd: if the sign is not connected to any circuit network, read its own signal
-                    elseif sign.get_signal(1).signal ~= nil then
-                        local localsignal = sign.get_signal(1)
-                        if localsignal.signal ~= nil then sign_value = localsignal.count end
-                    end
-                    -- read signal value only if a signal is set       
-                    if sign_value ~= 0 then
-                        global.imposed_speed_limit[index] = kmph_to_mpt(sign_value)
-                        if car.speed > global.imposed_speed_limit[index] then
-                            -- activate brake to deccelerate the vehicle
-                            global.cruise_control_brake_active[index] = true
+        if global.cruise_control[index] then
+            if game.surfaces[player.surface.index].count_entities_filtered{area = {{px-1, py-1},{px+1, py+1}}, type="constant-combinator"} > 0 then
+                local sign_scanner = game.surfaces[player.surface.index].find_entities_filtered{area = {{px-1, py-1},{px+1, py+1}}, type="constant-combinator"}             
+                for i = 1, #sign_scanner do
+                    -- speed limit sign
+                    if sign_scanner[i].name == "pda-road-sign-speed-limit" then                    
+                        local sign = sign_scanner[i].get_or_create_control_behavior()
+                        local network = nil
+                        local sign_value = 0
+                        -- wire priority: red wire > green wire > not connected
+                        -- signal priority: lexicographic order (0,1,2,...,9,A,B,C,... ,Y,Z)
+                        -- the signal of the sign itself is part of its circuit networks! Additional signals of the same type on this networks will be cummulated (e.g. a "L=60" on the sign and a signal "L=30" on the red network will add up to "L=90")
+                        network_red = sign.get_circuit_network(defines.wire_type.red)
+                        network_green = sign.get_circuit_network(defines.wire_type.green)
+                        -- 1st: check if a red wire is connected (with >=1 signals, including the one of the sign itself)
+                        if network_red ~= nil and network_red.signals ~= nil and #network_red.signals > 0 then
+                            local networksignal = network_red.signals[1]   
+                            if networksignal.signal ~= nil then sign_value = networksignal.count end
+                        -- 2nd: if there is no res wire, check if a green wire is connected (with >=1 signals, including the one of the sign itself)
+                        elseif network_green ~= nil and network_green.signals ~= nil and #network_green.signals > 0 then
+                            local networksignal = network_green.signals[1]   
+                            if networksignal.signal ~= nil then sign_value = networksignal.count end
+                        -- 3rd: if the sign is not connected to any circuit network, read its own signal
+                        elseif sign.get_signal(1).signal ~= nil then
+                            local localsignal = sign.get_signal(1)
+                            if localsignal.signal ~= nil then sign_value = localsignal.count end
                         end
+                        -- read signal value only if a signal is set       
+                        if --[[(sign_value ~= nil) and]] sign_value ~= 0 then
+                            global.imposed_speed_limit[index] = kmph_to_mpt(sign_value)
+                            if car.speed > global.imposed_speed_limit[index] then
+                                -- activate brake to deccelerate the vehicle
+                                global.cruise_control_brake_active[index] = true
+                            end
+                        end
+                        return
+                    -- unlimit sign
+                    elseif sign_scanner[i].name == "pda-road-sign-speed-unlimit" then
+                        global.imposed_speed_limit[index] = nil
+                        return
                     end
-                    return
-                -- unlimit sign
-                elseif sign_scanner[i].name == "pda-road-sign-speed-unlimit" then
-                    global.imposed_speed_limit[index] = nil
-                    return
                 end
             end
         end
