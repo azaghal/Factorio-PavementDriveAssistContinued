@@ -76,7 +76,7 @@ data:extend({
         type = "bool-setting",
         name = "PDA-setting-alt-toggle-mode",
         setting_type = "runtime-per-user",
-        default_value = false,
+        default_value = true,
         order = "c",        
     },
     {

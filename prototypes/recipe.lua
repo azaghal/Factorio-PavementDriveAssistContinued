@@ -20,4 +20,24 @@ data:extend({
         },
         result = "pda-road-sign-speed-unlimit"
     },
+    {
+        type = "recipe",
+        name = "pda-road-sign-stop",
+        enabled = false,
+        ingredients =
+        {
+            {"pda-road-sign-speed-limit", 1},
+        },
+        result = "pda-road-sign-stop"
+    },
+    {
+        type = "recipe",
+        name = "pda-road-sensor",
+        enabled = false,
+        ingredients =
+        {
+            {"pda-road-sign-speed-limit", 1},
+        },
+        result = "pda-road-sensor"
+    },
 })

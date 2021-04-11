@@ -2,30 +2,35 @@
 
 -- ###  ADVANCED SETTINGS  ###
 
+Config = {}
+
 -- Vehicles that will not be supported by the driving assistant. This is tested against the name of the vehicle. All other vehicles will be supported.
 -- example: {["car"] = false, ["tank"] = false}
-vehicle_blacklist = {}
+Config.vehicle_blacklist = {}
 
 -- How many tiles ahead of location to start looking. Remember that most vehicles are 2x2, so this should be 1-2 preferably.
-lookahead_start = 2
+Config.lookahead_start = 2
 
 -- How many tiles ahead to look at. Setting this too larger values may cause lags, but increases precision.
-lookahead_length = 4
+Config.lookahead_length = 4
 
 -- Angle to look for tiles on each side. 1/24 (= 360/24 = 15 degrees) seems to work nicely. 
-lookangle = 1/24
+Config.lookangle = 1/24
 
 -- Use 1/64 angles for better sprite orientation (@GotLag).
-changeangle = 1/64
+Config.changeangle = 1/64
+
+-- Maximum turning rate per scan. Multiplied with tick rate. WIP
+-- Config.max_changeangle = 1/128
 
 -- Straight lookahead eccentricity (to avoid driving on the edge of a paved path)
-eccent = 1
+Config.eccent = 1
 
 -- Adds to lookahead_start if vehicle is in highspeed mode.
-hs_start_extension = 1
+Config.hs_start_extension = 1
 
 -- Adds to lookahead_length if vehicle is in highspeed mode.
-hs_length_extension = 2
+Config.hs_length_extension = 2
 
 local scores_values = {
 	asphalt = settings.global["PDA-tileset-score-asphalt"].value,
@@ -34,14 +39,13 @@ local scores_values = {
 	stone = settings.global["PDA-tileset-score-stone"].value,
 	gravel = settings.global["PDA-tileset-score-gravel"].value,
 	wood = settings.global["PDA-tileset-score-wood"].value,
-	road_lines = settings.global["PDA-tileset-score-asphalt-road-lines"].value
+    road_lines = settings.global["PDA-tileset-score-asphalt-road-lines"].value,
+    --avoid_this = -0.4  -- not supported at this time
 }
-
-config = {}
 
 local scores = {}
 
-function config.set_scores()
+function Config.set_scores()
 scores = {
 	-- Score for each tile type. Tiles not included will be given zero score. Negative scores: try to avoid this type of tile. 
 	-- If you want to customize/override the tile scores, just replace the value/scores_value reference
@@ -52,7 +56,7 @@ scores = {
     ["refined-concrete"] = scores_values.ref_concrete,
     ["hazard-concrete-left"] = scores_values.concrete,
 	["hazard-concrete-right"] = scores_values.concrete,
-    ["refined-hazard-concrete-right"] = scores_values.ref_concrete, 
+    ["refined-hazard-concrete-left"] = scores_values.ref_concrete, 
 	["refined-hazard-concrete-right"] = scores_values.ref_concrete,
 
     -- "Asphalt Roads" mod tiles. Vehicles will try to not cross lane marking tiles and avoid red hazard zones.
@@ -235,18 +239,22 @@ scores = {
 	["decal4"] = scores_values.concrete, 
 	
 	-- the following are tile from angels smelting
-	["clay-bricks"] = scores_values.stone,
+    ["clay-bricks"] = scores_values.stone,
+    
+    -- Krastorio 2
+    ["kr-white-reinforced-plate"] = scores_values.asphalt,
+    ["kr-dark-reinforced-plate"] = scores_values.asphalt
 }
 end
 
-function config.get_scores()
+function Config.get_scores()
 	if #scores == 0 then
-		config.set_scores()
+		Config.set_scores()
 	end
 	return scores
 end
 
-function config.update_scores()
+function Config.update_scores()
 	scores_values = {
 		asphalt = settings.global["PDA-tileset-score-asphalt"].value,
 		ref_concrete = settings.global["PDA-tileset-score-refined-concrete"].value,
@@ -256,17 +264,17 @@ function config.update_scores()
 		wood = settings.global["PDA-tileset-score-wood"].value,
 		road_lines = settings.global["PDA-tileset-score-asphalt-road-lines"].value
 	}
-	config.set_scores()
+	Config.set_scores()
 	return scores
 end
 
 -- List of mods that are incompatible to pavement drive assist and will cause mod deactivation.
-mod_incompatibility_list = {}
+Config.mod_incompatibility_list = {}
 
 -- This variable determines the number of players inserted into the player_in_vehicle list if a vehicle is entered. Set this to more than 1 to simulate multiple players at once, useful for testing how many players your server is able to support until severe FPS-drops emerge. 
-benchmark_level = 1
+Config.benchmark_level = 1
 
 -- Debugging flag. Setting to true will spam your console with debugging messages. 
-debug = false
+Config.debug = false
 
-return config
+return Config

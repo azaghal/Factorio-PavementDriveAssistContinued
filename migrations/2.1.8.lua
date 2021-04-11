@@ -1,2 +1,2 @@
 --require("__PavementDriveAssist__.config");
-global.scores = config.get_scores()
+global.scores = Config.get_scores()

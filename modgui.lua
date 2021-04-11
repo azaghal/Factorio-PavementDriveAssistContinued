@@ -2,10 +2,10 @@
 -- Provided under MIT license. See license.txt for details. 
 -- This is the gui design script. The design was heavily inspired by @GotLag's "Renamer".
 
-modgui = {}
+PDA_Modgui = {}
 
-function modgui.create_cc_limit_gui(player)
-    frame = player.gui.center.add
+function PDA_Modgui.create_cc_limit_gui(player)
+    local frame = player.gui.center.add
     {
         type="frame",
         name="pda_cc_limit_gui_frame",

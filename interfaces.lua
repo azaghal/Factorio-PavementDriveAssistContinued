@@ -26,6 +26,7 @@ end
 
 function pda_interface.set_cruise_control_limit(id, limit)
     local player = game.players[id]
+    local hard_speed_limit = global.hard_speed_limit
     if tonumber(limit) ~= nil then
         if limit < 0 then 
             limit = -limit 

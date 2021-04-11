@@ -1,4 +1,22 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 02. 05. 2020
+  Major Features:
+    - Updated for Factorio 0.18.x
+  Features:
+    - Added stop sign: This sign stops player controlled vehicles almost instantly, unless a road sensor commands otherwise
+    - Added road sensor: This sign takes over control of your vehicle and commands it to stop or start at following stop signs. This allows automated railroad crossings.
+    - Added smart road tech: This tech unlocks all traffic signs
+    - Added tile detection support for Krastorio 2 tiles: Reinforced plates are treated as "asphalt" level tiles
+  Changes:
+    - Drive assistand tech is cheaper and much earlier available but does no longer unlock speed limit signs which were moved to the new smart road tech
+    - Code optimisations: reduced calculation time by 15%
+    - Alternative cruise control mode is now enabled by default
+  Bugfixes:
+    - Fixed wrong scanning direction for road departure warning if vehicle is standing still  
+    - Fixed that road departure warning is audible for other players 
+    - Fixed wrong tile detection score for vanilla refined hazard concrete left
+---------------------------------------------------------------------------------------------------
 Version: 2.1.11
 Date: 24. 07. 2019
   Bugfixes:

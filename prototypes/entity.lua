@@ -34,7 +34,7 @@ local function void_circuit_wire_connection_point(direction)
     }
 end
 
-data:extend({  
+data:extend({
 {
     type = "constant-combinator",
     name = "pda-road-sign-speed-limit",
@@ -124,23 +124,23 @@ data:extend({
     },
     circuit_wire_connection_points =
     {
-        {   
+        {
             shadow = { red = {-0.15, -0.75}, green = {0.15, -0.75}, }, 
             wire = { red = {-0.15, -0.75},  green = {0.15, -0.75}, },
         },
-        {   
+        {
             shadow = { red = {0.95, -0.12}, green = {0.95, 0.12}, }, 
             wire = { red = {0.95, -0.12},  green = {0.95, 0.12}, },
         },
-        {   
+        {
             shadow = { red = {0.15, 0.75}, green = {-0.15, 0.75}, }, 
             wire = { red = {0.15, 0.75},  green = {-0.15, 0.75}, },
-        },        
-        {   
+        },
+        {
             shadow = { red = {-0.95, 0.12}, green = {-0.95, -0.12}, }, 
             wire = { red = {-0.95, 0.12},  green = {-0.95, -0.12}, },
-        }             
-    },    
+        }
+    },
     circuit_wire_max_distance = 9
 },
 {
@@ -240,4 +240,113 @@ data:extend({
     circuit_wire_max_distance = 0
 
 }
-})  
+})
+local vehicleSensor = table.deepcopy(data.raw["constant-combinator"]["pda-road-sign-speed-unlimit"])
+vehicleSensor.name = "pda-road-sensor"
+vehicleSensor.minable.result = "pda-road-sensor"
+vehicleSensor.item_slot_count = 4
+vehicleSensor.sprites = {
+    north =
+    {
+      filename = "__PavementDriveAssist__/graphics/entity/road-sensor-n.png",
+      width = 96,
+      height = 96,
+      frame_count = 1,
+      shift = {0, 0},
+      hr_version =
+      {
+        scale = 0.5,
+        filename = "__PavementDriveAssist__/graphics/entity/hr-road-sensor-n.png",
+        width = 192,
+        height = 192,
+        frame_count = 1,
+        shift = {0, 0}
+      }
+    },
+    east =
+    {
+      filename = "__PavementDriveAssist__/graphics/entity/road-sensor-e.png",
+      width = 96,
+      height = 96,
+      frame_count = 1,
+      shift = {0, 0},
+      hr_version =
+      {
+        scale = 0.5,
+        filename = "__PavementDriveAssist__/graphics/entity/hr-road-sensor-e.png",
+        width = 192,
+        height = 192,
+        frame_count = 1,
+        shift = {0, 0}
+      }
+    },
+    west =
+    {
+      filename = "__PavementDriveAssist__/graphics/entity/road-sensor-w.png",
+      width = 96,
+      height = 96,
+      frame_count = 1,
+      shift = {0, 0},
+      hr_version =
+      {
+        scale = 0.5,
+        filename = "__PavementDriveAssist__/graphics/entity/hr-road-sensor-w.png",
+        width = 192,
+        height = 192,
+        frame_count = 1,
+        shift = {0, 0}
+      }
+    },
+    south =
+    {
+      filename = "__PavementDriveAssist__/graphics/entity/road-sensor-s.png",
+      width = 96,
+      height = 96,
+      frame_count = 1,
+      shift = {0, 0},
+      hr_version =
+      {
+        scale = 0.5,
+        filename = "__PavementDriveAssist__/graphics/entity/hr-road-sensor-s.png",
+        width = 192,
+        height = 192,
+        frame_count = 1,
+        shift = {0, 0}
+      }
+    }
+}
+vehicleSensor.collision_box = {{-1.4, -1.4}, {1.4, 1.4}}
+vehicleSensor.selection_box = {{-1.3, -1.3}, {1.3, 1.3}}
+vehicleSensor.circuit_wire_max_distance = 9
+vehicleSensor.circuit_wire_connection_points = {
+        {
+            shadow = { red = {-0.15, -1.2}, green = {0.15, -1.2}, },
+            wire = { red = {-0.15, -1.2},  green = {0.15, -1.2}, },
+        },
+        {
+            shadow = { red = {1.4, -0.12}, green = {1.4, 0.12}, },
+            wire = { red = {1.4, -0.12},  green = {1.4, 0.12}, },
+        },
+        {
+            shadow = { red = {0.15, 1.2}, green = {-0.15, 1.2}, },
+            wire = { red = {0.15, 1.2},  green = {-0.15, 1.2}, },
+        },
+        {
+            shadow = { red = {-1.4, 0.12}, green = {-1.4, -0.12}, },
+            wire = { red = {-1.4, 0.12},  green = {-1.4, -0.12}, },
+        }
+    }
+
+
+local road_sign_stop = table.deepcopy(data.raw["constant-combinator"]["pda-road-sign-speed-limit"])
+road_sign_stop.name = "pda-road-sign-stop"
+road_sign_stop.minable.result = "pda-road-sign-stop"
+road_sign_stop.sprites.north.filename = "__PavementDriveAssist__/graphics/entity/road-sign-stop-n.png"
+road_sign_stop.sprites.east.filename = "__PavementDriveAssist__/graphics/entity/road-sign-stop-e.png"
+road_sign_stop.sprites.south.filename = "__PavementDriveAssist__/graphics/entity/road-sign-stop-s.png"
+road_sign_stop.sprites.west.filename = "__PavementDriveAssist__/graphics/entity/road-sign-stop-w.png"
+
+data:extend({
+    vehicleSensor,
+    road_sign_stop
+})

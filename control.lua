@@ -1,4 +1,4 @@
--- Copyright (2019) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
+-- Copyright (2020) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
 -- Provided under MIT license. See license.txt for details. 
 -- This is the control script. For configuration options see config.lua.
 
@@ -65,8 +65,12 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 end)
 
 -- if an sign is placed by the player or a robot
-script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity}, function(event)
+script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity, defines.events.script_raised_built}, function(event)
     pda.on_placed_sign(event)
+end)
+
+script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_entity, defines.events.on_robot_mined_entity, defines.events.script_raised_destroy}, function(event)
+    pda.on_sign_removed(event)
 end)
 
 -- if a shortcut button is pressed
