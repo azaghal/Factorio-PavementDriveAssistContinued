@@ -1,9 +1,9 @@
 {
   "name": "PavementDriveAssist",
-  "version": "0.0.5",
+  "version": "2.0.0",
   "title": "Pavement Drive Assist",
-  "author": "sillyfly",
-  "contact": "Factorio forums.",
-  "homepage": "https://forums.factorio.com/viewtopic.php?f=92&t=21680",
-  "description": "Assits in driving on paved roads"
+  "author": "Arcitos, based on work of sillyfly",
+  "homepage": "",
+  "description": "Introduces a driver assistance system that autonomously follows paved roads, while maintaining a preset cruise speed if desired.",
+  "factorio_version": "0.14"
 }

@@ -1,0 +1,96 @@
+# Pavement Drive Assist 2
+---
+## Introduction
+
+*The nearly forgotten original from sillyfly, now available in a vastly improved version for 0.14+.*
+
+
+**Pavement Drive Assist**
+
+"PDA" is a helper mod dedicated to your vehicle's health and to improve survival rates of all structures surrounding your roads. No more unintentional crashing into chemical complexes or destruction of valuable chests! But this mod adds a lot more stuff for a whole new driving experience! 
+
+The idea for this was first implemented in "Pavement Drive Assist" made by sillyfly, but this mod was unfortunately never updated to work with Factorio 0.13+. So i took action and redesigned it around the excellent scanning routine from sillifly. Beside this i've added some other stuff i thought that might be useful. I hope you'll enjoy it!
+
+**Effects on gameplay**
+
+This mod will increase the importance of proper roads as it will allow you to cross kilometres of land on roads, while doing nothing more than pressing "forward"! If this is still to much (maybe because your left middle finger starts to ache), then simply set up cruise control and the vehicle will accelerate on its own to maintain its speed. At this point your remaining task is to press "left" or "right" at junctions or to brake the vehicle if needed. Spend your travel time doing useful stuff like exploring your production statistics or managing trains. Autonomous driving has reached Factorio!
+
+## Details
+
+### Main features
+
+- **The "Driving Assistant"**: It will automatically keep your vehicle on paved roads (if the road bends not to sharply)! The assistant scans all tiles in front of the vehicle and changes the orientation to follow tiles with a "pavement" score. Driving in left or right direction will override the assistant, so that you'll be allways able to leave roads or to choose your desired direction at junctions. Toggle the driving assistant by pressing **[K]** (key binding is customisable).
+
+![](https://mods-data.factorio.com/pub_data/media_files/TgWGJJDLNvtg.png)
+
+![](https://mods-data.factorio.com/pub_data/media_files/phTyjp8EZqLp.png)
+
+- **Config your primary road tile**: PDA tries to follow the tiles with the highest score. By default this is concrete (or asphalt, if "[Asphalt Roads](https://mods.factorio.com/mods/Arcitos/AsphaltRoads "Asphalt Roads")" or "[More Floors](https://mods.factorio.com/mods/Tone/More_Floors)" are present), but if you use stone as your primary tile, just set the stats in the config file accordingly and everything will work fine for you too. Beside the vanilla tiles for stone, concrete and hazard concrete some other mod tiles are supported too. If you want to add additional tiles, just put their name and a value into the scores field found in the config file. 
+
+![](https://mods-data.factorio.com/pub_data/media_files/ODCCqrp58rpE.png)
+
+- **Cruise control**: Set up a cruising speed by pressing **[L]** (also customisable). Great for long travel, safety zones, parking lots or for cars that will otherwise reach uncontrollable speeds. Press the respective key again to disable it. In order to ensure maximum safety, braking will always override cruise control and if the car is stopped or is moving backwards, the system will be temporarily inactive.  
+
+![](https://mods-data.factorio.com/pub_data/media_files/qULH1DuszZR7.png)
+
+###Additional features:###
+
+- **Highspeed support**: If your vehicle reaches speeds over 110 kmph (customisable in config file) the "path finder" will increase its search area in front of your vehicle, allowing safe ride for speeds up to 350 kmph. It is highly recommended to design your roads with appropriate curve radii before traveling with speeds of this magnitude!
+- **Native mod support**: All kinds of vehicles are supported if they are valid "car"-type entities.
+- **Blacklist vehicles**: Set up a custom list of vehicles you dont want to be supported.
+- **Global speed limit**: Limit the speed ridable cars can reach in your game (singleplayer and multiplayer).
+- **Optimised code for multiplayer**: You are running a huge server? That's not an issue: The main routine causes almost zero load as long as noone is driving, and up to 10 players are able to drive simultaneously at any given time without causing any serious lags! But i bet your machines will support much more than my ancient laptop was able to: My benchmark tests with 25 simulated players driving at 130 km/h and active cruise control resulted in an 10 FPS drop. 
+- **Fine-tune CPU usage**: You are always free to reduce the tick rate of the driving assistant or to disable cruise control if you experience load issues (just take a look at the config file). On the other hand: If your CPU is bored, you're also able to increase the precision (to 60 scans per second), while effectively doubling the load.
+
+
+
+**Supported tilesets:**
+
+
+- [Asphalt Roads](https://mods.factorio.com/mods/Arcitos/AsphaltRoads "Asphalt Roads"): This mod was specifically designed to work with Pavement Drive Assist. Asphalt is preconfigured as the primary road tile and vehicles will try to avoid crossing lane marking tiles (separated roads will therefore allow safe two-way traffic).
+
+![](https://mods-data.factorio.com/pub_data/media_files/Q9HQ73wjeaOQ.png)
+
+**Additional support for**:
+
+- [Color-coding concrete floors](https://mods.factorio.com/mods/justarandomgeek/color-coding) 
+
+- [5Dims concrete floors](https://mods.factorio.com/mods/McGuten/5dim_decoration) 
+
+- [Tones "More Floors"](https://mods.factorio.com/mods/Tone/More_Floors) 
+
+**Technology**
+
+Required technology is called **Driver assistance systems** and needs **Robotics, Lasers and Automobilism** as prerequisites. If you want to use the features without researching the tech beforehand, set "technology_required" in the config file to "false".
+
+**Incompatible mods:**
+
+Due to the nature of this mod, other mods that alter the orientation of vehicles are incompatible to PDA. A very good example for this would be ["Vehicle Snap"](https://mods.factorio.com/mods/Zaflis/VehicleSnap). As long as incompatible mods are present, PDA wont execute any actions.
+
+
+### Current language support
+
+- EN (English)
+- DE (German)
+
+If you like this mod and you've created a translation of your own, please do not hesitate to send it to me, so that it can be made accessible to all in the next version. Thanks in advance!
+
+---
+
+### Changelog
+  2.0.0 (2017-01-13)
+
+initial release of version 2:
+
+- New feature: Toggle driving assistant
+- New feature: Cruise control (can be disabled in config)
+- New feature: High-speed support for driving assistant
+- New feature: Support for all modded vehicles
+- New feature: Option for server-wide speed limit
+- New feature: Load balancing: Option to reduce tick rate to decrease the load
+- Change: car whitelist is now a car blacklist
+- improved check routine for valid car types
+- lots of code optimisations
+
+pre 2.0.0:  all credit to sillyfly!
+
