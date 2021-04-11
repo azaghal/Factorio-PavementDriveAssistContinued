@@ -97,6 +97,8 @@ function pda.on_player_driving_changed_state(event)
 				for i = 1, benchmark_level do
 				-- ... then insert player (or multiple instances of the same player, if benchmark_level > 1) in list
 					table.insert(global.players_in_vehicles, p_id)
+					player.set_shortcut_available("pda-cruise-control-toggle", true)
+					player.set_shortcut_available("pda-drive-assistant-toggle", true)
 				end
 			end
 		else
@@ -106,7 +108,9 @@ function pda.on_player_driving_changed_state(event)
 					-- reset emergency brake state and scores (e.g. if the vehicle got destroyed, its no longer necessary)
 					global.emergency_brake_active[p_id] = false
 					global.last_score[p_id] = 0
-					table.remove(global.players_in_vehicles, i)                
+					table.remove(global.players_in_vehicles, i)           
+					player.set_shortcut_available("pda-cruise-control-toggle", false)
+					player.set_shortcut_available("pda-drive-assistant-toggle", false)					
 				end
 			end
 			-- reset emergency brake
@@ -168,6 +172,7 @@ function pda.toggle_cruise_control(event)
         if settings.global["PDA-setting-allow-cruise-control"].value then
             if (global.cruise_control[event.player_index] == nil or global.cruise_control[event.player_index] == false) then
                 global.cruise_control[event.player_index] = true
+				player.set_shortcut_toggled("pda-cruise-control-toggle", true)
                 -- set cruise control speed limit, but do not, if alt toggle mode active
                 if global.cruise_control_limit[event.player_index] == nil or player.mod_settings["PDA-setting-alt-toggle-mode"].value == false then
                     global.cruise_control_limit[event.player_index] = player.vehicle.speed                    
@@ -186,6 +191,7 @@ function pda.toggle_cruise_control(event)
                 end                
             else
                 global.cruise_control[event.player_index] = false
+				player.set_shortcut_toggled("pda-cruise-control-toggle", false)
                 global.cruise_control_brake_active[event.player_index] = false 
                 -- discard the imposed speed limit
                 global.imposed_speed_limit[player.index] = nil
@@ -215,6 +221,8 @@ function pda.set_cruise_control_limit(event)
                 else
                     player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = ""
                 end
+				player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.select_all()
+				player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.focus()
             else
                 player.gui.center.pda_cc_limit_gui_frame.destroy()
             end
@@ -222,38 +230,68 @@ function pda.set_cruise_control_limit(event)
     end
 end
 
--- handle gui interaction
+-- set a new value for cruise control
+function pda.set_new_value_for_cruise_control_limit(event)
+	local player = game.players[event.player_index]    
+    local hard_speed_limit = global.hard_speed_limit
+	-- check if input is a valid number
+	if tonumber(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text) ~= nil then        
+		global.cruise_control_limit[player.index] = kmph_to_mpt(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text)
+		-- check for negative values
+		if global.cruise_control_limit[player.index] < 0 then
+			global.cruise_control_limit[player.index] = -global.cruise_control_limit[player.index]
+		end
+		-- set value to max speed limit, if active
+		if (hard_speed_limit > 0) and (global.cruise_control_limit[player.index] > hard_speed_limit) then
+			global.cruise_control_limit[player.index] = hard_speed_limit
+		elseif global.cruise_control_limit[player.index] > (299792458 / 60) then 
+			-- FTL travel on planetary surfaces should be avoided:
+			global.cruise_control_limit[player.index] = 299792458 / 60
+		end
+		global.cruise_control[player.index] = true
+		player.set_shortcut_toggled("pda-cruise-control-toggle", true)
+		-- check, if the player is sitting in a vehicle and changed the cc limit below the velocity of the car
+		if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil and player.vehicle.speed > global.cruise_control_limit[event.player_index] then
+			global.cruise_control_brake_active[event.player_index] = true
+		end
+		if player.mod_settings["PDA-setting-verbose"].value then 
+			player.print({"DA-cruise-control-active", mpt_to_kmph(global.cruise_control_limit[player.index])})
+		end
+	end
+end
+
+-- handle gui interaction: player pressed "Return"-key
+function pda.set_cruise_control_limit_ok(event)
+	local player = game.players[event.player_index]  
+	if player.gui.center.pda_cc_limit_gui_frame then
+		pda.set_new_value_for_cruise_control_limit(event)
+		player.gui.center.pda_cc_limit_gui_frame.destroy()
+	end
+end
+
+-- handle gui interaction: player clicked on a button
 function pda.on_gui_click(event)
     local player = game.players[event.player_index]    
-    local hard_speed_limit = global.hard_speed_limit
-    if event.element.name == "pda_cc_limit_gui_close" then
-        player.gui.center.pda_cc_limit_gui_frame.destroy()
-    elseif event.element.name == "pda_cc_limit_gui_confirm" then
-        -- check if input is a valid number
-        if tonumber(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text) ~= nil then        
-            global.cruise_control_limit[player.index] = kmph_to_mpt(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text)
-            -- check for negative values
-            if global.cruise_control_limit[player.index] < 0 then
-                global.cruise_control_limit[player.index] = -global.cruise_control_limit[player.index]
-            end
-            -- set value to max speed limit, if active
-            if (hard_speed_limit > 0) and (global.cruise_control_limit[player.index] > hard_speed_limit) then
-                global.cruise_control_limit[player.index] = hard_speed_limit
-            elseif global.cruise_control_limit[player.index] > (299792458 / 60) then 
-                -- FTL travel on planetary surfaces should be avoided:
-                global.cruise_control_limit[player.index] = 299792458 / 60
-            end
-            global.cruise_control[player.index] = true
-            -- check, if the player is sitting in a vehicle and changed the cc limit below the velocity of the car
-            if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil and player.vehicle.speed > global.cruise_control_limit[event.player_index] then
-                global.cruise_control_brake_active[event.player_index] = true
-            end
-            if player.mod_settings["PDA-setting-verbose"].value then 
-                player.print({"DA-cruise-control-active", mpt_to_kmph(global.cruise_control_limit[player.index])})
-            end
-        end
-        player.gui.center.pda_cc_limit_gui_frame.destroy()
-    end
+	if player.gui.center.pda_cc_limit_gui_frame then
+		if event.element.name == "pda_cc_limit_gui_close" then
+			player.gui.center.pda_cc_limit_gui_frame.destroy()
+		elseif event.element.name == "pda_cc_limit_gui_confirm" then
+			pda.set_new_value_for_cruise_control_limit(event)
+			player.gui.center.pda_cc_limit_gui_frame.destroy()
+		end
+	end
+end
+
+-- shortcuts
+function pda.on_lua_shortcut(event)
+	local shortcut = event.prototype_name
+	if shortcut == "pda-cruise-control-toggle" then
+		pda.toggle_cruise_control(event)
+	elseif shortcut == "pda-drive-assistant-toggle" then
+		pda.toggle_drive_assistant(event)
+	elseif shortcut == "pda-set-cruise-control-limit" then
+		pda.set_cruise_control_limit(event)
+	end
 end
 
 -- if the player presses the respective key, this event is fired to toggle the current state of the driving assistant
@@ -268,6 +306,8 @@ function pda.toggle_drive_assistant(event)
                     player.print({"DA-vehicle-blacklisted"})
                 else
                     drvassist = true
+
+					player.set_shortcut_toggled("pda-drive-assistant-toggle", true)
                     if player.mod_settings["PDA-setting-verbose"].value then 
                         player.print({"DA-drive-assistant-active"})
                     end
@@ -275,6 +315,9 @@ function pda.toggle_drive_assistant(event)
             end
         else
             drvassist = false
+			global.emergency_brake_active[player.index] = false
+			global.last_score[player.index] = 0
+			player.set_shortcut_toggled("pda-drive-assistant-toggle", false)
             if player.mod_settings["PDA-setting-verbose"].value then
                 player.print({"DA-drive-assistant-inactive"})
             end
@@ -426,9 +469,9 @@ local function manage_drive_assistant(index)
 		global.last_score[index] = ts
         
         -- set new direction depending on the scores (@sillyfly)
-		if sr > ss and sr > sl then
+		if sr > ss and sr > sl and (sr + ss) > 0 then
 			newdir = dir + (changeangle*sr*2)/(sr+ss)
-		elseif sl > ss and sl > sr then
+		elseif sl > ss and sl > sr and (sl + ss) > 0 then
 			newdir = dir - (changeangle*sl*2)/(sl+ss)
 		else
            newdir = dir

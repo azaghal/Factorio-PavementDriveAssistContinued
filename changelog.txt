@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.9
+Date: 17. 03. 2019
+  Features:
+    - Added shortcuts for toggle drive assist, toggle cruise control and set cruise control limit
+    - Improved GUI for setting cruise control limit
+  Bugfixes:
+    - Fixed rare crash that occured if tile scores for the right/left and center part of the scanned area in front of the vehicle are both nonzero, but zero in sum.
+    - Fixed migration error on start of a scenario or the campaign
+    - Fixed unnecessary emergency brake activation if drive assist is activated off-roads while "last-score" being greater than zero
+---------------------------------------------------------------------------------------------------
 Version: 2.1.8
 Date: 10. 03. 2019
   Features:

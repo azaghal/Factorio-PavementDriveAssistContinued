@@ -5,6 +5,7 @@ require("prototypes.sounds")
 require("prototypes.entity")
 require("prototypes.items")
 require("prototypes.recipe")
+require("prototypes.shortcuts")
 
 data:extend({
     {
@@ -25,6 +26,12 @@ data:extend({
         key_sequence = "CONTROL + O",
         consuming = "all"
     },
+	{
+		type = "custom-input",
+		name = "set_cruise_control_limit_ok",
+		key_sequence = "RETURN",
+		consuming = "none"
+	},
     {
         type = "font",
         name = "Arci-pda-font",

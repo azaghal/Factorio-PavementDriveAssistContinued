@@ -28,6 +28,12 @@ script.on_event("set_cruise_control_limit", function(event)
     pda.set_cruise_control_limit(event)
 end)
 
+-- if the player presses the return key, this event is fired to set the current cruise control limit
+script.on_event("set_cruise_control_limit_ok", function(event)
+    pda.set_cruise_control_limit_ok(event)
+end)
+
+
 -- handle gui interaction
 script.on_event(defines.events.on_gui_click, function(event)
     pda.on_gui_click(event)
@@ -59,13 +65,14 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 end)
 
 -- if an sign is placed by the player or a robot
-script.on_event(defines.events.on_built_entity, function(event)
-    pda.on_placed_sign(event)
-end)
-script.on_event(defines.events.on_robot_built_entity, function(event)
+script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity}, function(event)
     pda.on_placed_sign(event)
 end)
 
+-- if a shortcut button is pressed
+script.on_event(defines.events.on_lua_shortcut, function(event)
+	pda.on_lua_shortcut(event)
+end)
 
 -- Main routine
 script.on_event(defines.events.on_tick, function(event)
