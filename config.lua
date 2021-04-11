@@ -1,34 +1,10 @@
--- Copyright (2017) Arcitos, based on the work of sillyfly. Provided under MIT license. See license.txt for details. 
+-- Copyright (2017) Arcitos, based on work of sillyfly. Provided under MIT license. See license.txt for details. 
 
--- ###  CONTROL SETTINGS  ###
-
--- Messaging flag. Setting to true will announce changes of the state of the drive assistant or cruise control (activated/deactivated) to the console
-verbose = true
-
--- Sound flag. As long as this is "true" there will be playes a short warning sound if the player's vehicle left paved ground (indicating a dead end or an unintended failure of the PDA). If set so false, the warning will be printed to console.
-alert = true
-
--- Technology flag. Default setting is true. Set this to false if you want drive assistant and cruise control to work without researching the technology at first. 
-technology_required = true
+-- ###  ADVANCED SETTINGS  ###
 
 -- Vehicles that will not be supported by the driving assistant. This is tested against the name of the vehicle. All other vehicles will be supported.
 -- example: {["car"] = false, ["tank"] = false}
 vehicle_blacklist = {}
-
--- This variable determines the amount of ticks for one driving assist scan. Default is "2", meaning there are 30 scans per second (60/2)
--- Set this value to 1 if you want maximum precision (and an extra amount (+100%) of load, as the event will be fired on every tick). Set it to 3 or higher to reduce the load on your CPU, at the cost of decreased precision. Setting this to very high values (> 4) will make the driving assistant increasingly sluggish and finally useless at higher speeds. 
-driving_assistant_tickrate = 2
-
--- This flag determines if any player is allowed to use cruise control on their ride. If you experience significant lags, switching this to "false" might save you circa 20% of the overall load created by this mod.
-cruise_control_allowed = true
-
--- Use this variable to set up a hard speed limit for all players and all rideable "car"-type vehicles (so trains will not be affected) in your game. This will also limit the load caused by the driving assistant, as higher speeds are generally more demanding in terms of CPU time. Values smaller or equal to zero will allow for unlimited speed. Speed is allways in tiles/tick. Multiply by 216 to get km/h. 
-hard_speed_limit = -1
-
--- ###  ADVANCED SETTINGS  ###
-
--- Minimum speed to start assisting in. 
-minspeed = 0.1
 
 -- How many tiles ahead of location to start looking. Remember that most vehicles are 2x2, so this should be 1-2 preferably.
 lookahead_start = 2
@@ -45,18 +21,11 @@ changeangle = 1/64
 -- Straight lookahead eccentricity (to avoid driving on the edge of a paved path)
 eccent = 1
 
--- If a vehicle is faster than this speed, the scanned area in front of the vehicle will be linearily increased.
-highspeed = 0.5
-
--- Adds to lookahead_start if vehicle is in highspeed-mode.
+-- Adds to lookahead_start if vehicle is in highspeed mode.
 hs_start_extension = 1
 
--- Adds to lookahead_length if vehicle is in highspeed-mode.
+-- Adds to lookahead_length if vehicle is in highspeed mode.
 hs_length_extension = 2
-
--- Vehicle will accelerate in cruise control mode if velocity falls below vehicle speed times minspeed_tolerance. 
--- Factor 1 leads to constant speed, factor of 0 means no minimum speed will be aplied at all.
-minspeed_tolerance = 1
 
 -- Score for each tile type. Tiles not included will be given zero score. Negative scores: try to avoid this type of tile. 
 scores = {
@@ -111,7 +80,7 @@ scores = {
 }
 
 -- List of mods that are incompatible to pavement drive assist and will cause mod deactivation.
-mod_incompatibility_list = {["VehicleSnap"] = true}
+mod_incompatibility_list = {}
 
 -- This variable determines the number of players inserted into the player_in_vehicle list if a vehicle is entered. Set this to more than 1 to simulate multiple players at once, useful for testing how many players your server is able to support until severe FPS-drops emerge. 
 benchmark_level = 1

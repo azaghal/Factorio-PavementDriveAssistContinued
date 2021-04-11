@@ -19,6 +19,7 @@ local function notification(txt, force)
     end
 end
 
+--[[ currently not necessary
 local function check_compatibility()
 -- check if any of the present mods matches a mod in the incompatibility list
     for mod, version in pairs(game.active_mods) do
@@ -27,8 +28,9 @@ local function check_compatibility()
         end
     end
     return true
-end
+end]]
 
+--[[ currently not necessary
 local function incompability_detected()
 -- prints out which incompatible mods have been detected
     for mod, version in pairs(game.active_mods) do
@@ -40,6 +42,16 @@ local function incompability_detected()
         end
     end
 end
+]]
+
+-- converts Factorios meter per tick to floored integer kilometer per hour (used for GUI interaction)
+local function mpt_to_kmph(mpt)
+    return math.floor(mpt * 60 * 60 * 60 / 1000 + 0.5)
+end
+
+local function kmph_to_mpt(kmph)
+    return ((kmph * 1000) / 60 / 60 / 60)
+end
 
 local function init_global()
 -- get or init persistent vars
@@ -50,10 +62,16 @@ local function init_global()
     global.players_in_vehicles = global.players_in_vehicles or {}
     global.offline_players_in_vehicles = global.offline_players_in_vehicles or {}
     global.playertick = global.playertick or 0
-    global.mod_compatibility = nil
+    --global.mod_compatibility = nil --currently not necessary
     global.last_score = global.last_score or {}
     --global.last_scan = global.last_scan or {{},{}}
     global.emergency_brake_active = global.emergency_brake_active or {}
+    global.cruise_control_brake_active = global.cruisce_control_brake_active or {}
+    update_settings()
+    global.min_speed = global.min_speed or kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value) or 0.1
+    global.hard_speed_limit = global.hard_speed_limit or kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value) or 0
+    global.highspeed = global.highspeed or kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value) or 0.5
+    global.driving_assistant_tickrate = global.driving_assistant_tickrate or settings.global["PDA-setting-tick-rate"].value or 2
 end
 
 -- fired if a player enters or leaves a vehicle
@@ -105,41 +123,44 @@ function pda.on_configuration_changed(data)
         notification({"DA-notification-new-version", {"DA-prefix"}, oldver, newver})
     elseif data.mod_changes ~= nil then
         -- some other mod was added, removed or modified. Check, if this mod is or was incompatible with PDA
-        global.mod_compatibility = check_compatibility()
+        --currently not necessary
+        --[[global.mod_compatibility = check_compatibility()
         if global.mod_compatibility == false then
             incompability_detected()
         end
+        ]]
     end
-end
-
--- converts Factorios meter per tick to floored integer kilometer per hour (used for GUI interaction)
-local function mpt_to_kmph(mpt)
-    return math.floor(mpt * 60 * 60 * 60 / 1000 + 0.5)
-end
-
-local function kmph_to_mpt(kmph)
-    return ((kmph * 1000) / 60 / 60 / 60)
 end
 
 -- if the player presses the respective key, this event is fired to toggle the current state of cruise control
 function pda.toggle_cruise_control(event)
     local player = game.players[event.player_index]
-    if (technology_required and player.force.technologies["Arci-pavement-drive-assistant"].researched or technology_required == false) and global.mod_compatibility then
-        if cruise_control_allowed then
-            if (global.cruise_control[event.player_index] == nil or global.cruise_control[event.player_index] == false) and player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil then 
+    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) and player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil --[[and global.mod_compatibility]] then
+        if settings.global["PDA-setting-allow-cruise-control"].value then
+            if (global.cruise_control[event.player_index] == nil or global.cruise_control[event.player_index] == false) then
                 global.cruise_control[event.player_index] = true
-                -- set cruise control speed limit
-                global.cruise_control_limit[event.player_index] = player.vehicle.speed
-                -- check for reverse gear
-                if player.vehicle.speed < 0 then
-                    global.cruise_control_limit[event.player_index] = -global.cruise_control_limit[event.player_index]
+                -- set cruise control speed limit, but do not, if alt toggle mode active
+                if global.cruise_control_limit[event.player_index] == nil or player.mod_settings["PDA-setting-alt-toggle-mode"].value == false then
+                    global.cruise_control_limit[event.player_index] = player.vehicle.speed                    
+                    -- check for reverse gear
+                    if player.vehicle.speed < 0 then
+                        global.cruise_control_limit[event.player_index] = -global.cruise_control_limit[event.player_index]
+                    end
+                else
+                    -- slow down the vehicle if the current speed is greater than the cc limit
+                    if player.vehicle.speed > global.cruise_control_limit[event.player_index] then
+                        global.cruise_control_brake_active[event.player_index] = true
+                    end
                 end
-                if verbose then 
+                if player.mod_settings["PDA-setting-verbose"].value then 
                     player.print({"DA-cruise-control-active", mpt_to_kmph(global.cruise_control_limit[event.player_index])})
-                end
+                end                
             else
                 global.cruise_control[event.player_index] = false
-                if verbose then
+                global.cruise_control_brake_active[event.player_index] = false 
+                -- reset riding_state to stop acceleration
+                game.players[event.player_index].riding_state = {acceleration = defines.riding.acceleration.nothing, direction = game.players[event.player_index].riding_state.direction}
+                if player.mod_settings["PDA-setting-verbose"].value then
                     player.print({"DA-cruise-control-inactive"})
                 end
             end
@@ -152,8 +173,8 @@ end
 -- if the player presses the respective key, this event is fired to show/set the current cruise control limit
 function pda.set_cruise_control_limit(event)
     local player = game.players[event.player_index]
-    if (technology_required and player.force.technologies["Arci-pavement-drive-assistant"].researched or technology_required == false) and global.mod_compatibility then
-        if cruise_control_allowed then
+    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) --[[and global.mod_compatibility]] then
+        if settings.global["PDA-setting-allow-cruise-control"].value then
             -- open the gui if its not already open, otherwise close it
             if not player.gui.center.pda_cc_limit_gui_frame then
                 modgui.create_cc_limit_gui(player)
@@ -173,6 +194,7 @@ end
 -- handle gui interaction
 function pda.on_gui_click(event)
     local player = game.players[event.player_index]    
+    local hard_speed_limit = global.hard_speed_limit
     if event.element.name == "pda_cc_limit_gui_close" then
         player.gui.center.pda_cc_limit_gui_frame.destroy()
     elseif event.element.name == "pda_cc_limit_gui_confirm" then
@@ -191,7 +213,11 @@ function pda.on_gui_click(event)
                 global.cruise_control_limit[player.index] = 299792458 / 60
             end
             global.cruise_control[player.index] = true
-            if verbose then 
+            -- check, if the player is sitting in a vehicle and changed the cc limit below the velocity of the car
+            if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil and player.vehicle.speed > global.cruise_control_limit[event.player_index] then
+                global.cruise_control_brake_active[event.player_index] = true
+            end
+            if player.mod_settings["PDA-setting-verbose"].value then 
                 player.print({"DA-cruise-control-active", mpt_to_kmph(global.cruise_control_limit[player.index])})
             end
         end
@@ -203,7 +229,7 @@ end
 function pda.toggle_drive_assistant(event)
     local player = game.players[event.player_index]
     local drvassist = global.drive_assistant[player.index]
-    if (technology_required and player.force.technologies["Arci-pavement-drive-assistant"].researched or technology_required == false) and global.mod_compatibility then 
+    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) --[[and global.mod_compatibility]] then 
         if (drvassist == nil or drvassist == false) then 
             -- check if the vehicle is blacklisted
             if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" then
@@ -211,14 +237,14 @@ function pda.toggle_drive_assistant(event)
                     player.print({"DA-vehicle-blacklisted"})
                 else
                     drvassist = true
-                    if verbose then 
+                    if player.mod_settings["PDA-setting-verbose"].value then 
                         player.print({"DA-drive-assistant-active"})
                     end
                 end
             end
         else
             drvassist = false
-            if verbose then
+            if player.mod_settings["PDA-setting-verbose"].value then
                 player.print({"DA-drive-assistant-inactive"})
             end
         end
@@ -229,7 +255,7 @@ end
 -- adjusts the orientation of the car the player is driving to follow paved tiles
 local function manage_drive_assistant(index)
     local player = game.players[index]
-	if player.riding_state.direction == defines.riding.direction.straight and math.abs(player.vehicle.speed) > minspeed then
+	if player.riding_state.direction == defines.riding.direction.straight and math.abs(player.vehicle.speed) > global.min_speed then
 		local car = player.vehicle
 		local dir = car.orientation
         local newdir = 0
@@ -256,8 +282,8 @@ local function manage_drive_assistant(index)
         local lookahead_start_hs = 0 
         local lookahead_length_hs = 0  
         
-        if car.speed > highspeed then 
-            local speed_factor = car.speed / highspeed
+        if car.speed > global.highspeed then 
+            local speed_factor = car.speed / global.highspeed
             lookahead_start_hs = math.floor (hs_start_extension * speed_factor + 0.5)
             lookahead_length_hs = math.floor (hs_length_extension * speed_factor + 0.5)
         end
@@ -308,9 +334,9 @@ local function manage_drive_assistant(index)
         
         if ts < ls and ts == 0 and not global.emergency_brake_active[index] then
             -- warn the player and activate emergency brake
-            if alert then
+            if player.mod_settings["PDA-setting-sound-alert"].value then
                 player.surface.create_entity({name = "pda-warning-1", position = player.position})
-            elseif verbose then
+            elseif player.mod_settings["PDA-setting-verbose"].value then
                 player.print({"DA-road-departure-warning"})                
             end
             player.riding_state = {acceleration = defines.riding.acceleration.braking, direction = player.riding_state.direction}
@@ -330,6 +356,7 @@ local function manage_drive_assistant(index)
         -- Snap car to nearest 1/64 to avoid oscillation (@GotLag)
 		car.orientation = math.floor(newdir * 64 + 0.5) / 64		
             
+        -- no score reset in curves -> allow the player to guide his vehicle off road manually
 	elseif player.riding_state.direction ~= defines.riding.direction.straight then
         global.last_score[index] = 0
     end
@@ -342,13 +369,14 @@ local function manage_cruise_control(index)
     local speed = player.vehicle.speed
 	if speed ~= 0 and player.riding_state.acceleration ~= defines.riding.acceleration.braking then
         if math.abs(speed) > global.cruise_control_limit[index] then
+            player.riding_state = {acceleration = defines.riding.acceleration.nothing, direction = player.riding_state.direction}
             if speed > 0 then
                 player.vehicle.speed = global.cruise_control_limit[index]
             -- check for reverse gear
             else
                 player.vehicle.speed = -global.cruise_control_limit[index]
             end
-        elseif speed > 0 and speed < global.cruise_control_limit[index] * minspeed_tolerance then
+        elseif speed > 0 and speed < global.cruise_control_limit[index] then
             player.riding_state = {acceleration = defines.riding.acceleration.accelerating, direction = player.riding_state.direction}
         end
     end
@@ -358,12 +386,12 @@ function pda.on_init(data)
 --script.on_init(function(data)
 -- on game start 
     init_global()    
-    if global.mod_compatibility == false then
+    --[[if global.mod_compatibility == false then
         incompability_detected()
-    end
+    end]]
     -- if no tech is needed, disable the tech for all forces
     for k, f in pairs (game.forces) do
-        f.technologies["Arci-pavement-drive-assistant"].enabled = technology_required
+        f.technologies["Arci-pavement-drive-assistant"].enabled = settings.global["PDA-setting-tech-required"].value
     end
 end
 
@@ -419,64 +447,78 @@ function pda.on_player_left_game(event)
     end
 end
 
+function update_settings()
+    global.min_speed = kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value)
+    global.hard_speed_limit = kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value)
+    global.highspeed = kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value)
+    global.driving_assistant_tickrate = settings.global["PDA-setting-tick-rate"].value
+end
+
 function pda.on_tick(event)
 --script.on_event(defines.events.on_tick, function(event)
 -- Main routine (remember the api and the "no heavy code in the on_tick event" advice? ^^) 
--- Proceed only if there aren't any incompatible mods
-    if global.mod_compatibility ~= nil and global.mod_compatibility == true then
-        -- Process every n-th player in vehicles (n = driving_assistant_tickrate)
-        -- Exception: Process "cruise control" every tick to gain maximum acceleration
-        local ptick = global.playertick
-        local pinvec = #global.players_in_vehicles
-        
-        if ptick < driving_assistant_tickrate then 
-            ptick = ptick + 1
-        else 
-            ptick = 1
-        end           
-        -- process cruise control, check for hard_speed_limit and emergency_brake_active (every tick)
-        for i=1, pinvec, 1 do
-            local p = global.players_in_vehicles[i]
-            -- if vehicle == nil don't process the player (i.e. if the character bound to the player changed)
-            if game.players[p].vehicle == nil then
-                return
-            end
-            if hard_speed_limit > 0 then
-            -- check if a vehicle is faster than the global speed limit
-                local speed = game.players[p].vehicle.speed
-                if speed > 0 and speed > hard_speed_limit then
-                    game.players[p].vehicle.speed = hard_speed_limit
-                elseif speed < 0 and speed < -hard_speed_limit then
-                -- reverse
-                    game.players[p].vehicle.speed = -hard_speed_limit
-                end
-            end
-            -- check if emergency brake is active
-            if global.emergency_brake_active[p] then
-                if game.players[p].riding_state.acceleration == (defines.riding.acceleration.accelerating) or game.players[p].vehicle.speed == 0 then
-                    global.emergency_brake_active[p] = false
-                else 
-                    game.players[p].riding_state = {acceleration = defines.riding.acceleration.braking, direction = game.players[p].riding_state.direction}
-                end
-            elseif cruise_control_allowed and global.cruise_control[p] then 
-                manage_cruise_control(p)
+    -- Process every n-th player in vehicles (n = driving_assistant_tickrate)
+    -- Exception: Process "cruise control" every tick to gain maximum acceleration
+    local ptick = global.playertick
+    local pinvec = #global.players_in_vehicles
+
+    if (event.tick % 128) == 0 then
+        update_settings()
+    end
+    
+    if ptick < global.driving_assistant_tickrate then 
+        ptick = ptick + 1
+    else 
+        ptick = 1
+    end         
+    
+    -- process cruise control, check for hard_speed_limit and emergency_brake_active (every tick)
+    for i=1, pinvec, 1 do
+        local hard_speed_limit = global.hard_speed_limit
+        local p = global.players_in_vehicles[i]
+        -- if vehicle == nil don't process the player (i.e. if the character bound to the player changed)
+        if game.players[p].vehicle == nil then
+            return
+        end
+        if hard_speed_limit > 0 then
+        -- check if a vehicle is faster than the global speed limit
+            local speed = game.players[p].vehicle.speed
+            if speed > 0 and speed > hard_speed_limit then
+                game.players[p].vehicle.speed = hard_speed_limit
+            elseif speed < 0 and speed < -hard_speed_limit then
+            -- reverse
+                game.players[p].vehicle.speed = -hard_speed_limit
             end
         end
-        -- process driving assistant (every "driving_assistant_tickrate" ticks)
-        for i=ptick, pinvec, driving_assistant_tickrate do
-            -- if vehicle == nil don't process the player
-            if game.players[global.players_in_vehicles[i]].vehicle == nil then
-                return
+        -- check if forced braking is active
+        if global.emergency_brake_active[p] then
+            if game.players[p].riding_state.acceleration == (defines.riding.acceleration.accelerating) or game.players[p].vehicle.speed == 0 then
+                global.emergency_brake_active[p] = false
+                game.players[p].riding_state = {acceleration = defines.riding.acceleration.nothing, direction = game.players[p].riding_state.direction}
+            else 
+                game.players[p].riding_state = {acceleration = defines.riding.acceleration.braking, direction = game.players[p].riding_state.direction}
             end
-            if (pinvec >= i) and global.drive_assistant[global.players_in_vehicles[i]] then
-                manage_drive_assistant(global.players_in_vehicles[i])
+        elseif global.cruise_control_brake_active[p] then
+            if game.players[p].vehicle.speed < global.cruise_control_limit[p] then
+                global.cruise_control_brake_active[p] = false
+                game.players[p].riding_state = {acceleration = defines.riding.acceleration.nothing, direction = game.players[p].riding_state.direction}
+            else 
+                game.players[p].riding_state = {acceleration = defines.riding.acceleration.braking, direction = game.players[p].riding_state.direction}
             end
-        end
-        global.playertick = ptick
-    elseif global.mod_compatibility == nil then 
-        global.mod_compatibility = check_compatibility()
-        if global.mod_compatibility == false then
-            incompability_detected()            
+        -- otherwise proceed to handle cruise control
+        elseif settings.global["PDA-setting-allow-cruise-control"].value and global.cruise_control[p] then 
+            manage_cruise_control(p)
         end
     end
+    -- process driving assistant (every "driving_assistant_tickrate" ticks)
+    for i=ptick, pinvec, global.driving_assistant_tickrate do
+        -- if vehicle == nil don't process the player
+        if game.players[global.players_in_vehicles[i]].vehicle == nil then
+            return
+        end
+        if (pinvec >= i) and global.drive_assistant[global.players_in_vehicles[i]] then
+            manage_drive_assistant(global.players_in_vehicles[i])
+        end
+    end
+    global.playertick = ptick
 end

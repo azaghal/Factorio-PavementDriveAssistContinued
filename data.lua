@@ -7,19 +7,19 @@ data:extend({
     {
         type = "custom-input",
         name = "toggle_drive_assistant",
-        key_sequence = "K",
+        key_sequence = "I",
         consuming = "all"
     },
     {
         type = "custom-input",
         name = "toggle_cruise_control",
-        key_sequence = "L",
+        key_sequence = "O",
         consuming = "all"
     },
     {
         type = "custom-input",
         name = "set_cruise_control_limit",
-        key_sequence = "CONTROL + L",
+        key_sequence = "CONTROL + O",
         consuming = "all"
     },
     {

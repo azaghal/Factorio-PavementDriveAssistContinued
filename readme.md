@@ -2,7 +2,7 @@
 ---
 ## Introduction
 
-*The nearly forgotten original from sillyfly, now available in a vastly improved version for 0.14+.*
+*The nearly forgotten original from sillyfly, now available in a vastly improved version.*
 
 
 **Pavement Drive Assist**
@@ -19,7 +19,7 @@ This mod will increase the importance of proper roads as it will allow you to cr
 
 ### Main features
 
-- **The "Driving Assistant"**: It will automatically keep your vehicle on paved roads (if the road bends not to sharply)! The assistant scans all tiles in front of the vehicle and changes the orientation to follow tiles with a "pavement" score. Driving in left or right direction will override the assistant, so that you'll be allways able to leave roads or to choose your desired direction at junctions. Toggle the driving assistant by pressing **[K]** (key binding is customisable).
+- **The "Driving Assistant"**: It will automatically keep your vehicle on paved roads (if the road bends not to sharply)! The assistant scans all tiles in front of the vehicle and changes the orientation to follow tiles with a "pavement" score. Driving in left or right direction will override the assistant, so that you'll be allways able to leave roads or to choose your desired direction at junctions. Toggle the driving assistant by pressing **[I]** (key binding is customisable).
 
 ![](https://mods-data.factorio.com/pub_data/media_files/jK4Cft0x6GC0.png)
 
@@ -29,18 +29,19 @@ This mod will increase the importance of proper roads as it will allow you to cr
 
 ![](https://mods-data.factorio.com/pub_data/media_files/ODCCqrp58rpE.png)
 
-- **Cruise control**: Set up a cruising speed by pressing **[L]** (also customisable). Great for long travel, safety zones, parking lots or for cars that will otherwise reach uncontrollable speeds. Press the respective key again to disable it. In order to ensure maximum safety, braking will always override cruise control and if the car is stopped or is moving backwards, the system will be temporarily inactive. If you want to directly set up a certain value for your speed limit, press **[CTRL+L]**. A small text field will pop up, where you'll be able to insert a new cruise control speed limit.
+- **Cruise control**: Set up a cruising speed by pressing **[O]** (also customisable). Great for long travel, safety zones, parking lots or for cars that will otherwise reach uncontrollable speeds. Press the respective key again to disable it. In order to ensure maximum safety, braking will always override cruise control and if the car is stopped or is moving backwards, the system will be temporarily inactive. If you want to directly set up a certain value for your speed limit, press **[CTRL+O]**. A small text field will pop up, where you'll be able to insert a new cruise control speed limit.
+- **Alternative cruise control toggle mode (new in 2.1.0)**: If this personal setting option is enabled, toggling cruise control (by pressing [O]) no longer sets a new speed limit and will just load the last valid value instead. 
 
 ![](https://mods-data.factorio.com/pub_data/media_files/qULH1DuszZR7.png)
 
 ###Additional features:###
 
 - **Road departure warning**: Warns you acoustically or via console output if your vehicle is leaving paved area, i.e. at a dead end or in very sharp curves. If the vehicle is not steered manually (by pressing "[W]") an emergency brake will be activated to stop the vehicle. 
-- **Highspeed support**: If your vehicle reaches speeds over 110 kmph (customisable in config file) the "path finder" will increase its search area in front of your vehicle, allowing safe ride for speeds up to 350 kmph. It is highly recommended to design your roads with appropriate curve radii before traveling with speeds of this magnitude!
+- **Highspeed support**: If your vehicle reaches speeds over 100 kmph (customisable in config file) the "path finder" will increase its search area in front of your vehicle, allowing safe ride for speeds up to 350 kmph. It is highly recommended to design your roads with appropriate curve radii before traveling with speeds of this magnitude!
 - **Native mod support**: All kinds of vehicles are supported if they are valid "car"-type entities.
 - **Blacklist vehicles**: Set up a custom list of vehicles you dont want to be supported.
 - **Global speed limit**: Limit the speed that rideable cars are able to reach in your game (works also in multiplayer)
-- **Optimised code for multiplayer**: You are running a huge server? That's not an issue: The main routine causes almost zero load as long as no one is driving, and up to 10 players are able to drive simultaneously at any given time without causing any serious lags! But i bet your machines will support much more than my ancient laptop was able to: My benchmark tests with 25 simulated players driving at 130 km/h and active cruise control resulted in an 10 FPS drop. 
+- **Optimised code for multiplayer**: You are running a huge server? That's not an issue: The main routine causes almost zero load as long as no one is driving, and up to 10 players are able to drive simultaneously at any given time without causing any serious lags! But i bet your machines will support much more than my ancient laptop was able to: My benchmark tests with 25 simulated players driving at 130 km/h and active cruise control resulted in an 10 UPS drop. 
 - **Fine-tune CPU usage**: You are always free to reduce the tick rate of the driving assistant or to disable cruise control if you experience load issues (just take a look at the config file). On the other hand: If your CPU is bored, you're also able to increase the precision (to 60 scans per second), while effectively doubling the load.
 
 
@@ -48,7 +49,7 @@ This mod will increase the importance of proper roads as it will allow you to cr
 **Supported tilesets:**
 
 
-- [Asphalt Roads](https://mods.factorio.com/mods/Arcitos/AsphaltRoads "Asphalt Roads"): This mod was specifically designed to work with Pavement Drive Assist. Asphalt is preconfigured as the primary road tile and vehicles will try to avoid crossing lane marking tiles (separated roads will therefore allow safe two-way traffic).
+- [Asphalt Roads](https://mods.factorio.com/mods/Arcitos/AsphaltRoads "Asphalt Roads"): This mod was specifically designed to work with Pavement Drive Assist. Asphalt is preconfigured as the primary road tile and vehicles will try to avoid crossing lane marking tiles (roads with separated lanes will therefore allow safe two-way traffic).
 
 ![](https://mods-data.factorio.com/pub_data/media_files/Q9HQ73wjeaOQ.png)
 
@@ -62,11 +63,11 @@ This mod will increase the importance of proper roads as it will allow you to cr
 
 **Technology**
 
-Required technology is called **Driver assistance systems** and needs **Robotics, Lasers and Automobilism** as prerequisites. If you want to use the features without researching the tech beforehand, set "technology_required" in the config file to "false".
+Required technology is called **Driver assistance systems** and needs **Robotics, Lasers and Automobilism** as prerequisites. If you want to use the features without researching the tech beforehand, set "Tech required" in the map settings tab to "false".
 
 **Incompatible mods:**
 
-Due to the nature of this mod, other mods that alter the orientation of vehicles are incompatible to PDA. A very good example for this would be ["Vehicle Snap"](https://mods.factorio.com/mods/Zaflis/VehicleSnap). As long as incompatible mods are present, PDA wont execute any actions.
+Since version 2.1.0 there are no incompatible mods anymore. ["Vehicle Snap"](https://mods.factorio.com/mods/Zaflis/VehicleSnap) does now work perfectly with PDA! Just disable it with the respective hotkey if you enter assisted driving mode.
 
 ### Interfaces
 To read/alter PDA's main variables call the following remote functions:
@@ -115,6 +116,17 @@ If you like this mod and you've created a translation of your own, please do not
 ---
 
 ### Changelog
+  2.1.0 (2017-05-12)
+
+- Updated to work with Factorio version 0.15.10
+- Changed default key binding: [K]->[I] and [L]/[CTRL+L]->[O]/[CTRL+O] 
+- Now fully compatible with Zaflis' "Vehicle Snap"
+- Almost all important settings are now using the new setting mechanics
+- New Feature: independent, personal settings
+- New Feature: Alternative toggle mode for cruise control 
+- Fixed: Applying/enabling a cruise control speed limit lower than the current vehicle speed will now lead to smooth deceleration instead of instant speed reduction. 
+
+
   2.0.3 (2017-02-17)
 
 - New feature: Set or change your cruise control speed limit by pressing [CTRL + L]
