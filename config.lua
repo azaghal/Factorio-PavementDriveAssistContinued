@@ -1,4 +1,4 @@
--- Copyright (2018) Arcitos, based on work of sillyfly. Provided under MIT license. See license.txt for details. 
+-- Copyright (2019) Arcitos, based on work of sillyfly. Provided under MIT license. See license.txt for details. 
 
 -- ###  ADVANCED SETTINGS  ###
 

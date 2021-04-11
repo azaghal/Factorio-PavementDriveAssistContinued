@@ -1,8 +1,7 @@
--- Copyright (2017) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
+-- Copyright (2019) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
 -- Provided under MIT license. See license.txt for details. 
 -- This is the control script. For configuration options see config.lua.
 
-require "math"
 require "config"
 require "modgui"
 require "interfaces"

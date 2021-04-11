@@ -1,7 +1,6 @@
 -- Copyright (2018) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
 -- Provided under MIT license. See license.txt for details. 
 
-require "math"
 require "modgui"
 require "config"
 
@@ -75,40 +74,51 @@ end
 
 -- fired if a player enters or leaves a vehicle
 function pda.on_player_driving_changed_state(event)
+	--log(serpent.block(global, {maxlevel= 4}))
     -- local player = game.players[event.player_index]
     -- if player.vehicle ~= nil and player.vehicle.valid and    player.vehicle.get_driver() == player then
-
-    local player = game.players[event.player_index]
+	local p_id = event.player_index
+    local player = game.players[p_id]
     if player ~= nil then
+		local car = player.vehicle
         -- put player at last position in list of players in vehicles
         -- conditions: 
-        -- 1: player is within a vehicle
-        -- 2: the vehicle is a valid entity
-        -- 3: the entered vehicle is of type "car"
-        -- 4: the vehicle is not blacklisted
+        -- 1: the event was triggerd by a real player
+        -- 2: the player is within a vehicle
+        -- 3: the vehicle is a valid entity
+        -- 4: the entered vehicle is of type "car"
         -- 5: the player ist the driver of the vehicle (the return value of "get_driver()" is double checked for type "LuaEntity" and type "LuaPlayer" respectively)
-        if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil and (player.vehicle.get_driver() == player or player.vehicle.get_driver().player == player) then 
-            -- insert player (or multiple instances of the same player, if benchmark_level > 1) in list
-            for i = 1, benchmark_level do
-                table.insert(global.players_in_vehicles, player.index)
-            end
-        else
-            -- remove player from list. 
-            for i=#global.players_in_vehicles, 1, -1 do
-                if global.players_in_vehicles[i] == player.index then
-                    -- reset emergency brake state and scores (e.g. if the vehicle got destroyed, its no longer necessary)
-                    global.emergency_brake_active[player.index] = false
-                    global.last_score[player.index] = 0
-                    table.remove(global.players_in_vehicles, i)                
-                end
-            end
-            -- reset emergency brake
-            global.emergency_brake_active[event.player_index] = false
-        end
+        if car ~= nil and car.valid and car.type == "car" and vehicle_blacklist[car.name] == nil then
+		-- if the player entered a valid car...
+			local driver = car.get_driver()
+			if driver ~= nil and (driver == player or driver.player == player) then
+			-- ... and entered as the driver not as a passenger ...
+				for i = 1, benchmark_level do
+				-- ... then insert player (or multiple instances of the same player, if benchmark_level > 1) in list
+					table.insert(global.players_in_vehicles, p_id)
+				end
+			end
+		else
+			-- remove player from list. 
+			for i=#global.players_in_vehicles, 1, -1 do
+				if global.players_in_vehicles[i] == p_id then
+					-- reset emergency brake state and scores (e.g. if the vehicle got destroyed, its no longer necessary)
+					global.emergency_brake_active[p_id] = false
+					global.last_score[p_id] = 0
+					table.remove(global.players_in_vehicles, i)                
+				end
+			end
+			-- reset emergency brake
+			global.emergency_brake_active[p_id] = false
+		end
+
+		
+		
+		
         if #global.players_in_vehicles > 0 then
             if debug then
                 for i=1, #global.players_in_vehicles, 1 do
-                    notification(tostring(i..".: Player index"..global.players_in_vehicles[i].." ("..game.players[players_in_vehicles[i]].name..")"))
+                    notification(tostring(i..".: Player index"..global.players_in_vehicles[i].." ("..game.players[global.players_in_vehicles[i]].name..")"))
                 end
             end
         else
@@ -282,15 +292,19 @@ local function manage_drive_assistant(index)
 		local car = player.vehicle
 		local dir = car.orientation
         local newdir = 0
+		local pi = math.pi
+		local fsin = math.sin
+		local fcos = math.cos
+		local mfloor = math.floor
 		
 		local dirr = dir + lookangle
 		local dirl = dir - lookangle
 		
 		-- scores for straight, right and left (@sillyfly)
 		local ss,sr,sl = 0,0,0
-		local vs = {math.sin(2*math.pi*dir), -math.cos(2*math.pi*dir)}
-		local vr = {math.sin(2*math.pi*dirr), -math.cos(2*math.pi*dirr)}
-		local vl = {math.sin(2*math.pi*dirl), -math.cos(2*math.pi*dirl)}
+		local vs = {fsin(2*pi*dir), -fcos(2*pi*dir)}
+		local vr = {fsin(2*pi*dirr), -fcos(2*pi*dirr)}
+		local vl = {fsin(2*pi*dirl), -fcos(2*pi*dirl)}
 		
 		local px = player.position['x'] or player.position[1]
 		local py = player.position['y'] or player.position[2]
@@ -306,8 +320,8 @@ local function manage_drive_assistant(index)
         
         if car.speed > global.highspeed then 
             local speed_factor = car.speed / global.highspeed
-            lookahead_start_hs = math.floor (hs_start_extension * speed_factor + 0.5)
-            lookahead_length_hs = math.floor (hs_length_extension * speed_factor + 0.5)
+            lookahead_start_hs = mfloor (hs_start_extension * speed_factor + 0.5)
+            lookahead_length_hs = mfloor (hs_length_extension * speed_factor + 0.5)
         end
         
         -- sign detection
@@ -391,10 +405,10 @@ local function manage_drive_assistant(index)
             ]]
  		end
         --global.last_scan[player.index] = new_scan
-		if debug then
+		--[[if debug then
 			player.print("x:" .. px .. "->" .. px+vs[1]*(lookahead_start + lookahead_length) .. ", y:" .. py .. "->" .. py+vs[2]*(lookahead_start + lookahead_length))
 			player.print("S: " .. ss .. " R: " .. sr .. " L: " .. sl)
-		end
+		end]]
             
         -- check if the score indicates that the vehicle leaved paved area
         local ls = global.last_score[index] or 0
@@ -422,7 +436,7 @@ local function manage_drive_assistant(index)
         end
             
         -- Snap car to nearest 1/64 to avoid oscillation (@GotLag)
-		car.orientation = math.floor(newdir * 64 + 0.5) / 64		
+		car.orientation = mfloor(newdir * 64 + 0.5) / 64		
             
         -- no score reset in curves -> allow the player to guide his vehicle off road manually
 	elseif player.riding_state.direction ~= defines.riding.direction.straight then

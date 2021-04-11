@@ -11,9 +11,8 @@ data:extend(
             count = 175,
             ingredients =
             {
-                {"science-pack-1", 1},
-                {"science-pack-2", 1},
-                {"science-pack-3", 1}
+                {"automation-science-pack", 1},
+                {"logistic-science-pack", 1}
             },
         time = 30
         },

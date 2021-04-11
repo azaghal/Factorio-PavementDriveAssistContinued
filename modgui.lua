@@ -1,4 +1,4 @@
--- Copyright (2017) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
+-- Copyright (2019) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
 -- Provided under MIT license. See license.txt for details. 
 -- This is the gui design script. The design was heavily inspired by @GotLag's "Renamer".
 

@@ -1,9 +1,10 @@
 {
   "name": "PavementDriveAssist",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "title": "Pavement Drive Assist",
-  "author": "Arcitos, based on work of sillyfly",
+  "author": "Arcitos",
   "homepage": "",
   "description": "Introduces a driver assistance system that autonomously follows paved roads, while maintaining a preset cruise speed if desired.",
-  "factorio_version": "0.16"
+  "factorio_version": "0.17",
+  "dependencies": ["?AsphaltRoads"]
 }
