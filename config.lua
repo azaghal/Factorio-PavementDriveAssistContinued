@@ -5,7 +5,7 @@
 -- Messaging flag. Setting to true will announce changes of the state of the drive assistant or cruise control (activated/deactivated) to the console
 verbose = true
 
--- Sound flag. As long as this is "true" there will be a short warning sound played if the player's vehicle leaves paved ground, indicating a dead end (or an unintended failure of the PDA). If set so false, the warning will be printed to console.
+-- Sound flag. As long as this is "true" there will be playes a short warning sound if the player's vehicle left paved ground (indicating a dead end or an unintended failure of the PDA). If set so false, the warning will be printed to console.
 alert = true
 
 -- Technology flag. Default setting is true. Set this to false if you want drive assistant and cruise control to work without researching the technology at first. 
@@ -58,7 +58,7 @@ hs_length_extension = 2
 -- Factor 1 leads to constant speed, factor of 0 means no minimum speed will be aplied at all.
 minspeed_tolerance = 1
 
--- Score for each tile type. Tiles not included will be given zero score. Negative scores mean try to avoid this type of tile. 
+-- Score for each tile type. Tiles not included will be given zero score. Negative scores: try to avoid this type of tile. 
 scores = {
 	-- These are the tiles in the base game. Vehicles will try to avoid hazard zones.
 	["stone-path"] = 0.5, ["concrete"] = 1, 
@@ -74,6 +74,14 @@ scores = {
     ["Arci-asphalt-marking-yellow-ns"] = 0.4, ["Arci-asphalt-marking-yellow-swne"] = 0.4,
     ["Arci-asphalt-marking-yellow-we"] = 0.4, ["Arci-asphalt-marking-yellow-nwse"] = 0.4,
     ["Arci-asphalt-zebra-crossing-horizontal"] = 1.25, ["Arci-asphalt-zebra-crossing-vertical"] = 1.25, 
+    ["Arci-asphalt-marking-white-enw"] = 0.4, ["Arci-asphalt-marking-white-esw"] = 0.4,
+    ["Arci-asphalt-marking-white-nsw"] = 0.4, ["Arci-asphalt-marking-white-nse"] = 0.4,
+    ["Arci-asphalt-marking-white-sne"] = 0.4, ["Arci-asphalt-marking-white-snw"] = 0.4,
+    ["Arci-asphalt-marking-white-wne"] = 0.4, ["Arci-asphalt-marking-white-wse"] = 0.4,
+    ["Arci-asphalt-marking-yellow-enw"] = 0.4, ["Arci-asphalt-marking-yellow-esw"] = 0.4,
+    ["Arci-asphalt-marking-yellow-nsw"] = 0.4, ["Arci-asphalt-marking-yellow-nse"] = 0.4,
+    ["Arci-asphalt-marking-yellow-sne"] = 0.4, ["Arci-asphalt-marking-yellow-snw"] = 0.4,
+    ["Arci-asphalt-marking-yellow-wne"] = 0.4, ["Arci-asphalt-marking-yellow-wse"] = 0.4,
     -- The following are 5dim mod tiles. 
 	["5d-concrete-a"] = 1, ["5d-concrete-b"] = 1, ["5d-concrete-b2"] = 1, 
 	["5d-concrete-m"] = 1, ["5d-concrete-r"] = 1, ["5d-concrete-v"] = 1, 
@@ -86,9 +94,20 @@ scores = {
     -- The following are "More-Floors" mod tiles
     ["smooth-concrete"] = 1, ["wood-floor"] = 0.4, ["reinforced-concrete"] = 1, 
     ["diamond-plate"] = 0.5, ["rusty-metal"] = 0.5, ["rusty-grate"] = 0.5, 
-    ["arrow-grate"] = 1.25, ["circuit-floor"] = 0.5, ["gravel"] = 0.3, 
+    ["arrow-grate"] = 1.25, ["arrow-grate-left"] = 1.25, ["arrow-grate-right"] = 1.25, 
+    ["arrow-grate-down"] = 1.25, ["circuit-floor"] = 0.5, ["gravel"] = 0.3, 
     ["asphalt"] = 1.25, ["alien-metal"] = 0.5, ["metal-scraps"] = 0.5, 
-    ["hexagonb"] = 0.5,
+    ["hexagonb"] = 0.5, ["fast-arrow-grate"] = 1.25, ["fast-arrow-grate-left"] = 1.25,
+    ["fast-arrow-grate-right"] = 1.25, ["fast-arrow-grate-down"] = 1.25, ["express-arrow-grate"] = 1.25,
+    ["express-arrow-grate-left"] = 1.25, ["express-arrow-grate-right"] = 1.25, ["express-arrow-grate-down"] = 1.25,
+    ["yellowbrick"] = 0.5, ["mf-concrete-black"] = 1, ["mf-concrete-darkgrey"] = 1,
+    ["mf-concrete-blue"] = 1, ["mf-concrete-gold"] = 1, ["mf-concrete-green"] = 1,
+    ["mf-concrete-limegreen"] = 1, ["mf-concrete-orange"] = 1, ["mf-concrete-magenta"] = 1,
+    ["mf-concrete-pink"] = 1, ["mf-concrete-purple"] = 1, ["mf-concrete-red"] = 1,
+    ["mf-concrete-skyblue"] = 1, ["mf-concrete-white"] = 1, ["mf-concrete-yellow"] = 1,
+    ["road-line"] = 0.4, ["road-line-down"] = 0.4, ["road-line-left"] = 0.4, 
+    ["road-line-right"] = 0.4, ["redbrick"] = 0.5, ["decal1"] = 1,
+    ["decal2"] = 1, ["decal3"] = 1, ["decal4"] = 1, 
 }
 
 -- List of mods that are incompatible to pavement drive assist and will cause mod deactivation.

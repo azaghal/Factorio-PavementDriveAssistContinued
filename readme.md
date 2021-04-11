@@ -29,7 +29,7 @@ This mod will increase the importance of proper roads as it will allow you to cr
 
 ![](https://mods-data.factorio.com/pub_data/media_files/ODCCqrp58rpE.png)
 
-- **Cruise control**: Set up a cruising speed by pressing **[L]** (also customisable). Great for long travel, safety zones, parking lots or for cars that will otherwise reach uncontrollable speeds. Press the respective key again to disable it. In order to ensure maximum safety, braking will always override cruise control and if the car is stopped or is moving backwards, the system will be temporarily inactive.  
+- **Cruise control**: Set up a cruising speed by pressing **[L]** (also customisable). Great for long travel, safety zones, parking lots or for cars that will otherwise reach uncontrollable speeds. Press the respective key again to disable it. In order to ensure maximum safety, braking will always override cruise control and if the car is stopped or is moving backwards, the system will be temporarily inactive. If you want to directly set up a certain value for your speed limit, press **[CTRL+L]**. A small text field will pop up, where you'll be able to insert a new cruise control speed limit.
 
 ![](https://mods-data.factorio.com/pub_data/media_files/qULH1DuszZR7.png)
 
@@ -68,6 +68,42 @@ Required technology is called **Driver assistance systems** and needs **Robotics
 
 Due to the nature of this mod, other mods that alter the orientation of vehicles are incompatible to PDA. A very good example for this would be ["Vehicle Snap"](https://mods.factorio.com/mods/Zaflis/VehicleSnap). As long as incompatible mods are present, PDA wont execute any actions.
 
+### Interfaces
+To read/alter PDA's main variables call the following remote functions:
+
+Name of the interface: **"PDA"**
+
+List of functions:
+
+    #1
+	"get_state_of_cruise_control"
+	parameter needed: playerindex (int or player)
+	returns state of cruise control (boolean) for the specified player
+	
+	#2
+    "set_state_of_cruise_control"
+	parameter needed: playerindex (int or player), new state (boolean)
+	sets state of cruise control for the specified player according to the handed over parameter
+
+	#3
+	"get_cruise_control_limit"
+	parameter needed: playerindex (int or player)
+	returns cruise control limit (float) for the specified player
+
+	#4
+    "set_cruise_control_limit"
+	parameter needed: playerindex (int or player), new limit (float)
+	sets cruise control limit for the specified player according to the handed over parameter
+
+    #5
+	"get_state_of_driving_assistant"
+	parameter needed: playerindex (int or player)
+	returns state of driving assistant (boolean) for the specified player
+	
+	#6
+    "set_state_of_driving_assistant"
+	parameter needed: playerindex (int or player), new state (boolean)
+	sets state of driving assistant for the specified player according to the handed over parameter
 
 ### Current language support
 
@@ -79,11 +115,20 @@ If you like this mod and you've created a translation of your own, please do not
 ---
 
 ### Changelog
+  2.0.3 (2017-02-17)
+
+- New feature: Set or change your cruise control speed limit by pressing [CTRL + L]
+- Added tile detection support for Asphalt Roads 1.0.2
+- Added tile detection support for More Floors 1.1.0 
+- Revisited major parts of the code for improved maintainability
+- Added interface functions to get or set state of some variables
+- Fixed: Exiting vehicles will now always reset the condition of the emergency brake
+	
   2.0.2 (2017-01-24)
 
-- Fix: Changing the player's character while driving caused a crash (for example while using YARM in remote monitoring mode)
-- Fix: Loading a game where another player was currently driving caused a crash  
-- Fix: The game crashed when a player in a vehicle disconnected from a game in multiplayer
+- Fixed: Changing the player's character while driving caused a crash (for example while using YARM in remote monitoring mode)
+- Fixed: Loading a game where another player was currently driving caused a crash  
+- Fixed: The game crashed when a player in a vehicle disconnected from a game in multiplayer
 
 
   2.0.1 (2017-01-20)
