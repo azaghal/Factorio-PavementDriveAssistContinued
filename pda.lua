@@ -75,10 +75,13 @@ end
 
 -- fired if a player enters or leaves a vehicle
 function pda.on_player_driving_changed_state(event)
+    -- local player = game.players[event.player_index]
+    -- if player.vehicle ~= nil and player.vehicle.valid and    player.vehicle.get_driver() == player then
+
     local player = game.players[event.player_index]
     -- put player at last position in list of players in vehicles
     -- only allow certain vehicles (i.e. no trains)
-    if (player.vehicle ~= nil) and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil then 
+    if (player.vehicle ~= nil) and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil and player.vehicle.get_driver() == player then 
         -- insert player (or multiple instances of the same player, if benchmark_level > 1) in list
         for i = 1, benchmark_level do
             table.insert(global.players_in_vehicles, player.index)
@@ -87,7 +90,7 @@ function pda.on_player_driving_changed_state(event)
         -- remove player from list. 
         for i=#global.players_in_vehicles, 1, -1 do
             if global.players_in_vehicles[i] == player.index then
-                -- reset emergency brake state and scores (i.e. if the vehicle got destroyed, its no longer necessary)
+                -- reset emergency brake state and scores (e.g. if the vehicle got destroyed, its no longer necessary)
                 global.emergency_brake_active[player.index] = false
                 global.last_score[player.index] = 0
                 table.remove(global.players_in_vehicles, i)                
@@ -305,10 +308,28 @@ local function manage_drive_assistant(index)
             local sign_scanner = game.surfaces[player.surface.index].find_entities_filtered{area = {{px-1, py-1},{px+1, py+1}}, type="constant-combinator"}             
             for i = 1, #sign_scanner do
                 -- speed limit sign
-                if sign_scanner[i].name == "pda-road-sign-speed-limit" then
-                    local sign = sign_scanner[i].get_or_create_control_behavior().get_signal(1)
+                if sign_scanner[i].name == "pda-road-sign-speed-limit" then                    
+                    local sign = sign_scanner[i].get_or_create_control_behavior()
+                    local network = nil
                     local sign_value = 0
-                    if sign.signal ~= nil then sign_value = sign.count end
+                    -- wire priority: red wire > green wire > not connected
+                    -- signal priority: lexicographic order (0,1,2,...,9,A,B,C,... ,Y,Z)
+                    -- the signal of the sign itself is part of its circuit networks! Additional signals of the same type on this networks will be cummulated (e.g. a "L=60" on the sign and a signal "L=30" on the red network will add up to "L=90")
+                    network_red = sign.get_circuit_network(defines.wire_type.red)
+                    network_green = sign.get_circuit_network(defines.wire_type.green)
+                    -- 1st: check if a red wire is connected (with >=1 signals, including the one of the sign itself)
+                    if network_red ~= nil and network_red.signals ~= nil and #network_red.signals > 0 then
+                        local networksignal = network_red.signals[1]   
+                        if networksignal.signal ~= nil then sign_value = networksignal.count end
+                    -- 2nd: if there is no res wire, check if a green wire is connected (with >=1 signals, including the one of the sign itself)
+                    elseif network_green ~= nil and network_green.signals ~= nil and #network_green.signals > 0 then
+                        local networksignal = network_green.signals[1]   
+                        if networksignal.signal ~= nil then sign_value = networksignal.count end
+                    -- 3rd: if the sign is not connected to any circuit network, read its own signal
+                    elseif sign.get_signal(1).signal ~= nil then
+                        local localsignal = sign.get_signal(1)
+                        if localsignal.signal ~= nil then sign_value = localsignal.count end
+                    end
                     -- read signal value only if a signal is set       
                     if sign_value ~= 0 then
                         global.imposed_speed_limit[index] = kmph_to_mpt(sign_value)

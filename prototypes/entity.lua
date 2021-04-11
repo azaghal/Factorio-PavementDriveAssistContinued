@@ -21,11 +21,25 @@ local function void_circuit_wire_connection_point()
     }
 end
 
+local function void_circuit_wire_connection_point(direction)
+    return { 
+        shadow = { 
+            red = {-0.5, -0.05}, 
+            green = {-0.5, 0.05},
+        }, 
+        wire = { 
+            red = {-0.5, -0.05}, 
+            green = {-0.5, 0.05},
+        } 
+    }
+end
+
 data:extend({  
 {
     type = "constant-combinator",
     name = "pda-road-sign-speed-limit",
     icon = "__PavementDriveAssist__/graphics/icons/icon_speed_limit.png",
+    icon_size = 32,
     flags = {"placeable-neutral", "player-creation", "not-on-map", "placeable-off-grid"},
     minable = {hardness = 0.2, mining_time = 1.0, result = "pda-road-sign-speed-limit"},
     max_health = 75,
@@ -110,17 +124,30 @@ data:extend({
     },
     circuit_wire_connection_points =
     {
-        void_circuit_wire_connection_point(),
-        void_circuit_wire_connection_point(),
-        void_circuit_wire_connection_point(),
-        void_circuit_wire_connection_point()
+        {   
+            shadow = { red = {-0.15, -0.75}, green = {0.15, -0.75}, }, 
+            wire = { red = {-0.15, -0.75},  green = {0.15, -0.75}, },
+        },
+        {   
+            shadow = { red = {0.95, -0.12}, green = {0.95, 0.12}, }, 
+            wire = { red = {0.95, -0.12},  green = {0.95, 0.12}, },
+        },
+        {   
+            shadow = { red = {0.15, 0.75}, green = {-0.15, 0.75}, }, 
+            wire = { red = {0.15, 0.75},  green = {-0.15, 0.75}, },
+        },        
+        {   
+            shadow = { red = {-0.95, 0.12}, green = {-0.95, -0.12}, }, 
+            wire = { red = {-0.95, 0.12},  green = {-0.95, -0.12}, },
+        }             
     },    
-    circuit_wire_max_distance = 0
+    circuit_wire_max_distance = 9
 },
 {
     type = "constant-combinator",
     name = "pda-road-sign-speed-unlimit",
     icon = "__PavementDriveAssist__/graphics/icons/icon_speed_unlimit.png",
+    icon_size = 32,
     flags = {"placeable-neutral", "player-creation", "not-on-map", "placeable-off-grid"},
     minable = {hardness = 0.2, mining_time = 1.0, result = "pda-road-sign-speed-limit"},
     max_health = 75,

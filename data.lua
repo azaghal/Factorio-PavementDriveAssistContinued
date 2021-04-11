@@ -36,7 +36,7 @@ data:extend({
 data.raw["gui-style"].default["Arci-pda-gui-style"] =
 {
 	type = "button_style",
-	parent = "button_style",
+	parent = "button",
 	font = "Arci-pda-font",
 	align = "center",
     top_padding = 2,
