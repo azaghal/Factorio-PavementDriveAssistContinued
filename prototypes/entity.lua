@@ -9,28 +9,28 @@ local function void_activity_led_sprite()
 end
 
 local function void_circuit_wire_connection_point()
-    return { 
-        shadow = { 
-            red = {0, 0}, 
+    return {
+        shadow = {
+            red = {0, 0},
             green = {0, 0},
-        }, 
-        wire = { 
-            red = {0, 0}, 
-            green = {0, 0}, 
-        } 
+        },
+        wire = {
+            red = {0, 0},
+            green = {0, 0},
+        }
     }
 end
 
 local function void_circuit_wire_connection_point(direction)
-    return { 
-        shadow = { 
-            red = {-0.5, -0.05}, 
+    return {
+        shadow = {
+            red = {-0.5, -0.05},
             green = {-0.5, 0.05},
-        }, 
-        wire = { 
-            red = {-0.5, -0.05}, 
+        },
+        wire = {
+            red = {-0.5, -0.05},
             green = {-0.5, 0.05},
-        } 
+        }
     }
 end
 
@@ -125,19 +125,19 @@ data:extend({
     circuit_wire_connection_points =
     {
         {
-            shadow = { red = {-0.15, -0.75}, green = {0.15, -0.75}, }, 
+            shadow = { red = {-0.15, -0.75}, green = {0.15, -0.75}, },
             wire = { red = {-0.15, -0.75},  green = {0.15, -0.75}, },
         },
         {
-            shadow = { red = {0.95, -0.12}, green = {0.95, 0.12}, }, 
+            shadow = { red = {0.95, -0.12}, green = {0.95, 0.12}, },
             wire = { red = {0.95, -0.12},  green = {0.95, 0.12}, },
         },
         {
-            shadow = { red = {0.15, 0.75}, green = {-0.15, 0.75}, }, 
+            shadow = { red = {0.15, 0.75}, green = {-0.15, 0.75}, },
             wire = { red = {0.15, 0.75},  green = {-0.15, 0.75}, },
         },
         {
-            shadow = { red = {-0.95, 0.12}, green = {-0.95, -0.12}, }, 
+            shadow = { red = {-0.95, 0.12}, green = {-0.95, -0.12}, },
             wire = { red = {-0.95, 0.12},  green = {-0.95, -0.12}, },
         }
     },
@@ -236,7 +236,7 @@ data:extend({
         void_circuit_wire_connection_point(),
         void_circuit_wire_connection_point(),
         void_circuit_wire_connection_point()
-    },    
+    },
     circuit_wire_max_distance = 0
 
 }

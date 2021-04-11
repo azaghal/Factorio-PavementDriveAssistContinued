@@ -679,7 +679,7 @@ local function update_vehicle_registered_to_sign(player_index, params)
             if global.imposed_speed_limit[player_index] ~= nil and car.speed > 0 and car.speed > global.imposed_speed_limit[player_index] then
                 -- keep brake active to deccelerate the vehicle
                 global.cruise_control_brake_active[player_index] = true
-            else                
+            else
                 global.cruise_control_brake_active[player_index] = false
                 player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
             end
@@ -841,7 +841,7 @@ local function process_signs(player_index)
             global.last_sign_data[player_index] = {["ignore"] = {}}
         end
         for i = 1, #sign_scanner do
-            if not global.last_sign_data[player_index].ignore[sign_scanner[i].unit_number] then                    
+            if not global.last_sign_data[player_index].ignore[sign_scanner[i].unit_number] then
                 if sign_scanner[i].name == "pda-road-sign-stop" then
                     -- detect stop signs even if cruise control is inactive
                     updateLastSignData(player_index, sign_scanner[i].unit_number, "stop", sign_scanner[i])

@@ -11,7 +11,7 @@ data:extend({
         name = "PDA-setting-allow-cruise-control",
         setting_type = "runtime-global",
         default_value = true,
-        order = "b",        
+        order = "b",
     },
     {
         type = "int-setting",
@@ -28,7 +28,7 @@ data:extend({
         default_value = 20,
         minimum_value = 6,
         maximum_value = 10000,
-        order = "d",        
+        order = "d",
     },
     {
         type = "int-setting",
@@ -36,8 +36,8 @@ data:extend({
         setting_type = "runtime-global",
         default_value = 100,
         minimum_value = 50,
-        maximum_value = 10000,        
-        order = "e",        
+        maximum_value = 10000,
+        order = "e",
     },
     {
         type = "int-setting",
@@ -46,7 +46,7 @@ data:extend({
         default_value = 0,
         minimum_value = 0,
         maximum_value = 10000,
-        order = "f",        
+        order = "f",
     },
     {
         type = "int-setting",
@@ -55,29 +55,29 @@ data:extend({
         default_value = 60,
         minimum_value = 0,
         maximum_value = 10000,
-        order = "g",        
-    },    
-    -- settings per player 
+        order = "g",
+    },
+    -- settings per player
     {
         type = "bool-setting",
         name = "PDA-setting-verbose",
         setting_type = "runtime-per-user",
         default_value = true,
-        order = "a",        
+        order = "a",
     },
     {
         type = "bool-setting",
         name = "PDA-setting-sound-alert",
         setting_type = "runtime-per-user",
         default_value = true,
-        order = "b",        
+        order = "b",
     },
     {
         type = "bool-setting",
         name = "PDA-setting-alt-toggle-mode",
         setting_type = "runtime-per-user",
         default_value = true,
-        order = "c",        
+        order = "c",
     },
     {
         type = "int-setting",
@@ -86,9 +86,9 @@ data:extend({
         default_value = 60,
         minimum_value = 0,
         maximum_value = 10000,
-        order = "d",        
-    },    
-    
+        order = "d",
+    },
+
 	{
         type = "double-setting",
         name = "PDA-tileset-score-asphalt",
@@ -96,8 +96,8 @@ data:extend({
         default_value = 1.5,
 		minimum_value = -2,
 		maximum_value = 2,
-        order = "h-a",        
-    },    
+        order = "h-a",
+    },
 	{
         type = "double-setting",
         name = "PDA-tileset-score-refined-concrete",
@@ -105,8 +105,8 @@ data:extend({
         default_value = 1.25,
 		minimum_value = -2,
 		maximum_value = 2,
-        order = "h-b",        
-    },    
+        order = "h-b",
+    },
     {
         type = "double-setting",
         name = "PDA-tileset-score-concrete",
@@ -114,8 +114,8 @@ data:extend({
         default_value = 1.00,
 		minimum_value = -2,
 		maximum_value = 2,
-        order = "h-c",        
-    },    
+        order = "h-c",
+    },
 
     {
         type = "double-setting",
@@ -124,8 +124,8 @@ data:extend({
         default_value = 0.6,
 		minimum_value = -2,
 		maximum_value = 2,
-        order = "h-d",        
-    },        
+        order = "h-d",
+    },
 	{
         type = "double-setting",
         name = "PDA-tileset-score-gravel",
@@ -133,8 +133,8 @@ data:extend({
         default_value = 0.4,
 		minimum_value = -2,
 		maximum_value = 2,
-        order = "h-e",        
-    },    
+        order = "h-e",
+    },
     {
         type = "double-setting",
         name = "PDA-tileset-score-wood",
@@ -142,8 +142,8 @@ data:extend({
         default_value = 0.3,
 		minimum_value = -2,
 		maximum_value = 2,
-        order = "h-f",        
-    },    
+        order = "h-f",
+    },
     {
         type = "double-setting",
         name = "PDA-tileset-score-asphalt-road-lines",
@@ -151,7 +151,6 @@ data:extend({
         default_value = 0.4,
 		minimum_value = -2,
 		maximum_value = 2,
-        order = "h-g",        
+        order = "h-g",
     }
 })
-

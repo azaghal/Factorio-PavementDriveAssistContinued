@@ -1,6 +1,6 @@
--- Copyright (2017) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
--- Provided under MIT license. See license.txt for details. 
--- This is the interface script. 
+-- Copyright (2017) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly.
+-- Provided under MIT license. See license.txt for details.
+-- This is the interface script.
 
 require "pda"
 require "config"
@@ -28,10 +28,10 @@ function pda_interface.set_cruise_control_limit(id, limit)
     local player = game.players[id]
     local hard_speed_limit = global.hard_speed_limit
     if tonumber(limit) ~= nil then
-        if limit < 0 then 
-            limit = -limit 
+        if limit < 0 then
+            limit = -limit
         end
-        if (hard_speed_limit > 0) and (limit > hard_speed_limit) then 
+        if (hard_speed_limit > 0) and (limit > hard_speed_limit) then
             limit = hard_speed_limit
         end
         global.cruise_control_limit[player.index] = limit

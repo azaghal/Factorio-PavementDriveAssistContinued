@@ -4,7 +4,7 @@
 
 ## Introduction
 
-"PDA" is a helper mod dedicated to your vehicle's health and to improve survival rates of all structures surrounding your roads. No more unintentional crashing into chemical complexes or destruction of valuable chests! But this mod adds a lot more stuff for a whole new driving experience! 
+"PDA" is a helper mod dedicated to your vehicle's health and to improve survival rates of all structures surrounding your roads. No more unintentional crashing into chemical complexes or destruction of valuable chests! But this mod adds a lot more stuff for a whole new driving experience!
 
 The idea for this was first implemented in "Pavement Drive Assist" made by sillyfly, but this mod was unfortunately never updated to work with Factorio 0.13+. So i took action and redesigned it around the excellent scanning routine from sillifly. Beside this i've added some other stuff i thought that might be useful. I hope you'll enjoy it!
 
@@ -29,12 +29,12 @@ This mod will increase the importance of proper roads as it will allow you to cr
 
 ### Additional features:
 
-- **Road departure warning**: Warns you acoustically or via console output if your vehicle is leaving paved area, i.e. at a dead end or in very sharp curves. If the vehicle is not steered manually (by pressing "[W]") an emergency brake will be activated to stop the vehicle. 
+- **Road departure warning**: Warns you acoustically or via console output if your vehicle is leaving paved area, i.e. at a dead end or in very sharp curves. If the vehicle is not steered manually (by pressing "[W]") an emergency brake will be activated to stop the vehicle.
 - **Highspeed support**: If your vehicle reaches speeds over 100 kmph (customisable in config file) the "path finder" will increase its search area in front of your vehicle, allowing safe ride for speeds up to 350 kmph. It is highly recommended to design your roads with appropriate curve radii before traveling with speeds of this magnitude!
 - **Native mod support**: All kinds of vehicles are supported if they are valid "car"-type entities.
 - **Blacklist vehicles**: Set up a custom list of vehicles you dont want to be supported.
 - **Global speed limit**: Limit the speed that rideable cars are able to reach in your game (works also in multiplayer)
-- **Optimised code for multiplayer**: You are running a huge server? That's not an issue: The main routine causes almost zero load as long as no one is driving, and up to 10 players are able to drive simultaneously at any given time without causing any serious lags! But i bet your machines will support much more than my ancient laptop was able to: My benchmark tests with 25 simulated players driving at 130 km/h and active cruise control resulted in an 10 UPS drop. 
+- **Optimised code for multiplayer**: You are running a huge server? That's not an issue: The main routine causes almost zero load as long as no one is driving, and up to 10 players are able to drive simultaneously at any given time without causing any serious lags! But i bet your machines will support much more than my ancient laptop was able to: My benchmark tests with 25 simulated players driving at 130 km/h and active cruise control resulted in an 10 UPS drop.
 - **Fine-tune CPU usage**: You are always free to reduce the tick rate of the driving assistant or to disable cruise control if you experience load issues (just take a look at the config file). On the other hand: If your CPU is bored, you're also able to increase the precision (to 60 scans per second), while effectively doubling the load.
 
 
@@ -47,9 +47,9 @@ This mod will increase the importance of proper roads as it will allow you to cr
 **Additional support for**:
 
 - [Dectorio](https://mods.factorio.com/mod/Dectorio)
-- [Color-coding concrete floors](https://mods.factorio.com/mods/justarandomgeek/color-coding) 
-- [5Dims concrete floors](https://mods.factorio.com/mods/McGuten/5dim_decoration) 
-- [Tones "More Floors"](https://mods.factorio.com/mods/Tone/More_Floors) 
+- [Color-coding concrete floors](https://mods.factorio.com/mods/justarandomgeek/color-coding)
+- [5Dims concrete floors](https://mods.factorio.com/mods/McGuten/5dim_decoration)
+- [Tones "More Floors"](https://mods.factorio.com/mods/Tone/More_Floors)
 
 **Technology**
 
@@ -70,27 +70,27 @@ List of functions:
     "get_state_of_cruise_control"
     parameter needed: playerindex (int or player)
     returns state of cruise control (boolean) for the specified player
-    
+
     #2
     "set_state_of_cruise_control"
     parameter needed: playerindex (int or player), new state (boolean)
     sets state of cruise control for the specified player according to the handed over parameter
-    
+
     #3
     "get_cruise_control_limit"
     parameter needed: playerindex (int or player)
     returns cruise control limit (float) for the specified player
-    
+
     #4
     "set_cruise_control_limit"
     parameter needed: playerindex (int or player), new limit (float)
     sets cruise control limit for the specified player according to the handed over parameter
-    
+
     #5
     "get_state_of_driving_assistant"
     parameter needed: playerindex (int or player)
     returns state of driving assistant (boolean) for the specified player
-    
+
     #6
     "set_state_of_driving_assistant"
     parameter needed: playerindex (int or player), new state (boolean)

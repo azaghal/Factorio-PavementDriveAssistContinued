@@ -1,5 +1,5 @@
--- Copyright (2020) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
--- Provided under MIT license. See license.txt for details. 
+-- Copyright (2020) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly.
+-- Provided under MIT license. See license.txt for details.
 -- This is the control script. For configuration options see config.lua.
 
 require "config"
@@ -13,7 +13,7 @@ script.on_event(defines.events.on_player_driving_changed_state, function(event)
     pda.on_player_driving_changed_state(event)
 end)
 
--- some (including this) mod was modified, added or removed from the game  
+-- some (including this) mod was modified, added or removed from the game
 script.on_configuration_changed(function(data)
     pda.on_configuration_changed(data)
 end)
@@ -44,7 +44,7 @@ script.on_event("toggle_drive_assistant", function(event)
     pda.toggle_drive_assistant(event)
 end)
 
--- on game start 
+-- on game start
 script.on_init(function(data)
     pda.on_init(data)
 end)
@@ -82,4 +82,3 @@ end)
 script.on_event(defines.events.on_tick, function(event)
     pda.on_tick(event)
 end)
-

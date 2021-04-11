@@ -66,6 +66,6 @@ data:extend(
             }
         },
         order = "e-b-b"
-    } 
+    }
 }
-)	
+)
