@@ -46,6 +46,7 @@ local function init_global()
     global.cruise_control_limit = global.cruise_control_limit or {}
     global.cruise_control_forward = global.cruise_control_forward or {} 
     global.players_in_vehicles = global.players_in_vehicles or {}
+    global.offline_players_in_vehicles = global.offline_players_in_vehicles or {}
     global.playertick = global.playertick or 0
     global.mod_compatibility = nil
     global.last_score = global.last_score or {}
@@ -53,7 +54,7 @@ local function init_global()
 end
 
 script.on_event(defines.events.on_player_driving_changed_state, function(event)
--- fired if a player enters a vehicle
+-- fired if a player enters or leaves a vehicle
     local player = game.players[event.player_index]
     -- put player at last position in list of players in vehicles
     -- only allow certain vehicles (i.e. no trains)
@@ -144,12 +145,14 @@ script.on_event("toggle_drive_assistant", function(event)
     if (technology_required and player.force.technologies["Arci-pavement-drive-assistant"].researched or technology_required == false) and global.mod_compatibility then 
         if (global.drive_assistant[event.player_index] == nil or global.drive_assistant[event.player_index] == false) then 
             -- check if the vehicle is blacklisted
-            if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] ~= nil then
-                player.print({"DA-vehicle-blacklisted"})
-            else
-                global.drive_assistant[event.player_index] = true
-                if verbose then 
-                    player.print({"DA-drive-assistant-active"})
+            if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" then
+                if vehicle_blacklist[player.vehicle.name] ~= nil then
+                    player.print({"DA-vehicle-blacklisted"})
+                else
+                    global.drive_assistant[event.player_index] = true
+                    if verbose then 
+                        player.print({"DA-drive-assistant-active"})
+                    end
                 end
             end
         else
@@ -164,87 +167,87 @@ end)
 -- adjusts the orientation of the car the player is driving to follow paved tiles
 local function manage_drive_assistant(event, index)
     local player = game.players[index]
-		if player.riding_state.direction == defines.riding.direction.straight and math.abs(player.vehicle.speed) > minspeed then
-			local car = player.vehicle
-			local dir = car.orientation
-            local newdir = 0
-			
-			local dirr = dir + lookangle
-			local dirl = dir - lookangle
-			
-			-- scores for straight, right and left (@sillyfly)
-			local ss,sr,sl = 0,0,0
-			
-			local vs = {math.sin(2*math.pi*dir), -math.cos(2*math.pi*dir)}
-			local vr = {math.sin(2*math.pi*dirr), -math.cos(2*math.pi*dirr)}
-			local vl = {math.sin(2*math.pi*dirl), -math.cos(2*math.pi*dirl)}
-			
-			local px = player.position['x'] or player.position[1]
-			local py = player.position['y'] or player.position[2]
-			local sign = (car.speed > 0 and 1) or -1
-			
-			local sts = {px, py}
-			local str = {px + sign*vs[2]*eccent, py - sign*vs[1]*eccent}
-			local stl = {px -sign*vs[2]*eccent, py + sign*vs[1]*eccent}
-            
-            -- linearly increases start and length of the scanned area if the car is very fast
-            local lookahead_start_hs = 0 
-            local lookahead_length_hs = 0  
-                
-            if car.speed > highspeed then 
-                local speed_factor = car.speed / highspeed
-                lookahead_start_hs = math.floor (hs_start_extension * speed_factor + 0.5)
-                lookahead_length_hs = math.floor (hs_length_extension * speed_factor + 0.5)
-            end
-			
-            -- calculate scores within the scanning area in front of the vehicle (@sillyfly)
-			for i=lookahead_start + lookahead_start_hs,lookahead_start + lookahead_length + lookahead_length_hs do
-				local d = i*sign
-				local rst = player.surface.get_tile(str[1] + vs[1]*d, str[2] + vs[2]*d).name
-				local lst = player.surface.get_tile(stl[1] + vs[1]*d, stl[2] + vs[2]*d).name
-				local rt = player.surface.get_tile(px + vr[1]*d, py + vr[2]*d).name
-				local lt = player.surface.get_tile(px + vl[1]*d, py + vl[2]*d).name
-				
-				ss = ss + (((scores[rst] or 0) + (scores[lst] or 0))/2.0)
-				sr = sr + (scores[rt] or 0)
-				sl = sl + (scores[lt] or 0)
-			end
-			
-			if debug then
-				player.print("x:" .. px .. "->" .. px+vs[1]*(lookahead_start + lookahead_length) .. ", y:" .. py .. "->" .. py+vs[2]*(lookahead_start + lookahead_length))
-				player.print("S: " .. ss .. " R: " .. sr .. " L: " .. sl)
-			end
-            
-            -- check if the score indicates that the vehicle leaved paved area
-            global.last_score[index] = global.last_score[index] or 0
-            local ts = ss+sr+sl
-            if ts < global.last_score[index] and ts == 0 and not global.emergency_brake_active[index] then
-                -- warn the player and activate emergency brake
-                if alert then
-                    player.surface.create_entity({name = "pda-warning-1", position = player.position})
-                elseif verbose then
-                    player.print({"DA-road-departure-warning"})                
-                end
-                player.riding_state = {acceleration = defines.riding.acceleration.braking, direction = player.riding_state.direction}
-                global.emergency_brake_active[index] = true                           
-            end
-			global.last_score[index] = ts
-            
-            -- set new direction depending on the scores (@sillyfly)
-			if sr > ss and sr > sl then
-				newdir = dir + (changeangle*sr*2)/(sr+ss)
-			elseif sl > ss and sl > sr then
-				newdir = dir - (changeangle*sl*2)/(sl+ss)
-			else
-                newdir = dir
-            end
-            
-			-- Snap car to nearest 1/64 to avoid oscillation (@GotLag)
-			car.orientation = math.floor(newdir * 64 + 0.5) / 64		
-            
-		elseif player.riding_state.direction ~= defines.riding.direction.straight then
-            global.last_score[index] = 0
+	if player.riding_state.direction == defines.riding.direction.straight and math.abs(player.vehicle.speed) > minspeed then
+		local car = player.vehicle
+		local dir = car.orientation
+        local newdir = 0
+		
+		local dirr = dir + lookangle
+		local dirl = dir - lookangle
+		
+		-- scores for straight, right and left (@sillyfly)
+		local ss,sr,sl = 0,0,0
+		
+		local vs = {math.sin(2*math.pi*dir), -math.cos(2*math.pi*dir)}
+		local vr = {math.sin(2*math.pi*dirr), -math.cos(2*math.pi*dirr)}
+		local vl = {math.sin(2*math.pi*dirl), -math.cos(2*math.pi*dirl)}
+		
+		local px = player.position['x'] or player.position[1]
+		local py = player.position['y'] or player.position[2]
+		local sign = (car.speed > 0 and 1) or -1
+		
+		local sts = {px, py}
+		local str = {px + sign*vs[2]*eccent, py - sign*vs[1]*eccent}
+		local stl = {px -sign*vs[2]*eccent, py + sign*vs[1]*eccent}
+        
+        -- linearly increases start and length of the scanned area if the car is very fast
+        local lookahead_start_hs = 0 
+        local lookahead_length_hs = 0  
+        
+        if car.speed > highspeed then 
+            local speed_factor = car.speed / highspeed
+            lookahead_start_hs = math.floor (hs_start_extension * speed_factor + 0.5)
+            lookahead_length_hs = math.floor (hs_length_extension * speed_factor + 0.5)
         end
+			
+        -- calculate scores within the scanning area in front of the vehicle (@sillyfly)
+		for i=lookahead_start + lookahead_start_hs,lookahead_start + lookahead_length + lookahead_length_hs do
+			local d = i*sign
+			local rst = player.surface.get_tile(str[1] + vs[1]*d, str[2] + vs[2]*d).name
+			local lst = player.surface.get_tile(stl[1] + vs[1]*d, stl[2] + vs[2]*d).name
+			local rt = player.surface.get_tile(px + vr[1]*d, py + vr[2]*d).name
+			local lt = player.surface.get_tile(px + vl[1]*d, py + vl[2]*d).name
+			
+			ss = ss + (((scores[rst] or 0) + (scores[lst] or 0))/2.0)
+			sr = sr + (scores[rt] or 0)
+			sl = sl + (scores[lt] or 0)
+		end
+		
+		if debug then
+			player.print("x:" .. px .. "->" .. px+vs[1]*(lookahead_start + lookahead_length) .. ", y:" .. py .. "->" .. py+vs[2]*(lookahead_start + lookahead_length))
+			player.print("S: " .. ss .. " R: " .. sr .. " L: " .. sl)
+		end
+            
+        -- check if the score indicates that the vehicle leaved paved area
+        global.last_score[index] = global.last_score[index] or 0
+        local ts = ss+sr+sl
+        if ts < global.last_score[index] and ts == 0 and not global.emergency_brake_active[index] then
+            -- warn the player and activate emergency brake
+            if alert then
+                player.surface.create_entity({name = "pda-warning-1", position = player.position})
+            elseif verbose then
+                player.print({"DA-road-departure-warning"})                
+            end
+            player.riding_state = {acceleration = defines.riding.acceleration.braking, direction = player.riding_state.direction}
+            global.emergency_brake_active[index] = true                           
+        end
+		global.last_score[index] = ts
+        
+        -- set new direction depending on the scores (@sillyfly)
+		if sr > ss and sr > sl then
+			newdir = dir + (changeangle*sr*2)/(sr+ss)
+		elseif sl > ss and sl > sr then
+			newdir = dir - (changeangle*sl*2)/(sl+ss)
+		else
+           newdir = dir
+        end
+            
+        -- Snap car to nearest 1/64 to avoid oscillation (@GotLag)
+		car.orientation = math.floor(newdir * 64 + 0.5) / 64		
+            
+	elseif player.riding_state.direction ~= defines.riding.direction.straight then
+        global.last_score[index] = 0
+    end
 end
 
 -- check if vehicle speed needs to be adjusted (only if cruise control is active)
@@ -278,6 +281,56 @@ script.on_init(function(data)
     end
 end)
 
+script.on_event(defines.events.on_player_joined_game, function(event)
+-- joining players that drove vehicles while leaving the game are in the "offline_players_in_vehicles" list and will be put back to normal
+    local p = event.player_index
+    if debug then 
+        notification(tostring("on-joined triggered by player "..p)) 
+        notification(tostring("connected players: "..#game.connected_players))
+        notification(tostring("players in offline_mode: "..#global.offline_players_in_vehicles))
+    end
+    if global.offline_players_in_vehicles == nil then
+        global.offline_players_in_vehicles = {}
+    end
+    -- safety check (important for first player connecting to a game)
+    -- if a player is still in the "players_in_vehicles" list despite the fact he/she is not online then they will be put in offline mode
+    if #game.connected_players == 1 then
+        for i=#global.players_in_vehicles, 1, -1 do
+            local offline = true
+            for j=1, #game.connected_players, 1 do
+                if global.players_in_vehicles[i] == game.connected_players[j].index then
+                    offline = false
+                end
+            end
+            if offline then
+                table.insert(global.offline_players_in_vehicles, global.players_in_vehicles[i])
+                table.remove(global.players_in_vehicles, i)                
+            end
+        end
+    end
+    -- set player back to normal
+    for i=#global.offline_players_in_vehicles, 1, -1 do
+        if debug then notification(tostring(i..". test - is offline player "..global.offline_players_in_vehicles[i].." now online player: "..p.." ?")) end
+        if global.offline_players_in_vehicles[i] == p then
+            table.insert(global.players_in_vehicles, p)
+            table.remove(global.offline_players_in_vehicles, i)
+        end    
+    end
+    if debug then notification(tostring("num players now in offline_mode: "..#global.offline_players_in_vehicles)) end
+end)
+
+script.on_event(defines.events.on_player_left_game, function(event)
+-- puts leaving players currently driving a vehicle in the "offline_players_in_vehicles" list
+    local p = event.player_index
+    if debug then notification(tostring("on-left triggered by player "..p)) end
+    for i=#global.players_in_vehicles, 1, -1 do
+        if global.players_in_vehicles[i] == p then
+            table.insert(global.offline_players_in_vehicles, p)
+            table.remove(global.players_in_vehicles, i)
+        end
+    end
+end)
+
 script.on_event(defines.events.on_tick, function(event)
 -- Main routine (remember the api and the "no heavy code in the on_tick event" advice? ^^) 
 -- Proceed only if there aren't any incompatible mods
@@ -289,8 +342,14 @@ script.on_event(defines.events.on_tick, function(event)
         else 
             global.playertick = 1
         end
+            
+
         for i=1, #global.players_in_vehicles, 1 do
             local p = global.players_in_vehicles[i]
+            -- if vehicle == nil don't process the player (i.e. if the character bound to the player changed)
+            if game.players[p].vehicle == nil then
+                return
+            end
             if hard_speed_limit > 0 then
             -- check if a vehicle is faster than the global speed limit
                 local speed = game.players[p].vehicle.speed
@@ -314,6 +373,10 @@ script.on_event(defines.events.on_tick, function(event)
         end
         -- process driving assistant
         for i=global.playertick, #global.players_in_vehicles, driving_assistant_tickrate do
+            -- if vehicle == nil don't process the player
+            if game.players[global.players_in_vehicles[i]].vehicle == nil then
+                return
+            end
             if #global.players_in_vehicles >= i and global.drive_assistant[global.players_in_vehicles[i]] then
                 manage_drive_assistant(event, global.players_in_vehicles[i])
             end

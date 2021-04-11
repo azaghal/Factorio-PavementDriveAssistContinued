@@ -35,7 +35,7 @@ This mod will increase the importance of proper roads as it will allow you to cr
 
 ###Additional features:###
 
-- **Road departure warning (New in 2.0.1)**: Warns you acoustically or via console output if your vehicle is leaving paved area, i.e. at a dead end or in very sharp curves. If the vehicle is not steered manually (by pressing "[W]") an emergency brake will be activated to stop the vehicle. 
+- **Road departure warning**: Warns you acoustically or via console output if your vehicle is leaving paved area, i.e. at a dead end or in very sharp curves. If the vehicle is not steered manually (by pressing "[W]") an emergency brake will be activated to stop the vehicle. 
 - **Highspeed support**: If your vehicle reaches speeds over 110 kmph (customisable in config file) the "path finder" will increase its search area in front of your vehicle, allowing safe ride for speeds up to 350 kmph. It is highly recommended to design your roads with appropriate curve radii before traveling with speeds of this magnitude!
 - **Native mod support**: All kinds of vehicles are supported if they are valid "car"-type entities.
 - **Blacklist vehicles**: Set up a custom list of vehicles you dont want to be supported.
@@ -79,6 +79,13 @@ If you like this mod and you've created a translation of your own, please do not
 ---
 
 ### Changelog
+  2.0.2 (2017-01-24)
+
+- Fix: Changing the player's character while driving caused a crash (for example while using YARM in remote monitoring mode)
+- Fix: Loading a game where another player was currently driving caused a crash  
+- Fix: The game crashed when a player in a vehicle disconnected from a game in multiplayer
+
+
   2.0.1 (2017-01-20)
 
 - New feature: Road departure warning system
