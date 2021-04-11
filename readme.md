@@ -116,6 +116,10 @@ If you like this mod and you've created a translation of your own, please do not
 ---
 
 ### Changelog
+  2.1.1 (2017-05-14)
+
+- Fixed an issue with the mod download manager caused by version numbering
+
   2.1.0 (2017-05-12)
 
 - Updated to work with Factorio version 0.15.10
