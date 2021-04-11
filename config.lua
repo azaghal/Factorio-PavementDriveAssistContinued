@@ -60,11 +60,16 @@ scores = {
 	["concrete-purple"] = 1, ["concrete-magenta"] = 1, ["concrete-white"] = 1,
 	["concrete-black"] = 1, ["concrete-hazard-left"] = 1, ["concrete-hazard-right"] = 1,
 	["concrete-fire-left"] = 1, ["concrete-fire-right"] = 1,
+    -- The following are "Dectorio" mod tiles
+    ["dect-wood-floor"] = 0.3, ["dect-gravel"] = 0.4, ["dect-paint-hazard"] = 0.2,
+    ["dect-paint-danger"] = 0.2, ["dect-paint-emergency"] = 0.5, ["dect-paint-caution"] = 0.5,
+    ["dect-paint-radiation"] = 0.5, ["dect-paint-defect"] = 0.5, ["dect-paint-operations"] = 0.5,
+    ["dect-paint-safety"] = 0.5,    
     -- The following are "More-Floors" mod tiles
-    ["smooth-concrete"] = 1, ["wood-floor"] = 0.4, ["reinforced-concrete"] = 1, 
+    ["smooth-concrete"] = 1, ["wood-floor"] = 0.3, ["reinforced-concrete"] = 1, 
     ["diamond-plate"] = 0.5, ["rusty-metal"] = 0.5, ["rusty-grate"] = 0.5, 
     ["arrow-grate"] = 1.25, ["arrow-grate-left"] = 1.25, ["arrow-grate-right"] = 1.25, 
-    ["arrow-grate-down"] = 1.25, ["circuit-floor"] = 0.5, ["gravel"] = 0.3, 
+    ["arrow-grate-down"] = 1.25, ["circuit-floor"] = 0.5, ["gravel"] = 0.4, 
     ["asphalt"] = 1.25, ["alien-metal"] = 0.5, ["metal-scraps"] = 0.5, 
     ["hexagonb"] = 0.5, ["fast-arrow-grate"] = 1.25, ["fast-arrow-grate-left"] = 1.25,
     ["fast-arrow-grate-right"] = 1.25, ["fast-arrow-grate-down"] = 1.25, ["express-arrow-grate"] = 1.25,

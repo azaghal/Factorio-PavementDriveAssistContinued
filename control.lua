@@ -54,6 +54,20 @@ script.on_event(defines.events.on_player_left_game, function(event)
     pda.on_player_left_game(event)
 end)
 
+-- if the runtime configuration of this mod is changed during gameplay
+script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
+    pda.on_settings_changed(event)
+end)
+
+-- if an sign is placed by the player or a robot
+script.on_event(defines.events.on_built_entity, function(event)
+    pda.on_placed_sign(event)
+end)
+script.on_event(defines.events.on_robot_built_entity, function(event)
+    pda.on_placed_sign(event)
+end)
+
+
 -- Main routine
 script.on_event(defines.events.on_tick, function(event)
     pda.on_tick(event)

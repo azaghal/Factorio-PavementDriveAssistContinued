@@ -17,9 +17,16 @@ data:extend(
             },
         time = 30
         },
-        -- no immediate effects. The tech is used as a flag for the mod code.
         effects =
         {
+            {
+                type = "unlock-recipe",
+                recipe = "pda-road-sign-speed-limit"
+            },
+            {
+                type = "unlock-recipe",
+                recipe = "pda-road-sign-speed-unlimit"
+            },
         },
         order = "e-b-a"	
     } 

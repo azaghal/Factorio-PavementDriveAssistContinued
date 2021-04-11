@@ -13,7 +13,7 @@ The idea for this was first implemented in "Pavement Drive Assist" made by silly
 
 **Effects on gameplay**
 
-This mod will increase the importance of proper roads as it will allow you to cross kilometres of land on roads, while doing nothing more than pressing "forward"! If this is still to much (maybe because your left middle finger starts to ache), then simply set up cruise control and the vehicle will accelerate on its own to maintain its speed. At this point your remaining task is to press "left" or "right" at junctions or to brake the vehicle if needed. Spend your travel time doing useful stuff like exploring your production statistics or managing trains. Autonomous driving has reached Factorio!
+This mod will increase the importance of proper roads as it will allow you to cross kilometres of land on roads, while doing nothing more than pressing "forward"! If this is still to much (maybe because your left middle finger starts to ache), then simply set up cruise control and the vehicle will accelerate on its own to maintain its speed. At this point your remaining task is to press "left" or "right" at junctions or to brake the vehicle if needed. Spend your travel time doing useful stuff like exploring your production statistics or managing trains. **Autonomous driving has reached Factorio!**
 
 ## Details
 
@@ -30,9 +30,13 @@ This mod will increase the importance of proper roads as it will allow you to cr
 ![](https://mods-data.factorio.com/pub_data/media_files/ODCCqrp58rpE.png)
 
 - **Cruise control**: Set up a cruising speed by pressing **[O]** (also customisable). Great for long travel, safety zones, parking lots or for cars that will otherwise reach uncontrollable speeds. Press the respective key again to disable it. In order to ensure maximum safety, braking will always override cruise control and if the car is stopped or is moving backwards, the system will be temporarily inactive. If you want to directly set up a certain value for your speed limit, press **[CTRL+O]**. A small text field will pop up, where you'll be able to insert a new cruise control speed limit.
-- **Alternative cruise control toggle mode (new in 2.1.0)**: If this personal setting option is enabled, toggling cruise control (by pressing [O]) no longer sets a new speed limit and will just load the last valid value instead. 
+- **Alternative cruise control toggle mode**: If this personal setting option is enabled, toggling cruise control (by pressing [O]) no longer sets a new speed limit and will just load the last valid value instead. 
 
 ![](https://mods-data.factorio.com/pub_data/media_files/qULH1DuszZR7.png)
+
+- **Speed limit signs!** (New in 2.1.2): Place speed limit signs on your roads to impose a speed limit on those vehicles that drive across it. This prevents driving at breakneck speed through gates, across railroad crossings or in your central parking lot. To change the limit, simply click on a sign and change the value of its output signal. Driving across a "End of speed limit"-sign will remove all imposed limits. To detect and process signs, both driving assistant and cruise control have to be activated. Switching cruise control to "off" will reset any speed limit.
+
+![Imgur](http://i.imgur.com/W5NodqF.png)
 
 ###Additional features:###
 
@@ -116,6 +120,14 @@ If you like this mod and you've created a translation of your own, please do not
 ---
 
 ### Changelog
+  2.1.2 (2017-07-09)
+
+- New Feature: Speed limit signs
+- Improved handling of mod settings
+- Added localised mod descritption for DE locale
+- Added tile detection support for Dectorio 0.5.12
+- Code optimisations
+
   2.1.1 (2017-05-14)
 
 - Fixed an issue with the mod download manager caused by version numbering

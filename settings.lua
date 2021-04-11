@@ -48,6 +48,15 @@ data:extend({
         maximum_value = 10000,
         order = "f",        
     },
+    {
+        type = "int-setting",
+        name = "PDA-setting-server-limit-sign-speed",
+        setting_type = "runtime-global",
+        default_value = 60,
+        minimum_value = 0,
+        maximum_value = 10000,
+        order = "g",        
+    },    
     -- settings per player 
     {
         type = "bool-setting",
@@ -70,8 +79,15 @@ data:extend({
         default_value = false,
         order = "c",        
     },
-    
-    -- tile score settings
+    {
+        type = "int-setting",
+        name = "PDA-setting-personal-limit-sign-speed",
+        setting_type = "runtime-per-user",
+        default_value = 60,
+        minimum_value = 0,
+        maximum_value = 10000,
+        order = "d",        
+    },    
 
     --[[{ doesnt work yet
         type = "string-setting",

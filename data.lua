@@ -2,6 +2,9 @@
 
 require("prototypes.technology")
 require("prototypes.sounds")
+require("prototypes.entity")
+require("prototypes.items")
+require("prototypes.recipe")
 
 data:extend({
     {
