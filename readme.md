@@ -120,6 +120,10 @@ If you like this mod and you've created a translation of your own, please do not
 ---
 
 ### Changelog
+  2.1.3 (2017-08-25)
+
+- Added tile detection support for Asphalt Roads 1.1.0
+
   2.1.2 (2017-07-09)
 
 - New Feature: Speed limit signs
