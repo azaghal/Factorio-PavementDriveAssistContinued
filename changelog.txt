@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.8
+Date: 10. 03. 2019
+  Features:
+    - Scores for tiles are now configurable via mod settings (runtime per map setting) and are preserved during future version changes
+    - Added tile detection support for refined concrete tiles provided by Dectorio
+    - Added tile detection support for clay bricks tile from Angel's Smelting
+  Changes:
+    - Simplified scores and removed negative score values for restricted tiles (it is still possible to set negative scores for certain tiles by hand, if desired)
+---------------------------------------------------------------------------------------------------
 Version: 2.1.7
 Date: 03. 03. 2019
   Major Features:

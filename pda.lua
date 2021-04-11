@@ -1,4 +1,4 @@
--- Copyright (2018) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
+-- Copyright (2019) Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly. 
 -- Provided under MIT license. See license.txt for details. 
 
 require "modgui"
@@ -70,6 +70,7 @@ local function init_global()
     global.hard_speed_limit = global.hard_speed_limit or kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value) or 0
     global.highspeed = global.highspeed or kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value) or 0.5
     global.driving_assistant_tickrate = global.driving_assistant_tickrate or settings.global["PDA-setting-tick-rate"].value or 2
+	global.scores = config.get_scores()
 end
 
 -- fired if a player enters or leaves a vehicle
@@ -110,10 +111,7 @@ function pda.on_player_driving_changed_state(event)
 			end
 			-- reset emergency brake
 			global.emergency_brake_active[p_id] = false
-		end
-
-		
-		
+		end		
 		
         if #global.players_in_vehicles > 0 then
             if debug then
@@ -291,6 +289,7 @@ local function manage_drive_assistant(index)
 	if player.riding_state.direction == defines.riding.direction.straight and math.abs(player.vehicle.speed) > global.min_speed then
 		local car = player.vehicle
 		local dir = car.orientation
+		local scores = global.scores
         local newdir = 0
 		local pi = math.pi
 		local fsin = math.sin
@@ -436,6 +435,7 @@ local function manage_drive_assistant(index)
         end
             
         -- Snap car to nearest 1/64 to avoid oscillation (@GotLag)
+		--car.orientation = newdir	
 		car.orientation = mfloor(newdir * 64 + 0.5) / 64		
             
         -- no score reset in curves -> allow the player to guide his vehicle off road manually
@@ -550,6 +550,9 @@ function pda.on_settings_changed(event)
         if s == "PDA-setting-tick-rate" then 
             global.driving_assistant_tickrate = settings.global["PDA-setting-tick-rate"].value 
         end
+		if string.sub(s, 1, 11) == "PDA-tileset" then
+			global.scores = config.update_scores()
+		end
     end
 end
 

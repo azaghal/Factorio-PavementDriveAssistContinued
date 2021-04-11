@@ -88,76 +88,70 @@ data:extend({
         maximum_value = 10000,
         order = "d",        
     },    
-
-    --[[{ doesnt work yet
-        type = "string-setting",
-        name = "PDA-setting-score",
-        setting_type = "runtime-global",
-        default_value = "PDA-setting-score-1",
-        allowed_values = {"PDA-setting-score-1", "PDA-setting-score-2", "PDA-setting-score-3"},
-        
-        --default_value = "Asphalt > Concrete > Stone",        
-        --allowed_values = {"Asphalt > Concrete > Stone", "Asphalt > Stone > Concrete", "Concrete > Asphalt > Stone", "Concrete > Stone > Asphalt", "Stone > Asphalt > Concrete", "Stone > Concrete > Asphalt" },
-        order = "h",        
-    },]]  
-    -- workaround:
-    --[[ WIP
-    {
-        type = "bool-setting",
-        name = "PDA-setting-custom-score",
-        setting_type = "runtime-global",
-        default_value = "false",
-        order = "g",        
-    },     
-    {
+    
+	{
         type = "double-setting",
-        name = "PDA-setting-custom-score-concrete",
+        name = "PDA-tileset-score-asphalt",
         setting_type = "runtime-global",
-        default_value = 1.00,
-        order = "ha",        
+        default_value = 1.5,
+		minimum_value = -2,
+		maximum_value = 2,
+        order = "h-a",        
     },    
-    {
+	{
         type = "double-setting",
-        name = "PDA-setting-custom-score-concrete-restricted",
-        setting_type = "runtime-global",
-        default_value = 0.2,
-        order = "hb",        
-    },    
-    {
-        type = "double-setting",
-        name = "PDA-setting-custom-score-stone",
-        setting_type = "runtime-global",
-        default_value = 0.5,
-        order = "hc",        
-    },        
-    {
-        type = "double-setting",
-        name = "PDA-setting-custom-score-asphalt",
+        name = "PDA-tileset-score-refined-concrete",
         setting_type = "runtime-global",
         default_value = 1.25,
-        order = "hd",        
+		minimum_value = -2,
+		maximum_value = 2,
+        order = "h-b",        
     },    
     {
         type = "double-setting",
-        name = "PDA-setting-custom-score-road-lines",
+        name = "PDA-tileset-score-concrete",
+        setting_type = "runtime-global",
+        default_value = 1.00,
+		minimum_value = -2,
+		maximum_value = 2,
+        order = "h-c",        
+    },    
+
+    {
+        type = "double-setting",
+        name = "PDA-tileset-score-stone",
+        setting_type = "runtime-global",
+        default_value = 0.6,
+		minimum_value = -2,
+		maximum_value = 2,
+        order = "h-d",        
+    },        
+	{
+        type = "double-setting",
+        name = "PDA-tileset-score-gravel",
         setting_type = "runtime-global",
         default_value = 0.4,
-        order = "he",        
+		minimum_value = -2,
+		maximum_value = 2,
+        order = "h-e",        
     },    
     {
         type = "double-setting",
-        name = "PDA-setting-custom-score-asphalt-restricted",
-        setting_type = "runtime-global",
-        default_value = -0.25,
-        order = "hf",        
-    },    
-    {
-        type = "double-setting",
-        name = "PDA-setting-custom-score-wood",
+        name = "PDA-tileset-score-wood",
         setting_type = "runtime-global",
         default_value = 0.3,
-        order = "hg",        
+		minimum_value = -2,
+		maximum_value = 2,
+        order = "h-f",        
     },    
-    ]]
+    {
+        type = "double-setting",
+        name = "PDA-tileset-score-asphalt-road-lines",
+        setting_type = "runtime-global",
+        default_value = 0.4,
+		minimum_value = -2,
+		maximum_value = 2,
+        order = "h-g",        
+    }
 })
 

@@ -21,7 +21,7 @@ This mod will increase the importance of proper roads as it will allow you to cr
 | Feature                       | Description                                                  |
 | ----------------------------- | :----------------------------------------------------------- |
 | **Driving Assistant**<br />   | **The driving assistant will keep your vehicle on paved roads** (if the road bends not to sharply)! The assistant scans all tiles in front of the vehicle and changes the orientation to follow tiles with a "pavement" score. Driving in left or right direction will override the assistant, so that you'll be always able to leave roads or to choose your desired direction at junctions. Toggle the driving assistant by pressing **[I]** (key binding is customizable).<br /> |
-| **Road tile detection**<br /> | **PDA tries to follow the tiles with the highest score.** By default this is concrete (or asphalt, if "[Asphalt Roads](https://mods.factorio.com/mods/Arcitos/AsphaltRoads "Asphalt Roads")" or "[More Floors](https://mods.factorio.com/mods/Tone/More_Floors)" are present), but if you use stone as your primary tile, just set the stats in the config file accordingly and everything will work fine for you too. Beside the vanilla tiles for stone, concrete and hazard concrete some other mod tiles are supported too. If you want to add additional tiles, just put their name and a value into the scores field found in the config file.<br /> |
+| **Road tile detection**<br /> | **PDA tries to follow the tiles with the highest score.** By default this is concrete (or asphalt, if "[Asphalt Roads](https://mods.factorio.com/mods/Arcitos/AsphaltRoads "Asphalt Roads")" or "[More Floors](https://mods.factorio.com/mods/Tone/More_Floors)" are present), but if you use stone as your primary tile, just set the value in mod settings accordingly and everything will work fine for you, too. Beside the vanilla tiles for stone, concrete and hazard concrete some other mod tiles are also supported. If you want to add additional tiles, just put their name and a value into the scores field found in the config file.<br /> |
 | **Cruise control**<br />      | **Set up a cruising speed by pressing** **[O]** (default key binding). Great for long travel, safety zones, parking lots or for cars that will otherwise reach uncontrollable speeds. Press the respective key again to disable it. In order to ensure maximum safety, braking will always override cruise control and if the car is stopped or is moving backwards, the system will be temporarily inactive. If you want to directly set up a certain value for your speed limit, press **[CTRL+O]**. A small text field will pop up, where you'll be able to insert a new cruise control speed limit.<br />**Alternative cruise control toggle mode:** If this personal setting option is enabled, toggling cruise control (by pressing **[O]**) no longer sets a new speed limit and will just load the last valid value instead.<br /> |
 | **Speed limit signs**         | **Place speed limit signs on your roads** to impose a speed limit on those vehicles that drive across it. This prevents driving at breakneck speed through gates, across railroad crossings or in your central parking lot. To change the limit, simply click on a sign and change the value of its output signal. Driving across a "End of speed limit"-sign will remove all imposed limits. To detect and process signs, both driving assistant and cruise control have to be activated. Switching cruise control to "off" will reset any speed limit. <br />**Set up variable speed limits** by linking speed limit signs to a circuit network: To do this, simply remove the limit on the sign itself and provide at least one signal via a red or green wire. Red signals will be prioritized over green signals and the signals itself will be treated according to their internal order (0>1>2>...>9>A>B>C>...>Z) |
 
@@ -46,10 +46,9 @@ This mod will increase the importance of proper roads as it will allow you to cr
 
 **Additional support for**:
 
+- [Dectorio](https://mods.factorio.com/mod/Dectorio)
 - [Color-coding concrete floors](https://mods.factorio.com/mods/justarandomgeek/color-coding) 
-
 - [5Dims concrete floors](https://mods.factorio.com/mods/McGuten/5dim_decoration) 
-
 - [Tones "More Floors"](https://mods.factorio.com/mods/Tone/More_Floors) 
 
 **Technology**
@@ -103,23 +102,3 @@ List of functions:
 - DE (German)
 
 If you like this mod and you've created a translation of your own, please do not hesitate to send it to me, so that it can be made accessible to all in the next version. Thanks in advance!
-
----
-
-### Changelog (latest change, for full log see changelog.txt)
-
-Version: 2.1.7
-
-Date: 03. 03. 2019
-
-**Major Features:**
-
-- Updated for Factorio 0.17.x
-
-**Bugfixes:**
-
-- **Fixed AAI related crash, when a non-player-character entered a vehicle as a passenger without a driver being present
-
-**Changes**:
-
-- Removed blue (now chemical) science pack requirement for driving assist technology
