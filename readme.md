@@ -123,6 +123,10 @@ If you like this mod and you've created a translation of your own, please do not
 
 ### Changelog
 
+  2.1.5 (2018-01-03)
+
+- Fixed issue with inactive driving assistant in multiplayer
+
   2.1.4 (2018-01-02)
 
 - Updated for Factorio 0.16.x

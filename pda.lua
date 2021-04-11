@@ -80,8 +80,13 @@ function pda.on_player_driving_changed_state(event)
 
     local player = game.players[event.player_index]
     -- put player at last position in list of players in vehicles
-    -- only allow certain vehicles (i.e. no trains)
-    if (player.vehicle ~= nil) and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil and player.vehicle.get_driver() == player then 
+    -- conditions: 
+    -- 1: player is within a vehicle
+    -- 2: the vehicle is a valid entity
+    -- 3: the entered vehicle is of type "car"
+    -- 4: the vehicle is not blacklisted
+    -- 5: the player ist the driver of the vehicle (the return value of "get_driver()" is double checked for type "LuaEntity" and type "LuaPlayer" respectively)
+    if (player.vehicle ~= nil) and player.vehicle.valid and player.vehicle.type == "car" and vehicle_blacklist[player.vehicle.name] == nil and (player.vehicle.get_driver() == player or player.vehicle.get_driver().player == player) then 
         -- insert player (or multiple instances of the same player, if benchmark_level > 1) in list
         for i = 1, benchmark_level do
             table.insert(global.players_in_vehicles, player.index)
