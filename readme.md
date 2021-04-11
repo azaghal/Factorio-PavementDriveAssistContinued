@@ -21,7 +21,7 @@ This mod will increase the importance of proper roads as it will allow you to cr
 
 - **The "Driving Assistant"**: It will automatically keep your vehicle on paved roads (if the road bends not to sharply)! The assistant scans all tiles in front of the vehicle and changes the orientation to follow tiles with a "pavement" score. Driving in left or right direction will override the assistant, so that you'll be allways able to leave roads or to choose your desired direction at junctions. Toggle the driving assistant by pressing **[K]** (key binding is customisable).
 
-![](https://mods-data.factorio.com/pub_data/media_files/TgWGJJDLNvtg.png)
+![](https://mods-data.factorio.com/pub_data/media_files/jK4Cft0x6GC0.png)
 
 ![](https://mods-data.factorio.com/pub_data/media_files/phTyjp8EZqLp.png)
 
@@ -35,11 +35,12 @@ This mod will increase the importance of proper roads as it will allow you to cr
 
 ###Additional features:###
 
+- **Road departure warning (New in 2.0.1)**: Warns you acoustically or via console output if your vehicle is leaving paved area, i.e. at a dead end or in very sharp curves. If the vehicle is not steered manually (by pressing "[W]") an emergency brake will be activated to stop the vehicle. 
 - **Highspeed support**: If your vehicle reaches speeds over 110 kmph (customisable in config file) the "path finder" will increase its search area in front of your vehicle, allowing safe ride for speeds up to 350 kmph. It is highly recommended to design your roads with appropriate curve radii before traveling with speeds of this magnitude!
 - **Native mod support**: All kinds of vehicles are supported if they are valid "car"-type entities.
 - **Blacklist vehicles**: Set up a custom list of vehicles you dont want to be supported.
-- **Global speed limit**: Limit the speed ridable cars can reach in your game (singleplayer and multiplayer).
-- **Optimised code for multiplayer**: You are running a huge server? That's not an issue: The main routine causes almost zero load as long as noone is driving, and up to 10 players are able to drive simultaneously at any given time without causing any serious lags! But i bet your machines will support much more than my ancient laptop was able to: My benchmark tests with 25 simulated players driving at 130 km/h and active cruise control resulted in an 10 FPS drop. 
+- **Global speed limit**: Limit the speed that rideable cars are able to reach in your game (works also in multiplayer)
+- **Optimised code for multiplayer**: You are running a huge server? That's not an issue: The main routine causes almost zero load as long as no one is driving, and up to 10 players are able to drive simultaneously at any given time without causing any serious lags! But i bet your machines will support much more than my ancient laptop was able to: My benchmark tests with 25 simulated players driving at 130 km/h and active cruise control resulted in an 10 FPS drop. 
 - **Fine-tune CPU usage**: You are always free to reduce the tick rate of the driving assistant or to disable cruise control if you experience load issues (just take a look at the config file). On the other hand: If your CPU is bored, you're also able to increase the precision (to 60 scans per second), while effectively doubling the load.
 
 
@@ -78,6 +79,11 @@ If you like this mod and you've created a translation of your own, please do not
 ---
 
 ### Changelog
+  2.0.1 (2017-01-20)
+
+- New feature: Road departure warning system
+- Fixed some typos
+
   2.0.0 (2017-01-13)
 
 initial release of version 2:

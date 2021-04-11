@@ -48,6 +48,8 @@ local function init_global()
     global.players_in_vehicles = global.players_in_vehicles or {}
     global.playertick = global.playertick or 0
     global.mod_compatibility = nil
+    global.last_score = global.last_score or {}
+    global.emergency_brake_active = global.emergency_brake_active or {}
 end
 
 script.on_event(defines.events.on_player_driving_changed_state, function(event)
@@ -61,12 +63,14 @@ script.on_event(defines.events.on_player_driving_changed_state, function(event)
             table.insert(global.players_in_vehicles, event.player_index)
         end
     else
-    -- remove player from list. 
+        -- remove player from list. 
         for i=#global.players_in_vehicles, 1, -1 do
             if global.players_in_vehicles[i] == event.player_index then
                 table.remove(global.players_in_vehicles, i)
             end
         end
+        -- reset emergency brake
+        global.emergency_brake_active[event.player_index] = false
     end
     if #global.players_in_vehicles > 0 then
         if debug then
@@ -210,7 +214,22 @@ local function manage_drive_assistant(event, index)
 				player.print("x:" .. px .. "->" .. px+vs[1]*(lookahead_start + lookahead_length) .. ", y:" .. py .. "->" .. py+vs[2]*(lookahead_start + lookahead_length))
 				player.print("S: " .. ss .. " R: " .. sr .. " L: " .. sl)
 			end
-			
+            
+            -- check if the score indicates that the vehicle leaved paved area
+            global.last_score[index] = global.last_score[index] or 0
+            local ts = ss+sr+sl
+            if ts < global.last_score[index] and ts == 0 and not global.emergency_brake_active[index] then
+                -- warn the player and activate emergency brake
+                if alert then
+                    player.surface.create_entity({name = "pda-warning-1", position = player.position})
+                elseif verbose then
+                    player.print({"DA-road-departure-warning"})                
+                end
+                player.riding_state = {acceleration = defines.riding.acceleration.braking, direction = player.riding_state.direction}
+                global.emergency_brake_active[index] = true                           
+            end
+			global.last_score[index] = ts
+            
             -- set new direction depending on the scores (@sillyfly)
 			if sr > ss and sr > sl then
 				newdir = dir + (changeangle*sr*2)/(sr+ss)
@@ -219,9 +238,13 @@ local function manage_drive_assistant(event, index)
 			else
                 newdir = dir
             end
+            
 			-- Snap car to nearest 1/64 to avoid oscillation (@GotLag)
-			car.orientation = math.floor(newdir * 64 + 0.5) / 64			
-		end
+			car.orientation = math.floor(newdir * 64 + 0.5) / 64		
+            
+		elseif player.riding_state.direction ~= defines.riding.direction.straight then
+            global.last_score[index] = 0
+        end
 end
 
 -- check if vehicle speed needs to be adjusted (only if cruise control is active)
@@ -257,7 +280,7 @@ end)
 
 script.on_event(defines.events.on_tick, function(event)
 -- Main routine (remember the api and the "no heavy code in the on_tick event" advice? ^^) 
--- Proceed only if there are'nt any incompatible mods
+-- Proceed only if there aren't any incompatible mods
     if global.mod_compatibility ~= nil and global.mod_compatibility == true then
         -- Process every n-th player in vehicles (n = driving_assistant_tickrate)
         -- Exception: Process "cruise control" every tick to gain maximum acceleration
@@ -278,10 +301,18 @@ script.on_event(defines.events.on_tick, function(event)
                     game.players[p].vehicle.speed = -hard_speed_limit
                 end
             end
-            if cruise_control_allowed and global.cruise_control[p] then 
+            -- check if emergency brake is active
+            if global.emergency_brake_active[p] then
+                if game.players[p].riding_state.acceleration == (defines.riding.acceleration.accelerating) or game.players[p].vehicle.speed == 0 then
+                    global.emergency_brake_active[p] = false
+                else 
+                    game.players[p].riding_state = {acceleration = defines.riding.acceleration.braking, direction = game.players[p].riding_state.direction}
+                end
+            elseif cruise_control_allowed and global.cruise_control[p] then 
                 manage_cruise_control(event, p)
             end
         end
+        -- process driving assistant
         for i=global.playertick, #global.players_in_vehicles, driving_assistant_tickrate do
             if #global.players_in_vehicles >= i and global.drive_assistant[global.players_in_vehicles[i]] then
                 manage_drive_assistant(event, global.players_in_vehicles[i])

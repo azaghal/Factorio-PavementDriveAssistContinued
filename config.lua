@@ -5,6 +5,9 @@
 -- Messaging flag. Setting to true will announce changes of the state of the drive assistant or cruise control (activated/deactivated) to the console
 verbose = true
 
+-- Sound flag. As long as this is "true" there will be a short warning sound played if the player's vehicle leaves paved ground, indicating a dead end (or an unintended failure of the PDA). If set so false, the warning will be printed to console.
+alert = true
+
 -- Technology flag. Default setting is true. Set this to false if you want drive assistant and cruise control to work without researching the technology at first. 
 technology_required = true
 

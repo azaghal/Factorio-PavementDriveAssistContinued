@@ -1,4 +1,5 @@
 require("prototypes.technology")
+require("prototypes.sounds")
 
 data:extend({
     {
