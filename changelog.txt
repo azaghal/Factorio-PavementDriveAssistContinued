@@ -1,7 +1,7 @@
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.1
 Date: 13.04.2021.
-  Optimisations:
+  Compatibility:
     - All migration-related code has been dropped since it is relevant only for releases of Pavement Drive Assist for Factorio versions below 0.18. Factorio 1.1 is not capable of loading savegames older than those created with version 0.18. Therefore all users will need to upgrade first to Factorio version 0.18 or 1.0 first, at which point the necessary migrations will get applied by the upstream (old) mod. None of the migration code is applicable for new installations of Pavement Drive Assist Continued mod.
   Bugfixes:
     - Fixed problem where mod would not load because a migration was using an old path.
