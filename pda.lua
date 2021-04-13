@@ -68,12 +68,10 @@ local function init_global()
     global.players_in_vehicles = global.players_in_vehicles or {}
     global.offline_players_in_vehicles = global.offline_players_in_vehicles or {}
     global.playertick = global.playertick or 0
-    --global.mod_compatibility = nil --currently not necessary
     global.last_score = global.last_score or {}
     global.last_sign_data = global.last_sign_data or {}
     global.active_signs = global.active_signs or {}
     global.vehicles_registered_to_signs = global.vehicles_registered_to_signs or {}
-    --global.last_scan = global.last_scan or {{},{}}
     global.road_departure_brake_active = global.road_departure_brake_active or {}
     global.cruise_control_brake_active = global.cruise_control_brake_active or {}
     global.emergency_brake_power = global.emergency_brake_power or {}
@@ -81,7 +79,7 @@ local function init_global()
     global.hard_speed_limit = global.hard_speed_limit or kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value) or 0
     global.highspeed = global.highspeed or kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value) or 0.5
     global.driving_assistant_tickrate = global.driving_assistant_tickrate or settings.global["PDA-setting-tick-rate"].value or 2
-	global.scores = Config.get_scores()
+    global.scores = Config.get_scores()
 end
 
 
@@ -227,45 +225,10 @@ function pda.on_player_driving_changed_state(event)
     end
 end
 
--- some (including this) mod was modified, added or removed from the game
-function pda.on_configuration_changed(data)
-    init_global()
-    if data.mod_changes ~= nil and data.mod_changes["PavementDriveAssist"] ~= nil and data.mod_changes["PavementDriveAssist"].old_version == nil then
-        -- anounce installation
-        notification({"DA-notification-midgame-update", {"DA-prefix"}, data.mod_changes["PavementDriveAssist"].new_version})
-    elseif data.mod_changes ~= nil and data.mod_changes["PavementDriveAssist"] ~= nil and data.mod_changes["PavementDriveAssist"].old_version ~= nil then
-        -- anounce update
-        local oldver = data.mod_changes["PavementDriveAssist"].old_version
-        local newver = data.mod_changes["PavementDriveAssist"].new_version
-        notification({"DA-notification-new-version", {"DA-prefix"}, oldver, newver})
-        -- 2.1.2 update
-        for index, force in pairs(game.forces) do
-            local technologies = force.technologies
-            local recipes = force.recipes
-            technologies["Arci-pavement-drive-assistant"].reload()
-            recipes["pda-road-sign-speed-limit"].reload()
-            recipes["pda-road-sign-speed-unlimit"].reload()
-            if technologies["Arci-pavement-drive-assistant"].researched then
-                recipes["pda-road-sign-speed-limit"].enabled = true
-                recipes["pda-road-sign-speed-unlimit"].enabled = true
-            end
-        end
-    elseif data.mod_changes ~= nil then
-        init_global()
-        -- some other mod was added, removed or modified. Check, if this mod is or was incompatible with PDA
-        --currently not necessary
-        --[[global.mod_compatibility = check_compatibility()
-        if global.mod_compatibility == false then
-            incompability_detected()
-        end
-        ]]
-    end
-end
-
 -- if the player presses the respective key, this event is fired to toggle the current state of cruise control
 function pda.toggle_cruise_control(event)
     local player = game.players[event.player_index]
-    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) and player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and Config.vehicle_blacklist[player.vehicle.name] == nil --[[and global.mod_compatibility]] then
+    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) and player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and Config.vehicle_blacklist[player.vehicle.name] == nil then
         if settings.global["PDA-setting-allow-cruise-control"].value then
             if (global.cruise_control[event.player_index] == nil or global.cruise_control[event.player_index] == false) then
                 global.cruise_control[event.player_index] = true
@@ -312,7 +275,7 @@ end
 -- if the player presses the respective key, this event is fired to show/set the current cruise control limit
 function pda.set_cruise_control_limit(event)
     local player = game.players[event.player_index]
-    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) --[[and global.mod_compatibility]] then
+    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) then
         if settings.global["PDA-setting-allow-cruise-control"].value then
             -- open the gui if its not already open, otherwise close it
             if not player.gui.center.pda_cc_limit_gui_frame then
@@ -400,7 +363,7 @@ end
 function pda.toggle_drive_assistant(event)
     local player = game.players[event.player_index]
     local drvassist = global.drive_assistant[player.index]
-    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) --[[and global.mod_compatibility]] then
+    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) then
         if (drvassist == nil or drvassist == false) then
             -- check if the vehicle is blacklisted
             if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" then
@@ -472,16 +435,7 @@ local function manage_drive_assistant(player_index)
             lookahead_start_hs = mfloor (Config.hs_start_extension * speed_factor + 0.5)
             lookahead_length_hs = mfloor (Config.hs_length_extension * speed_factor + 0.5)
         end
---[[
-        local dir = car.orientation
-        local pi = math.pi
-        local sign = (car.speed >= 0 and 1) or -1
-        local vs = {math.sin(2*pi*dir), -math.cos(2*pi*dir)}
-]]
-        --local last_scan = global.last_scan[player.index]
-        --local new_scan = {{},{}}
-        -- calculate scores within the scanning area in front of the vehicle (@sillyfly)
-        -- commented out areas: Intended to cache scanned tiles to avoid multiple scans. Downside: This is apparently 5%-10% slower than accessing the raw tile data on each tick.
+
         for i=Config.lookahead_start + lookahead_start_hs,Config.lookahead_start + Config.lookahead_length + lookahead_length_hs do
 			local d = i*sign
             local rstx = str[1] + vs[1]*d
@@ -492,10 +446,10 @@ local function manage_drive_assistant(player_index)
             local rty = py + vr[2]*d
             local ltx = px + vl[1]*d
             local lty = py + vl[2]*d
-			local rst = --[[(last_scan ~= nil and last_scan[rstx] ~= nil and last_scan[rstx][rsty]) or]] scores[get_tile(rstx, rsty).name]
-			local lst = --[[(last_scan ~= nil and last_scan[lstx] ~= nil and last_scan[lstx][lsty]) or]] scores[get_tile(lstx, lsty).name]
-			local rt = --[[(last_scan ~= nil and last_scan[rtx] ~= nil and last_scan[rtx][rty]) or]] scores[get_tile(rtx, rty).name]
-			local lt = --[[(last_scan ~= nil and last_scan[ltx] ~= nil and last_scan[ltx][lty]) or]] scores[get_tile(ltx, lty).name]
+			local rst = scores[get_tile(rstx, rsty).name]
+			local lst = scores[get_tile(lstx, lsty).name]
+			local rt = scores[get_tile(rtx, rty).name]
+			local lt = scores[get_tile(ltx, lty).name]
 
             ss = ss + (((rst or 0) + (lst or 0))/2.0)
 			sr = sr + (rt or 0)
@@ -512,7 +466,6 @@ local function manage_drive_assistant(player_index)
             new_scan[ltx][lty] = lt
             ]]
  		end
-        --global.last_scan[player.index] = new_scan
 		--[[if debug then
 			player.print("x:" .. px .. "->" .. px+vs[1]*(lookahead_start + lookahead_length) .. ", y:" .. py .. "->" .. py+vs[2]*(lookahead_start + lookahead_length))
 			player.print("S: " .. ss .. " R: " .. sr .. " L: " .. sl)
@@ -972,10 +925,7 @@ end
 -- on game start
 function pda.on_init(data)
     init_global()
-    --[[if global.mod_compatibility == false then
-        incompability_detected()
-    end]]
-    -- if no tech is needed, disable the tech for all forces
+
     for k, f in pairs (game.forces) do
         f.technologies["Arci-pavement-drive-assistant"].enabled = settings.global["PDA-setting-tech-required"].value
     end

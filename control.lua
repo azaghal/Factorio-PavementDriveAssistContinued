@@ -15,11 +15,6 @@ script.on_event(defines.events.on_player_driving_changed_state, function(event)
     pda.on_player_driving_changed_state(event)
 end)
 
--- some (including this) mod was modified, added or removed from the game
-script.on_configuration_changed(function(data)
-    pda.on_configuration_changed(data)
-end)
-
 -- if the player presses the respective key, this event is fired to toggle the current state of cruise control
 script.on_event("toggle_cruise_control", function(event)
     pda.toggle_cruise_control(event)
