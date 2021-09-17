@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
-Version: 999.999.999
-Date: 99.99.9999.
+Version: 3.1.0
+Date: 17.09.2021.
   Features:
     - Added tile detection support for AAI Industries.
     - Added tile detection support for Transport Drones.
