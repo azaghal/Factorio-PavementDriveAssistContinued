@@ -46,6 +46,11 @@ script.on_init(function(data)
     pda.on_init(data)
 end)
 
+-- on mod upgrade/change to installed mods
+script.on_configuration_changed(function(data)
+    pda.on_init(data)
+end)
+
 -- joining players that drove vehicles while leaving the game are in the "offline_players_in_vehicles" list and will be put back to normal
 script.on_event(defines.events.on_player_joined_game, function(event)
     pda.on_player_joined_game(event)
