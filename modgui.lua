@@ -37,5 +37,8 @@ function PDA_Modgui.create_cc_limit_gui(player)
       caption = "OK",
       style = "Arci-pda-gui-style"
     }
-  -- end
+
+    -- Make the created/opened frame as top one upon creation (so user
+    -- can close it by pressing Escape key).
+    player.opened = frame
 end

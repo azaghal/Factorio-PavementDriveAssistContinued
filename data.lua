@@ -26,12 +26,6 @@ data:extend({
         key_sequence = "CONTROL + O",
         consuming = "game-only"
     },
-	{
-		type = "custom-input",
-		name = "set_cruise_control_limit_ok",
-		key_sequence = "RETURN",
-		consuming = "none"
-	},
     {
         type = "font",
         name = "Arci-pda-font",

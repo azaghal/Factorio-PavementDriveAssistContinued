@@ -25,12 +25,6 @@ script.on_event("set_cruise_control_limit", function(event)
     pda.set_cruise_control_limit(event)
 end)
 
--- if the player presses the return key, this event is fired to set the current cruise control limit
-script.on_event("set_cruise_control_limit_ok", function(event)
-    pda.set_cruise_control_limit_ok(event)
-end)
-
-
 -- handle gui interaction
 script.on_event(defines.events.on_gui_click, function(event)
     pda.on_gui_click(event)
@@ -84,3 +78,9 @@ end)
 script.on_event(defines.events.on_tick, function(event)
     pda.on_tick(event)
 end)
+
+-- Handle player confirmation (pressing Enter on focused textfield).
+script.on_event(defines.events.on_gui_confirmed, pda.on_gui_confirmed)
+
+-- Handle player closing the windows (pressing Escape).
+script.on_event(defines.events.on_gui_closed, pda.on_gui_closed)

@@ -4,8 +4,12 @@ Date: 99.99.9999.
   Features:
     - Added tile detection support for AAI Industries.
     - Added tile detection support for Transport Drones.
+    - The "Set cruise speed limit" dialog can now be closed via keyboard by pressing "Escape".
+  Changes:
+    - Removed the configurable set_cruise_control_limit_ok shortcut key for accepting the changes in dialog for setting the cruise speed.
   Bugfixes:
     - Enable tile detection support for mods added/upgraded in an existing savegame.
+    - Cruise speed change can now be properly confirmed by pressing "Enter" in the "Set cruise speed limit" dialog.
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.1
 Date: 13.04.2021.

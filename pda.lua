@@ -325,15 +325,6 @@ function pda.set_new_value_for_cruise_control_limit(event)
 	end
 end
 
--- handle gui interaction: player pressed "Return"-key
-function pda.set_cruise_control_limit_ok(event)
-	local player = game.players[event.player_index]
-	if player.gui.center.pda_cc_limit_gui_frame then
-		pda.set_new_value_for_cruise_control_limit(event)
-		player.gui.center.pda_cc_limit_gui_frame.destroy()
-	end
-end
-
 -- handle gui interaction: player clicked on a button
 function pda.on_gui_click(event)
     local player = game.players[event.player_index]
@@ -345,6 +336,29 @@ function pda.on_gui_click(event)
 			player.gui.center.pda_cc_limit_gui_frame.destroy()
 		end
 	end
+end
+
+-- handle gui interaction: player confirmed entry via textfield
+function pda.on_gui_confirmed(event)
+   if event.element and event.element.name == "pda_cc_limit_gui_textfield" then
+      local player = game.players[event.player_index]
+
+      if player.gui.center.pda_cc_limit_gui_frame then
+         pda.set_new_value_for_cruise_control_limit(event)
+         player.gui.center.pda_cc_limit_gui_frame.destroy()
+      end
+   end
+end
+
+-- handle gui interaction: player closed cruise speed window via Escape
+function pda.on_gui_closed(event)
+   if event.element and event.element.name == "pda_cc_limit_gui_frame" then
+      local player = game.players[event.player_index]
+
+      if player.gui.center.pda_cc_limit_gui_frame then
+         player.gui.center.pda_cc_limit_gui_frame.destroy()
+      end
+   end
 end
 
 -- shortcuts
