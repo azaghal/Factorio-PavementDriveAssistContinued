@@ -1,6 +1,9 @@
 ---------------------------------------------------------------------------------------------------
 Version: 999.999.999
 Date: 99.99.9999.
+  Features:
+    - Added tile detection support for AAI Industries.
+    - Added tile detection support for Transport Drones.
   Bugfixes:
     - Enable tile detection support for mods added/upgraded in an existing savegame.
 ---------------------------------------------------------------------------------------------------
