@@ -1143,7 +1143,7 @@ function pda.on_tick(event)
             end
         -- ...otherwise proceed to handle cruise control
         elseif global.cruise_control_brake_active[p] then
-            if (car.speed < global.cruise_control_limit[p]) and global.imposed_speed_limit[p] == nil or (global.imposed_speed_limit[p] ~= nil and car.speed < global.imposed_speed_limit[p]) then
+            if (global.cruise_control_limit[p] ~= nil and car.speed < global.cruise_control_limit[p]) and global.imposed_speed_limit[p] == nil or (global.imposed_speed_limit[p] ~= nil and car.speed < global.imposed_speed_limit[p]) then
                 global.cruise_control_brake_active[p] = false
                 player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
             else

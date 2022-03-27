@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
-Version: 999.999.999
-Date: 99.99.9999.
+Version: 3.1.1
+Date: 28.03.2022.
+  Bugfixes:
+    - Fixed a crash that occurred if a player crossed a speed limit sign without first setting a cruise control limit.
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.0
 Date: 17.09.2021.
