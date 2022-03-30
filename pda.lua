@@ -80,6 +80,15 @@ local function init_global()
     global.highspeed = global.highspeed or kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value) or 0.5
     global.driving_assistant_tickrate = global.driving_assistant_tickrate or settings.global["PDA-setting-tick-rate"].value or 2
     global.scores = Config.get_scores()
+
+    -- Ensure that cruise control limit is set to non-nil value for existing players.
+    -- Needed when upgrading from versions <= 3.1.0.
+    for player_index in pairs(game.players) do
+        global.cruise_control_limit[player_index] =
+            global.cruise_control_limit[player_index] or
+            kmph_to_mpt(game.players[player_index].mod_settings["PDA-setting-personal-limit-sign-speed"].value)
+    end
+
 end
 
 
@@ -233,8 +242,8 @@ function pda.toggle_cruise_control(event)
             if (global.cruise_control[event.player_index] == nil or global.cruise_control[event.player_index] == false) then
                 global.cruise_control[event.player_index] = true
 				player.set_shortcut_toggled("pda-cruise-control-toggle", true)
-                -- set cruise control speed limit, but do not, if alt toggle mode active
-                if global.cruise_control_limit[event.player_index] == nil or player.mod_settings["PDA-setting-alt-toggle-mode"].value == false then
+                -- Set cruise control speed limit if alt toggle mode is not active.
+                if player.mod_settings["PDA-setting-alt-toggle-mode"].value == false then
                     global.cruise_control_limit[event.player_index] = player.vehicle.speed
                     -- check for reverse gear
                     if player.vehicle.speed < 0 then
@@ -280,12 +289,7 @@ function pda.set_cruise_control_limit(event)
             -- open the gui if its not already open, otherwise close it
             if not player.gui.center.pda_cc_limit_gui_frame then
                 PDA_Modgui.create_cc_limit_gui(player)
-                -- if cruise control is active, load the current limit
-                if global.cruise_control[player.index] == true then
-                    player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = tostring(mpt_to_kmph(global.cruise_control_limit[player.index]))
-                else
-                    player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = ""
-                end
+                player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = tostring(mpt_to_kmph(global.cruise_control_limit[player.index]))
 				player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.select_all()
 				player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.focus()
             else
@@ -981,6 +985,11 @@ function pda.on_player_joined_game(event)
         end
     end
     if Config.debug then notification(tostring("num players now in offline_mode: "..#global.offline_players_in_vehicles)) end
+
+    -- Ensure that cruise control limit is set to non-nil value for joining players.
+    global.cruise_control_limit[p] =
+        global.cruise_control_limit[p] or
+        kmph_to_mpt(game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value)
 end
 
 -- puts leaving players currently driving a vehicle in the "offline_players_in_vehicles" list

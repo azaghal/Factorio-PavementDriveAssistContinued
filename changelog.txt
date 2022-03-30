@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 999.999.999
 Date: 99.99.9999.
+  Bugfixes:
+    - Fix crashes due to cruise control limit not being set for players when driving over a speed limit sign. If not already set, cruise control limit will default to player's default value for speed limit signs.
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.0
 Date: 17.09.2021.
