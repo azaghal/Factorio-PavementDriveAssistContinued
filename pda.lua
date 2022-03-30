@@ -1,6 +1,6 @@
 -- Copyright (c) 2016 sillyfly
 -- Copyright (c) 2019 Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly.
--- Copyright (c) 2021 Branko Majic
+-- Copyright (c) 2022 Branko Majic
 -- Provided under MIT license. See LICENSE for details.
 
 require "modgui"

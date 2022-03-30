@@ -1,5 +1,6 @@
 -- Copyright (c) 2016 sillyfly
 -- Copyright (c) 2019 Arcitos, based on work of sillyfly. Provided under MIT license. See license.txt for details.
+-- Copyright (c) 2022 Branko Majic
 -- Provided under MIT license. See LICENSE for details.
 
 -- ###  ADVANCED SETTINGS  ###
