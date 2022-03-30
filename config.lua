@@ -245,13 +245,16 @@ scores = {
 
     -- Krastorio 2
     ["kr-white-reinforced-plate"] = scores_values.asphalt,
-    ["kr-dark-reinforced-plate"] = scores_values.asphalt,
+    ["kr-black-reinforced-plate"] = scores_values.asphalt,
+    ["kr-white-reinforced-plate-l"] = scores_values.asphalt,
+    ["kr-black-reinforced-plate-l"] = scores_values.asphalt,
 
     -- AAI Industries.
     ["rough-stone-path"] = scores_values.gravel,
 
     -- Transport Drones.
-    ["transport-drone-road"] = scores_values.stone
+    ["transport-drone-road"] = scores_values.stone,
+    ["transport-drone-road-better"] = scores_values.asphalt
 }
 end
 

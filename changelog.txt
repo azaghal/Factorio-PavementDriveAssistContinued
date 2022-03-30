@@ -1,8 +1,12 @@
 ---------------------------------------------------------------------------------------------------
 Version: 999.999.999
 Date: 99.99.9999.
+  Features:
+    - Added tile detection support for Fast Road from Transport Drones mod.
+    - Added tile detection support for legacy variants of reinforced plates from Krastorio 2 mod.
   Bugfixes:
     - Fix crashes due to cruise control limit not being set for players when driving over a speed limit sign. If not already set, cruise control limit will default to player's default value for speed limit signs.
+    - Fixed tile detection for black reinforced plates from Krastorio 2 mod.
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.0
 Date: 17.09.2021.
