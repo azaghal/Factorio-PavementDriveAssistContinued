@@ -237,10 +237,12 @@ end
 -- if the player presses the respective key, this event is fired to toggle the current state of cruise control
 function pda.toggle_cruise_control(event)
     local player = game.players[event.player_index]
-    if (settings.startup["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or
-        settings.startup["PDA-setting-tech-required"].value == false) and
-        player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and Config.vehicle_blacklist[player.vehicle.name] == nil then
-        if settings.global["PDA-setting-allow-cruise-control"].value then
+
+    if  pda.is_driver_assistance_technology_available() and
+        player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and
+        Config.vehicle_blacklist[player.vehicle.name] == nil then
+
+        if pda.is_cruise_control_allowed() then
             if (global.cruise_control[event.player_index] == nil or global.cruise_control[event.player_index] == false) then
                 global.cruise_control[event.player_index] = true
 				player.set_shortcut_toggled("pda-cruise-control-toggle", true)
@@ -286,8 +288,8 @@ end
 -- if the player presses the respective key, this event is fired to show/set the current cruise control limit
 function pda.set_cruise_control_limit(event)
     local player = game.players[event.player_index]
-    if (settings.startup["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.startup["PDA-setting-tech-required"].value == false) then
-        if settings.global["PDA-setting-allow-cruise-control"].value then
+    if pda.is_driver_assistance_technology_available() then
+        if pda.is_cruise_control_allowed() then
             -- open the gui if its not already open, otherwise close it
             if not player.gui.center.pda_cc_limit_gui_frame then
                 PDA_Modgui.create_cc_limit_gui(player)
@@ -383,8 +385,7 @@ end
 function pda.toggle_drive_assistant(event)
     local player = game.players[event.player_index]
     local drvassist = global.drive_assistant[player.index]
-    if (settings.startup["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or
-        settings.startup["PDA-setting-tech-required"].value == false) then
+    if pda.is_driver_assistance_technology_available() then
         if (drvassist == nil or drvassist == false) then
             -- check if the vehicle is blacklisted
             if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" then
@@ -1158,7 +1159,7 @@ function pda.on_tick(event)
                 player.riding_state = {acceleration = brk, direction = player.riding_state.direction}
             end
         -- ...otherwise proceed to handle cruise control
-        elseif settings.global["PDA-setting-allow-cruise-control"].value and global.cruise_control[p] then
+        elseif pda.is_cruise_control_allowed() and global.cruise_control[p] then
             manage_cruise_control(p)
         end
     end
@@ -1173,4 +1174,28 @@ function pda.on_tick(event)
         end
     end
     --global.playertick = ptick
+end
+
+
+--- Checks if driver assistance and cruise control technologies are available.
+--
+-- @return bool True if yes, false otherwise.
+--
+function pda.is_driver_assistance_technology_available()
+    if settings.startup["PDA-setting-tech-required"].value then
+        return player.force.technologies["Arci-pavement-drive-assistant"].researched
+    end
+
+    return true
+end
+
+
+--- Check if cruise control is allowed.
+--
+-- This is a separate check from the technology availability check.
+--
+-- @return bool True if allowed, false otherwise.
+--
+function pda.is_cruise_control_allowed()
+    return settings.global["PDA-setting-allow-cruise-control"].value
 end
