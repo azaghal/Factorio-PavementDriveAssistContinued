@@ -1,6 +1,10 @@
 ---------------------------------------------------------------------------------------------------
 Version: 999.999.999
 Date: 99.99.9999.
+  Changes:
+    - Moved setting for requiring technology requirement for driving assistant and cruise control into startup settings.
+  Features:
+    - Added startup setting for disabling the smart roads functionality (does not affect driving assistant nor cruise control).
 ---------------------------------------------------------------------------------------------------
 Version: 3.2.0
 Date: 31.03.2022.

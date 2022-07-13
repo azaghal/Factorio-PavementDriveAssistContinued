@@ -2,9 +2,16 @@ data:extend({
     {
         type = "bool-setting",
         name = "PDA-setting-tech-required",
-        setting_type = "runtime-global",
+        setting_type = "startup",
         default_value = true,
-        order = "a",
+        order = "aa",
+    },
+    {
+        type = "bool-setting",
+        name = "PDA-setting-smart-roads-enabled",
+        setting_type = "startup",
+        default_value = true,
+        order = "ab",
     },
     {
         type = "bool-setting",

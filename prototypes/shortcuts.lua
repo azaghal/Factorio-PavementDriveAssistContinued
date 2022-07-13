@@ -1,9 +1,3 @@
-local tech = "Arci-pavement-drive-assistant"
---[[
-if settings.global["PDA-setting-tech-required"].value then
-	tech = "Arci-pavement-drive-assistant"
-end]]
-
 data:extend({
 	{
 		type = "shortcut",
@@ -11,7 +5,6 @@ data:extend({
 		order = "a",
 		action = "lua",
 		localised_name = {"controls.toggle_cruise_control"},
-		technology_to_unlock = tech,
 		toggleable = true,
 		icon =
 		{
@@ -44,7 +37,6 @@ data:extend({
 		order = "a",
 		action = "lua",
 		localised_name = {"controls.set_cruise_control_limit"},
-		technology_to_unlock = tech,
 		style = "green",
 		icon =
 		{
@@ -77,7 +69,6 @@ data:extend({
 		order = "a",
 		action = "lua",
 		localised_name = {"controls.toggle_drive_assistant"},
-		technology_to_unlock = tech,
 		toggleable = true,
 		icon =
 		{

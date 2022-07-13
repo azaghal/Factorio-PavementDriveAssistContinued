@@ -237,7 +237,9 @@ end
 -- if the player presses the respective key, this event is fired to toggle the current state of cruise control
 function pda.toggle_cruise_control(event)
     local player = game.players[event.player_index]
-    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) and player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and Config.vehicle_blacklist[player.vehicle.name] == nil then
+    if (settings.startup["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or
+        settings.startup["PDA-setting-tech-required"].value == false) and
+        player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and Config.vehicle_blacklist[player.vehicle.name] == nil then
         if settings.global["PDA-setting-allow-cruise-control"].value then
             if (global.cruise_control[event.player_index] == nil or global.cruise_control[event.player_index] == false) then
                 global.cruise_control[event.player_index] = true
@@ -284,7 +286,7 @@ end
 -- if the player presses the respective key, this event is fired to show/set the current cruise control limit
 function pda.set_cruise_control_limit(event)
     local player = game.players[event.player_index]
-    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) then
+    if (settings.startup["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.startup["PDA-setting-tech-required"].value == false) then
         if settings.global["PDA-setting-allow-cruise-control"].value then
             -- open the gui if its not already open, otherwise close it
             if not player.gui.center.pda_cc_limit_gui_frame then
@@ -381,7 +383,8 @@ end
 function pda.toggle_drive_assistant(event)
     local player = game.players[event.player_index]
     local drvassist = global.drive_assistant[player.index]
-    if (settings.global["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or settings.global["PDA-setting-tech-required"].value == false) then
+    if (settings.startup["PDA-setting-tech-required"].value and player.force.technologies["Arci-pavement-drive-assistant"].researched or
+        settings.startup["PDA-setting-tech-required"].value == false) then
         if (drvassist == nil or drvassist == false) then
             -- check if the vehicle is blacklisted
             if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" then
@@ -943,10 +946,6 @@ end
 -- on game start
 function pda.on_init(data)
     init_global()
-
-    for k, f in pairs (game.forces) do
-        f.technologies["Arci-pavement-drive-assistant"].enabled = settings.global["PDA-setting-tech-required"].value
-    end
 end
 
 -- joining players that drove vehicles while leaving the game are in the "offline_players_in_vehicles" list and will be put back to normal
