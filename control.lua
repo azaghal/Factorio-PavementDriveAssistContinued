@@ -17,12 +17,12 @@ end)
 
 -- if the player presses the respective key, this event is fired to toggle the current state of cruise control
 script.on_event("toggle_cruise_control", function(event)
-    pda.toggle_cruise_control(event)
+    pda.toggle_cruise_control(game.players[event.player_index])
 end)
 
 -- if the player presses the respective key, this event is fired to show/set the current cruise control limit
 script.on_event("set_cruise_control_limit", function(event)
-    pda.set_cruise_control_limit(event)
+    pda.set_cruise_control_limit(game.players[event.player_index])
 end)
 
 -- handle gui interaction
@@ -32,7 +32,7 @@ end)
 
 -- if the player presses the respective key, this event is fired to toggle the current state of the driving assistant
 script.on_event("toggle_drive_assistant", function(event)
-    pda.toggle_drive_assistant(event)
+    pda.toggle_drive_assistant(game.players[event.player_index])
 end)
 
 -- on game start
@@ -84,3 +84,7 @@ script.on_event(defines.events.on_gui_confirmed, pda.on_gui_confirmed)
 
 -- Handle player closing the windows (pressing Escape).
 script.on_event(defines.events.on_gui_closed, pda.on_gui_closed)
+
+-- Handle research completion/reversal.
+script.on_event(defines.events.on_research_finished, pda.on_research_finished)
+script.on_event(defines.events.on_research_reversed, pda.on_research_reversed)

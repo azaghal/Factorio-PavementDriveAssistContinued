@@ -172,13 +172,13 @@ end
 
 --- Fired if a player enters or leaves a vehicle
 function pda.on_player_driving_changed_state(event)
-	--log(serpent.block(global, {maxlevel= 4}))
+    --log(serpent.block(global, {maxlevel= 4}))
     -- local player = game.players[event.player_index]
     -- if player.vehicle ~= nil and player.vehicle.valid and    player.vehicle.get_driver() == player then
-	local p_id = event.player_index
+    local p_id = event.player_index
     local player = game.players[p_id]
     if player ~= nil then
-		local car = player.vehicle
+        local car = player.vehicle
         -- put player at last position in list of players in vehicles
         -- conditions:
         -- 1: the event was triggerd by a real player
@@ -187,39 +187,39 @@ function pda.on_player_driving_changed_state(event)
         -- 4: the entered vehicle is of type "car"
         -- 5: the player ist the driver of the vehicle (the return value of "get_driver()" is double checked for type "LuaEntity" and type "LuaPlayer" respectively)
         if car ~= nil and car.valid and car.type == "car" and Config.vehicle_blacklist[car.name] == nil then
-		-- if the player entered a valid car...
-			local driver = car.get_driver()
-			if driver ~= nil and (driver == player or driver.player == player) then
-			-- ... and entered as the driver not as a passenger ...
-				for i = 1, Config.benchmark_level do
-				-- ... then insert player (or multiple instances of the same player, if benchmark_level > 1) in list
-					table.insert(global.players_in_vehicles, p_id)
-					player.set_shortcut_available("pda-cruise-control-toggle", true)
-					player.set_shortcut_available("pda-drive-assistant-toggle", true)
-				end
-			end
-		else
-			-- remove player from list.
-			for i=#global.players_in_vehicles, 1, -1 do
-				if global.players_in_vehicles[i] == p_id then
-					-- reset emergency brake state, imposed speed limit and scores (e.g. if the vehicle got destroyed, its no longer necessary)
+            -- if the player entered a valid car...
+            local driver = car.get_driver()
+            if driver ~= nil and (driver == player or driver.player == player) then
+                -- ... and entered as the driver not as a passenger ...
+                for i = 1, Config.benchmark_level do
+                    -- ... then insert player (or multiple instances of the same player, if benchmark_level > 1) in list
+                    table.insert(global.players_in_vehicles, p_id)
+                end
+            end
+        else
+            -- remove player from list.
+            for i=#global.players_in_vehicles, 1, -1 do
+                if global.players_in_vehicles[i] == p_id then
+                    -- reset emergency brake state, imposed speed limit and scores (e.g. if the vehicle got destroyed, its no longer necessary)
                     global.road_departure_brake_active[p_id] = false
                     global.emergency_brake_power[p_id] = nil
-					global.imposed_speed_limit[p_id] = nil
+                    global.imposed_speed_limit[p_id] = nil
                     global.last_score[p_id] = 0
                     removeStopSignsFromLastSignData(player.index)
                     global.last_sign_data[p_id] = nil
                     if global.vehicles_registered_to_signs[p_id] ~= nil then
                         deregister_from_road_sensor(global.vehicles_registered_to_signs[p_id].registered_to_sensor, p_id)
                     end
-					table.remove(global.players_in_vehicles, i)
-					player.set_shortcut_available("pda-cruise-control-toggle", false)
-					player.set_shortcut_available("pda-drive-assistant-toggle", false)
-				end
-			end
-			-- reset emergency brake
-			global.road_departure_brake_active[p_id] = false
-		end
+                    table.remove(global.players_in_vehicles, i)
+                end
+            end
+            -- reset emergency brake
+            global.road_departure_brake_active[p_id] = false
+        end
+
+        -- Update shortcuts in one swoop.
+        pda.update_shortcut_availability(player)
+
         if #global.players_in_vehicles > 0 then
             if Config.debug then
                 for i=1, #global.players_in_vehicles, 1 do
@@ -234,68 +234,31 @@ function pda.on_player_driving_changed_state(event)
     end
 end
 
--- if the player presses the respective key, this event is fired to toggle the current state of cruise control
-function pda.toggle_cruise_control(event)
-    local player = game.players[event.player_index]
-
-    if  pda.is_driver_assistance_technology_available() and
-        player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and
-        Config.vehicle_blacklist[player.vehicle.name] == nil then
-
-        if pda.is_cruise_control_allowed() then
-            if (global.cruise_control[event.player_index] == nil or global.cruise_control[event.player_index] == false) then
-                global.cruise_control[event.player_index] = true
-				player.set_shortcut_toggled("pda-cruise-control-toggle", true)
-                -- Set cruise control speed limit if alt toggle mode is not active.
-                if player.mod_settings["PDA-setting-alt-toggle-mode"].value == false then
-                    global.cruise_control_limit[event.player_index] = player.vehicle.speed
-                    -- check for reverse gear
-                    if player.vehicle.speed < 0 then
-                        global.cruise_control_limit[event.player_index] = -global.cruise_control_limit[event.player_index]
-                    end
-                else
-                    -- slow down the vehicle if the current speed is greater than the cc limit
-                    if player.vehicle.speed > global.cruise_control_limit[event.player_index] then
-                        global.cruise_control_brake_active[event.player_index] = true
-                    end
-                end
-                if player.mod_settings["PDA-setting-verbose"].value then
-                    player.print({"DA-cruise-control-active", mpt_to_kmph(global.cruise_control_limit[event.player_index])})
-                end
-            else
-                global.cruise_control[player.index] = false
-				player.set_shortcut_toggled("pda-cruise-control-toggle", false)
-                global.cruise_control_brake_active[player.index] = false
-                -- discard the imposed speed limit
-                global.imposed_speed_limit[player.index] = nil
-                removeStopSignsFromLastSignData(player.index)
-                global.last_sign_data[player.index] = nil
-                if global.vehicles_registered_to_signs[player.index] ~= nil then
-                    deregister_from_road_sensor(global.vehicles_registered_to_signs[player.index].registered_to_sensor, player.index)
-                end
-                -- reset riding_state to stop acceleration
-                game.players[event.player_index].riding_state = {acceleration = idl, direction = game.players[event.player_index].riding_state.direction}
-                if player.mod_settings["PDA-setting-verbose"].value then
-                    player.print({"DA-cruise-control-inactive"})
-                end
-            end
-        else
-            player.print({"DA-cruise-control-not-allowed"})
-        end
+--- Toggles (enables/disables) cruise control for player.
+--
+-- @param event LuaPlayer Player for which to toggle the cruise control.
+--
+function pda.toggle_cruise_control(player)
+    if global.cruise_control[player.index] then
+        pda.disable_cruise_control(player)
+    else
+        pda.enable_cruise_control(player)
     end
 end
 
--- if the player presses the respective key, this event is fired to show/set the current cruise control limit
-function pda.set_cruise_control_limit(event)
-    local player = game.players[event.player_index]
-    if pda.is_driver_assistance_technology_available() then
+--- Displays dialog for setting the cruise control limit.
+--
+-- @param player LuaPlayer Player for which the dialog should be shown.
+--
+function pda.set_cruise_control_limit(player)
+    if pda.is_driver_assistance_technology_available(player) then
         if pda.is_cruise_control_allowed() then
             -- open the gui if its not already open, otherwise close it
             if not player.gui.center.pda_cc_limit_gui_frame then
                 PDA_Modgui.create_cc_limit_gui(player)
                 player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = tostring(mpt_to_kmph(global.cruise_control_limit[player.index]))
-				player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.select_all()
-				player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.focus()
+                player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.select_all()
+                player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.focus()
             else
                 player.gui.center.pda_cc_limit_gui_frame.destroy()
             end
@@ -303,34 +266,36 @@ function pda.set_cruise_control_limit(event)
     end
 end
 
--- set a new value for cruise control
-function pda.set_new_value_for_cruise_control_limit(event)
-	local player = game.players[event.player_index]
+--- Sets new value for cruise control limit.
+--
+-- @param player LuaPlayer Player for which the cruise control limit is being changed.
+--
+function pda.set_new_value_for_cruise_control_limit(player)
+
     local hard_speed_limit = global.hard_speed_limit
-	-- check if input is a valid number
-	if tonumber(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text) ~= nil then
-		global.cruise_control_limit[player.index] = kmph_to_mpt(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text)
-		-- check for negative values
-		if global.cruise_control_limit[player.index] < 0 then
-			global.cruise_control_limit[player.index] = -global.cruise_control_limit[player.index]
-		end
-		-- set value to max speed limit, if active
-		if (hard_speed_limit > 0) and (global.cruise_control_limit[player.index] > hard_speed_limit) then
-			global.cruise_control_limit[player.index] = hard_speed_limit
-		elseif global.cruise_control_limit[player.index] > (299792458 / 60) then
-			-- FTL travel on planetary surfaces should be avoided:
-			global.cruise_control_limit[player.index] = 299792458 / 60
-		end
-		global.cruise_control[player.index] = true
-		player.set_shortcut_toggled("pda-cruise-control-toggle", true)
-		-- check, if the player is sitting in a vehicle and changed the cc limit below the velocity of the car
-		if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and Config.vehicle_blacklist[player.vehicle.name] == nil and player.vehicle.speed > global.cruise_control_limit[event.player_index] then
-			global.cruise_control_brake_active[event.player_index] = true
-		end
-		if player.mod_settings["PDA-setting-verbose"].value then
-			player.print({"DA-cruise-control-active", mpt_to_kmph(global.cruise_control_limit[player.index])})
-		end
-	end
+    -- check if input is a valid number
+    if tonumber(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text) ~= nil then
+        global.cruise_control_limit[player.index] = kmph_to_mpt(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text)
+        -- check for negative values
+        if global.cruise_control_limit[player.index] < 0 then
+            global.cruise_control_limit[player.index] = -global.cruise_control_limit[player.index]
+        end
+        -- set value to max speed limit, if active
+        if (hard_speed_limit > 0) and (global.cruise_control_limit[player.index] > hard_speed_limit) then
+            global.cruise_control_limit[player.index] = hard_speed_limit
+        elseif global.cruise_control_limit[player.index] > (299792458 / 60) then
+            -- FTL travel on planetary surfaces should be avoided:
+            global.cruise_control_limit[player.index] = 299792458 / 60
+        end
+
+        -- check, if the player is sitting in a vehicle and changed the cc limit below the velocity of the car
+        if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and Config.vehicle_blacklist[player.vehicle.name] == nil and player.vehicle.speed > global.cruise_control_limit[player.index] then
+            global.cruise_control_brake_active[player.index] = true
+        end
+        if player.mod_settings["PDA-setting-verbose"].value then
+            player.print({"DA-cruise-control-active", mpt_to_kmph(global.cruise_control_limit[player.index])})
+        end
+    end
 end
 
 -- handle gui interaction: player clicked on a button
@@ -340,7 +305,7 @@ function pda.on_gui_click(event)
 		if event.element.name == "pda_cc_limit_gui_close" then
 			player.gui.center.pda_cc_limit_gui_frame.destroy()
 		elseif event.element.name == "pda_cc_limit_gui_confirm" then
-			pda.set_new_value_for_cruise_control_limit(event)
+			pda.set_new_value_for_cruise_control_limit(player)
 			player.gui.center.pda_cc_limit_gui_frame.destroy()
 		end
 	end
@@ -348,14 +313,14 @@ end
 
 -- handle gui interaction: player confirmed entry via textfield
 function pda.on_gui_confirmed(event)
-   if event.element and event.element.name == "pda_cc_limit_gui_textfield" then
-      local player = game.players[event.player_index]
+    if event.element and event.element.name == "pda_cc_limit_gui_textfield" then
+        local player = game.players[event.player_index]
 
-      if player.gui.center.pda_cc_limit_gui_frame then
-         pda.set_new_value_for_cruise_control_limit(event)
-         player.gui.center.pda_cc_limit_gui_frame.destroy()
-      end
-   end
+        if player.gui.center.pda_cc_limit_gui_frame then
+            pda.set_new_value_for_cruise_control_limit(player)
+            player.gui.center.pda_cc_limit_gui_frame.destroy()
+        end
+    end
 end
 
 -- handle gui interaction: player closed cruise speed window via Escape
@@ -369,49 +334,37 @@ function pda.on_gui_closed(event)
    end
 end
 
--- shortcuts
+
+--- Event handler for activating shortcuts.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
 function pda.on_lua_shortcut(event)
-	local shortcut = event.prototype_name
-	if shortcut == "pda-cruise-control-toggle" then
-		pda.toggle_cruise_control(event)
-	elseif shortcut == "pda-drive-assistant-toggle" then
-		pda.toggle_drive_assistant(event)
-	elseif shortcut == "pda-set-cruise-control-limit" then
-		pda.set_cruise_control_limit(event)
-	end
-end
-
--- if the player presses the respective key, this event is fired to toggle the current state of the driving assistant
-function pda.toggle_drive_assistant(event)
     local player = game.players[event.player_index]
-    local drvassist = global.drive_assistant[player.index]
-    if pda.is_driver_assistance_technology_available() then
-        if (drvassist == nil or drvassist == false) then
-            -- check if the vehicle is blacklisted
-            if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" then
-                if Config.vehicle_blacklist[player.vehicle.name] ~= nil then
-                    player.print({"DA-vehicle-blacklisted"})
-                else
-                    drvassist = true
+    local shortcut = event.prototype_name
 
-					player.set_shortcut_toggled("pda-drive-assistant-toggle", true)
-                    if player.mod_settings["PDA-setting-verbose"].value then
-                        player.print({"DA-drive-assistant-active"})
-                    end
-                end
-            end
-        else
-            drvassist = false
-			global.road_departure_brake_active[player.index] = false
-			global.last_score[player.index] = 0
-			player.set_shortcut_toggled("pda-drive-assistant-toggle", false)
-            if player.mod_settings["PDA-setting-verbose"].value then
-                player.print({"DA-drive-assistant-inactive"})
-            end
-        end
-        global.drive_assistant[player.index] = drvassist
+    if shortcut == "pda-cruise-control-toggle" then
+        pda.toggle_cruise_control(player)
+    elseif shortcut == "pda-drive-assistant-toggle" then
+        pda.toggle_drive_assistant(player)
+    elseif shortcut == "pda-set-cruise-control-limit" then
+        pda.set_cruise_control_limit(player)
     end
 end
+
+
+--- Toggles driving assistant for the player.
+--
+-- @param player LuaPlayer Player for which to toggle the driving assistant.
+--
+function pda.toggle_drive_assistant(player)
+    if global.drive_assistant[player.index] then
+        pda.disable_drive_assistant(player)
+    else
+        pda.enable_drive_assistant(player)
+    end
+end
+
 
 --- Guide the vehicle the player is driving depending on the surface tiles that are in front of the vehicle
 ---@param player_index number
@@ -947,6 +900,20 @@ end
 -- on game start
 function pda.on_init(data)
     init_global()
+
+    for _, player in pairs(game.players) do
+
+        if not pda.is_driver_assistance_technology_available(player) then
+            pda.disable_drive_assistant(player)
+        end
+
+        -- Cruise control depends on additional map setting in order to be available.
+        if not pda.is_driver_assistance_technology_available(player) or not pda.is_cruise_control_allowed() then
+            pda.disable_cruise_control(player)
+        end
+
+        pda.update_shortcut_availability(player)
+    end
 end
 
 -- joining players that drove vehicles while leaving the game are in the "offline_players_in_vehicles" list and will be put back to normal
@@ -1179,9 +1146,9 @@ end
 
 --- Checks if driver assistance and cruise control technologies are available.
 --
--- @return bool True if yes, false otherwise.
+-- @return bool true if yes, false otherwise.
 --
-function pda.is_driver_assistance_technology_available()
+function pda.is_driver_assistance_technology_available(player)
     if settings.startup["PDA-setting-tech-required"].value then
         return player.force.technologies["Arci-pavement-drive-assistant"].researched
     end
@@ -1194,8 +1161,206 @@ end
 --
 -- This is a separate check from the technology availability check.
 --
--- @return bool True if allowed, false otherwise.
+-- @return bool true if allowed, false otherwise.
 --
 function pda.is_cruise_control_allowed()
     return settings.global["PDA-setting-allow-cruise-control"].value
+end
+
+
+--- Checks if cruise control limit has been configured to use fixed value.
+--
+-- @return bool true if active, false otherwise.
+--
+function pda.is_fixed_cruise_control_limit_enabled(player)
+    return player.mod_settings["PDA-setting-alt-toggle-mode"].value
+end
+
+
+--- Enables driving assistant for a player.
+--
+-- @param player LuaPlayer Player for which the driving assistant should be enabled.
+--
+function pda.enable_drive_assistant(player)
+    -- Nothing to be done, bail out immediatelly.
+    if not pda.is_driver_assistance_technology_available(player) or global.drive_assistant[player.index] then
+        return
+    end
+
+    -- Player is not in a valid vehicle.
+    if not player.vehicle or not player.vehicle.valid or player.vehicle.type ~= "car" then
+        return
+    elseif Config.vehicle_blacklist[player.vehicle.name] then
+        player.print({"DA-vehicle-blacklisted"})
+        return
+    end
+
+    global.drive_assistant[player.index] = true
+
+    player.set_shortcut_toggled("pda-drive-assistant-toggle", true)
+
+    if player.mod_settings["PDA-setting-verbose"].value then
+        player.print({"DA-drive-assistant-active"})
+    end
+end
+
+
+--- Disables driving assistant for a player.
+--
+-- @param player LuaPlayer Player for which the driving assistant should be disabled.
+--
+function pda.disable_drive_assistant(player)
+    -- Nothing to be done, bail out immediatelly.
+    if not global.drive_assistant[player.index] then
+        return
+    end
+
+    global.drive_assistant[player.index] = false
+    global.road_departure_brake_active[player.index] = false
+    global.last_score[player.index] = 0
+
+    player.set_shortcut_toggled("pda-drive-assistant-toggle", false)
+
+    if player.mod_settings["PDA-setting-verbose"].value then
+        player.print({"DA-drive-assistant-inactive"})
+    end
+end
+
+
+--- Enables cruise control for a player.
+--
+-- Cruise control is only enabled if player is in a car-like vehicle.
+--
+-- @param player LuaPlayer Player for which the cruise control should be enabled.
+--
+function pda.enable_cruise_control(player)
+    -- Cruise control disabled game-wise, bail out immediatelly.
+    if not pda.is_cruise_control_allowed() then
+        player.print({"DA-cruise-control-not-allowed"})
+        return
+    end
+
+    -- Nothing to be done, bail out immediatelly.
+    if not pda.is_driver_assistance_technology_available(player) or global.cruise_control[player.index] then
+        return
+    end
+
+    -- Player is not in a valid vehicle.
+    if not player.vehicle or not player.vehicle.valid or player.vehicle.type ~= "car" then
+        return
+    elseif Config.vehicle_blacklist[player.vehicle.name] then
+        player.print({"DA-vehicle-blacklisted"})
+        return
+    end
+
+    global.cruise_control[player.index] = true
+
+    -- Set cruise control limit to current vehicle speed if fixed control limit is not enabled.
+    if not pda.is_fixed_cruise_control_limit_enabled(player) then
+        -- Store absolute value as vehicle speed (less than zero means player is reversing the car).
+        if player.vehicle.speed > 0 then
+            global.cruise_control_limit[player.index] = player.vehicle.speed
+        else
+            global.cruise_control_limit[player.index] = -player.vehicle.speed
+        end
+    else
+        -- Slow down the vehicle to current cruise control limit.
+        if player.vehicle.speed > global.cruise_control_limit[player.index] then
+            global.cruise_control_brake_active[player.index] = true
+        end
+    end
+
+    player.set_shortcut_toggled("pda-cruise-control-toggle", true)
+
+    if player.mod_settings["PDA-setting-verbose"].value then
+        player.print({"DA-cruise-control-active", mpt_to_kmph(global.cruise_control_limit[player.index])})
+    end
+end
+
+
+--- Disables cruise control for a player.
+--
+-- @param player LuaPlayer Player for which the cruise control should be disabled
+--
+function pda.disable_cruise_control(player)
+    -- Nothing to be done, bail out immediatelly.
+    if not global.cruise_control[player.index] then
+        return
+    end
+
+    -- Drop player's vehicle from stop signs vehicle tracking.
+    global.last_sign_data[player.index] = nil
+    removeStopSignsFromLastSignData(player.index)
+
+    -- Deregister player's vehicle from road sensors.
+    if global.vehicles_registered_to_signs[player.index] then
+        deregister_from_road_sensor(global.vehicles_registered_to_signs[player.index].registered_to_sensor, player.index)
+    end
+
+    -- Reset riding_state to stop acceleration.
+    player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
+
+    global.cruise_control[player.index] = false
+    global.cruise_control_brake_active[player.index] = false
+    global.imposed_speed_limit[player.index] = nil
+
+    player.set_shortcut_toggled("pda-cruise-control-toggle", false)
+
+    if player.mod_settings["PDA-setting-verbose"].value then
+        player.print({"DA-cruise-control-inactive"})
+    end
+end
+
+
+--- Handles on_research_finished game event for PDA-related technologies.
+--
+-- Takes care of enabling the necessary shortcuts etc.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
+function pda.on_research_finished(event)
+    if event.research.name == "Arci-pavement-drive-assistant" then
+        for _, player in pairs(event.research.force.players) do
+            pda.update_shortcut_availability(player)
+        end
+    end
+end
+
+
+--- Handles on_research_reversed game event for PDA-related technologies.
+--
+-- Takes care of disabling the shortcuts, drive assistant, and cruise control.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
+function pda.on_research_reversed(event)
+    if event.research.name == "Arci-pavement-drive-assistant" then
+        for _, player in pairs(event.research.force.players) do
+            pda.disable_cruise_control(player)
+            pda.disable_drive_assistant(player)
+            pda.update_shortcuts(player)
+        end
+    end
+end
+
+
+--- Updates availability of shortcuts for a given player.
+--
+-- Takes into account availability of technology, map settings, and player status (in vehicle or not in vehicle).
+--
+-- @param player LuaPlayer Player to update the shortcuts for.
+--
+function pda.update_shortcut_availability(player)
+    local driver_assistance = pda.is_driver_assistance_technology_available(player)
+    local cruise_control = pda.is_driver_assistance_technology_available(player) and pda.is_cruise_control_allowed()
+
+    if player.vehicle and player.vehicle.valid and player.vehicle.type == "car" and not Config.vehicle_blacklist[player.vehicle.name] then
+        player.set_shortcut_available("pda-drive-assistant-toggle", driver_assistance)
+        player.set_shortcut_available("pda-cruise-control-toggle", cruise_control)
+    else
+        player.set_shortcut_available("pda-drive-assistant-toggle", false)
+        player.set_shortcut_available("pda-cruise-control-toggle", false)
+    end
+
+    player.set_shortcut_available("pda-set-cruise-control-limit", pda.is_driver_assistance_technology_available(player) and pda.is_cruise_control_allowed())
 end
