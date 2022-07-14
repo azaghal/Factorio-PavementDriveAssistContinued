@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
-Version: 999.999.999
-Date: 99.99.9999.
+Version: 4.0.0
+Date: 14.07.2022.
   Changes:
     - Moved setting for requiring technology requirement for driving assistant and cruise control into startup settings.
     - Setting cruise control limit no longer activates cruise control itself.
