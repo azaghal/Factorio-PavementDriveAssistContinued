@@ -4,7 +4,6 @@
 -- Provided under MIT license. See LICENSE for details.
 
 local config = require("scripts/config")
-local modgui = require("scripts/modgui")
 local interfaces = require("scripts/interfaces")
 local pda = require("scripts/pda")
 
@@ -43,7 +42,7 @@ script.on_event(defines.events.on_player_left_game, pda.on_player_left_game)
 -- GUI handling (for setting cruise control limt).
 script.on_event(defines.events.on_gui_click, pda.on_gui_click)
 script.on_event(defines.events.on_gui_closed, pda.on_gui_closed)
-script.on_event(defines.events.on_gui_confirmed, pda.on_gui_confirmed)
+script.on_event({defines.events.on_gui_confirmed, "confirm_set_cruise_control_limit"}, pda.on_gui_confirmed)
 script.on_event(defines.events.on_lua_shortcut, pda.on_lua_shortcut)
 
 -- Entity placement and destruction.

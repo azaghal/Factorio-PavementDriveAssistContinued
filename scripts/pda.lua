@@ -3,7 +3,7 @@
 -- Copyright (c) 2022 Branko Majic
 -- Provided under MIT license. See LICENSE for details.
 
-local modgui = require("modgui")
+local cruise_control_limit_gui = require("gui.cruise_control_limit")
 local config = require("config")
 
 local pda = {}
@@ -230,7 +230,7 @@ function pda.set_cruise_control_limit(player)
         if pda.is_cruise_control_allowed() then
             -- open the gui if its not already open, otherwise close it
             if not player.gui.center.pda_cc_limit_gui_frame then
-                modgui.create_cc_limit_gui(player)
+                cruise_control_limit_gui.build(player)
                 player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = tostring(mpt_to_kmph(global.cruise_control_limit[player.index]))
                 player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.select_all()
                 player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.focus()
@@ -288,13 +288,11 @@ end
 
 -- handle gui interaction: player confirmed entry via textfield
 function pda.on_gui_confirmed(event)
-    if event.element and event.element.name == "pda_cc_limit_gui_textfield" then
-        local player = game.players[event.player_index]
+    local player = game.players[event.player_index]
 
-        if player.gui.center.pda_cc_limit_gui_frame then
-            pda.set_new_value_for_cruise_control_limit(player)
-            player.gui.center.pda_cc_limit_gui_frame.destroy()
-        end
+    if player.opened and player.opened.name == "pda_cc_limit_gui_frame" then
+        pda.set_new_value_for_cruise_control_limit(player)
+        player.gui.center.pda_cc_limit_gui_frame.destroy()
     end
 end
 

@@ -17,4 +17,10 @@ data:extend({
         key_sequence = "CONTROL + O",
         consuming = "game-only"
     },
+    {
+        type = "custom-input",
+        name = "confirm_set_cruise_control_limit",
+        key_sequence = "",
+        linked_game_control = "confirm-gui"
+    },
 })

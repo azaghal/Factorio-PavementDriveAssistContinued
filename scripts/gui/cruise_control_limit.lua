@@ -1,11 +1,17 @@
 -- Copyright (c) 2019 Arcitos, based on "Pavement-Drive-Assist" v.0.0.5 made by sillyfly.
+-- Copyright (c) 2022 Branko Majic
 -- Provided under MIT license. See LICENSE for details.
 
 -- This is the gui design script. The design was heavily inspired by @GotLag's "Renamer".
 
-local modgui = {}
+local cruise_control_limit_gui = {}
 
-function modgui.create_cc_limit_gui(player)
+
+--- Opens dialog for setting cruise control limit.
+--
+-- @param player LuaPlayer Player for which to open the dialog.
+--
+function cruise_control_limit_gui.build(player)
     local frame = player.gui.center.add
     {
         type="frame",
@@ -21,13 +27,14 @@ function modgui.create_cc_limit_gui(player)
     }
     frame.add
     {
-        type="textfield",
-        name="pda_cc_limit_gui_textfield"
+        type = "textfield",
+        name = "pda_cc_limit_gui_textfield",
+        numeric = true
     }
     frame.add
     {
-        type="label",
-        name="pda_cc_limit_gui_label",
+        type = "label",
+        name = "pda_cc_limit_gui_label",
         caption= {"DA-gui-label-kmh"}
     }
     frame.add
@@ -43,4 +50,5 @@ function modgui.create_cc_limit_gui(player)
     player.opened = frame
 end
 
-return modgui
+
+return cruise_control_limit_gui
