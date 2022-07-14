@@ -8,10 +8,10 @@ local config = require("config")
 
 local pda = {}
 
-local acc = defines.riding.acceleration.accelerating
-local brk = defines.riding.acceleration.braking
-local idl = defines.riding.acceleration.nothing
-local rev = defines.riding.acceleration.reversing
+local ACCELERATING = defines.riding.acceleration.accelerating
+local BRAKING = defines.riding.acceleration.braking
+local IDLING = defines.riding.acceleration.nothing
+local REVERSING = defines.riding.acceleration.reversing
 
 
 --- Outputs console message to all players or all players in a force.
@@ -186,7 +186,7 @@ local function deregister_from_road_sensor(sign_uid, player_index)
             global.cruise_control_brake_active[player_index] = true
         else
             global.cruise_control_brake_active[player_index] = false
-            player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
+            player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
         end
     end
     global.vehicles_registered_to_signs[player_index] = nil
@@ -480,7 +480,7 @@ local function manage_drive_assistant(player_index)
             elseif player.mod_settings["PDA-setting-verbose"].value then
                 player.print({"DA-road-departure-warning"})
             end
-            player.riding_state = {acceleration = brk, direction = player.riding_state.direction}
+            player.riding_state = {acceleration = BRAKING, direction = player.riding_state.direction}
             global.road_departure_brake_active[player_index] = true
         end
         global.last_score[player_index] = ts
@@ -663,12 +663,12 @@ local function update_vehicle_registered_to_sign(player_index, params)
                 global.cruise_control_brake_active[player_index] = true
             else
                 global.cruise_control_brake_active[player_index] = false
-                player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
+                player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
             end
         end
         if vreg.waiting_at_stop_position then
             vreg.waiting_at_stop_position = false
-            player.riding_state = {acceleration = acc, direction = player.riding_state.direction}
+            player.riding_state = {acceleration = ACCELERATING, direction = player.riding_state.direction}
         end
     elseif params.command == -1 then
         -- ignore this sign
@@ -888,7 +888,7 @@ local function process_signs(player_index)
                             global.emergency_brake_power[player_index] = brake_power
                         end
                         global.imposed_speed_limit[player_index] = 0 -- global.min_speed + 0.024 -- min speed + 5 km/h
-                        player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
+                        player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
                         -- activate brake to deccelerate the vehicle
                     end
                     return true
@@ -927,7 +927,7 @@ local function process_signs(player_index)
                                     global.cruise_control_brake_active[player_index] = true
                                 else
                                     global.cruise_control_brake_active[player_index] = false
-                                    player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
+                                    player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
                                 end
                             end
                         end
@@ -970,9 +970,9 @@ local function manage_cruise_control(player_index)
     else
         target_speed = global.cruise_control_limit[player_index]
     end
-    if speed ~= 0 and player.riding_state.acceleration ~= brk and global.emergency_brake_power[player_index] == nil then
+    if speed ~= 0 and player.riding_state.acceleration ~= BRAKING and global.emergency_brake_power[player_index] == nil then
         if math.abs(speed) > target_speed then
-            player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
+            player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
             if speed > 0 then
                 player.vehicle.speed = target_speed
                 -- check for reverse gear
@@ -980,7 +980,7 @@ local function manage_cruise_control(player_index)
                 player.vehicle.speed = -target_speed
             end
         elseif speed > 0 and speed < target_speed then
-            player.riding_state = {acceleration = acc, direction = player.riding_state.direction}
+            player.riding_state = {acceleration = ACCELERATING, direction = player.riding_state.direction}
         end
     end
 end
@@ -1231,7 +1231,7 @@ function pda.on_tick(event)
         process_signs(p)
         -- check if forced braking is active...
         if global.emergency_brake_power[p] then
-            if player.riding_state.acceleration == (acc) or car.speed <= 0 then
+            if player.riding_state.acceleration == (ACCELERATING) or car.speed <= 0 then
                 global.emergency_brake_power[p] = nil
                 global.imposed_speed_limit[p] = nil
                 car.speed = 0
@@ -1239,23 +1239,23 @@ function pda.on_tick(event)
                     global.vehicles_registered_to_signs[p].waiting_at_stop_position = true
                 end
             else
-                player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
+                player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
                 car.speed = math.max(car.speed - global.emergency_brake_power[p], 0)
             end
         elseif global.road_departure_brake_active[p] then
-            if player.riding_state.acceleration == (acc) or car.speed == 0 then
+            if player.riding_state.acceleration == (ACCELERATING) or car.speed == 0 then
                 global.road_departure_brake_active[p] = false
-                player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
+                player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
             else
-                player.riding_state = {acceleration = brk, direction = player.riding_state.direction}
+                player.riding_state = {acceleration = BRAKING, direction = player.riding_state.direction}
             end
             -- ...otherwise proceed to handle cruise control
         elseif global.cruise_control_brake_active[p] then
             if (car.speed < global.cruise_control_limit[p]) and global.imposed_speed_limit[p] == nil or (global.imposed_speed_limit[p] ~= nil and car.speed < global.imposed_speed_limit[p]) then
                 global.cruise_control_brake_active[p] = false
-                player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
+                player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
             else
-                player.riding_state = {acceleration = brk, direction = player.riding_state.direction}
+                player.riding_state = {acceleration = BRAKING, direction = player.riding_state.direction}
             end
             -- ...otherwise proceed to handle cruise control
         elseif pda.is_cruise_control_allowed() and global.cruise_control[p] then
@@ -1430,7 +1430,7 @@ function pda.disable_cruise_control(player)
     end
 
     -- Reset riding_state to stop acceleration.
-    player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
+    player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
 
     global.cruise_control[player.index] = false
     global.cruise_control_brake_active[player.index] = false
