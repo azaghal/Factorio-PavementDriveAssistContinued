@@ -176,61 +176,60 @@ end
 -- @param event EventData Event data passed-on by the game engine.
 --
 function pda.on_player_driving_changed_state(event)
-    local p_id = event.player_index
-    local player = game.players[p_id]
-    if player ~= nil then
-        local car = player.vehicle
-        -- put player at last position in list of players in vehicles
-        -- conditions:
-        -- 1: the event was triggerd by a real player
-        -- 2: the player is within a vehicle
-        -- 3: the vehicle is a valid entity
-        -- 4: the entered vehicle is of type "car"
-        -- 5: the player ist the driver of the vehicle (the return value of "get_driver()" is double checked for type "LuaEntity" and type "LuaPlayer" respectively)
-        if car ~= nil and car.valid and car.type == "car" and not config.vehicle_blacklist[car.name] then
-            -- if the player entered a valid car...
-            local driver = car.get_driver()
-            if driver ~= nil and (driver == player or driver.player == player) then
-                -- ... and entered as the driver not as a passenger ...
-                for i = 1, config.benchmark_level do
-                    -- ... then insert player (or multiple instances of the same player, if benchmark_level > 1) in list
-                    table.insert(global.players_in_vehicles, p_id)
-                end
+    local player = game.players[event.player_index]
+
+    -- Bail out immediatelly if no (real) player is involved.
+    if not player then
+        return
+    end
+
+    local car = player.vehicle
+
+    -- Add player into table listing all players in vehicles, but only if:
+    --
+    --     - player's vehicle is an allowed car entity
+    --     - player is the vehicle's driver (get_driver() is double-check for type LuaEntity _and_ LuaPlayer)
+    if car and car.valid and car.type == "car" and not config.vehicle_blacklist[car.name] then
+        local driver = car.get_driver()
+
+        if driver and (driver == player or driver.player == player) then
+            for i = 1, config.benchmark_level do
+                -- Insert player (or multiple instances of the same player, if benchmark_level > 1) into list
+                table.insert(global.players_in_vehicles, player.index)
             end
-        else
-            -- remove player from list.
-            for i=#global.players_in_vehicles, 1, -1 do
-                if global.players_in_vehicles[i] == p_id then
-                    -- reset emergency brake state, imposed speed limit and scores (e.g. if the vehicle got destroyed, its no longer necessary)
-                    global.road_departure_brake_active[p_id] = false
-                    global.emergency_brake_power[p_id] = nil
-                    global.imposed_speed_limit[p_id] = nil
-                    global.last_score[p_id] = 0
-                    remove_stop_signs_form_last_sign_data(player.index)
-                    global.last_sign_data[p_id] = nil
-                    if global.vehicles_registered_to_signs[p_id] ~= nil then
-                        deregister_from_road_sensor(global.vehicles_registered_to_signs[p_id].registered_to_sensor, p_id)
-                    end
-                    table.remove(global.players_in_vehicles, i)
-                end
-            end
-            -- reset emergency brake
-            global.road_departure_brake_active[p_id] = false
         end
+    else
+        -- Remove player from all possible lists.
+        for i=#global.players_in_vehicles, 1, -1 do
+            if global.players_in_vehicles[i] == player.index then
+                -- Reset emergency brake state, imposed speed limit and scores (e.g. if the vehicle got destroyed, is is no longer necessary)
+                global.road_departure_brake_active[player.index] = false
+                global.emergency_brake_power[player.index] = nil
+                global.imposed_speed_limit[player.index] = nil
+                global.last_score[player.index] = 0
+                remove_stop_signs_form_last_sign_data(player.index)
+                global.last_sign_data[player.index] = nil
 
-        -- Update shortcuts in one swoop.
-        pda.update_shortcut_availability(player)
-
-        if #global.players_in_vehicles > 0 then
-            if config.debug then
-                for i=1, #global.players_in_vehicles, 1 do
-                    notification(tostring(i..".: Player index"..global.players_in_vehicles[i].." ("..game.players[global.players_in_vehicles[i]].name..")"))
+                if global.vehicles_registered_to_signs[player.index] ~= nil then
+                    deregister_from_road_sensor(global.vehicles_registered_to_signs[player.index].registered_to_sensor, player.index)
                 end
+
+                table.remove(global.players_in_vehicles, i)
+            end
+        end
+    end
+
+    -- Update shortcuts in one swoop.
+    pda.update_shortcut_availability(player)
+
+    -- Show some additional debug output if requested.
+    if config.debug then
+        if #global.players_in_vehicles > 0 then
+            for i=1, #global.players_in_vehicles, 1 do
+                notification(tostring(i..".: Player index"..global.players_in_vehicles[i].." ("..game.players[global.players_in_vehicles[i]].name..")"))
             end
         else
-            if config.debug then
-                notification("List empty.")
-            end
+            notification("List empty.")
         end
     end
 end
