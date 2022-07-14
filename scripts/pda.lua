@@ -1445,16 +1445,19 @@ function pda.is_player_in_car_vehicle(player)
 end
 
 
---- Notifies player via console.
+--- Notifies player via flying text at cursor position.
 --
--- Notification is only sent if player has requested output of information to console.
+-- Notification is only sent if player has requested verbose reporting.
 --
 -- @param player LuaPlayer Playet that should be notified.
 -- @param message LocalisedString Message to show to player.
 --
 function pda.notify_player(player, message)
     if player.mod_settings["PDA-setting-verbose"].value then
-        player.print(message)
+        player.create_local_flying_text{
+            text = message,
+            create_at_cursor = true
+        }
     end
 end
 
