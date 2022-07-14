@@ -241,7 +241,7 @@ end
 -- @param event LuaPlayer Player for which to toggle the cruise control.
 --
 function pda.toggle_cruise_control(player)
-    if global.cruise_control[player.index] then
+    if global.cruise_control[player.index] and pda.is_player_in_car_vehicle(player) then
         pda.disable_cruise_control(player)
     else
         pda.enable_cruise_control(player)
@@ -282,7 +282,7 @@ end
 -- @param player LuaPlayer Player for which to toggle the driving assistant.
 --
 function pda.toggle_drive_assistant(player)
-    if global.drive_assistant[player.index] then
+    if global.drive_assistant[player.index] and pda.is_player_in_car_vehicle(player) then
         pda.disable_drive_assistant(player)
     else
         pda.enable_drive_assistant(player)
@@ -1402,6 +1402,19 @@ end
 --
 function pda.on_toggle_drive_assistant(event)
     pda.toggle_drive_assistant(game.players[event.player_index])
+end
+
+
+--- Checks if player is in a car vehicle.
+--
+-- Does not take into account any black-listing.
+--
+-- @param player LuaPlayer Player for which to perform the check.
+--
+-- @return bool true if player is in a car vehicle, false otherwise.
+--
+function pda.is_player_in_car_vehicle(player)
+    return player.vehicle and player.vehicle.valid and player.vehicle.type == "car"
 end
 
 

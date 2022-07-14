@@ -11,6 +11,7 @@ Date: 99.99.9999.
     - Fixed list of prerequisite technologies for smart roads technology when technology requirement for driving assistant and cruise control is disabled.
     - Fixed enabling/disabling of shortcuts depending on settings and researched technologies.
     - When setting cruise control limit, only numbers are accepted now in the text field.
+    - Driving assistant and cruise control can no longer be disabled outside of a car using control bindings.
 ---------------------------------------------------------------------------------------------------
 Version: 3.2.0
 Date: 31.03.2022.
