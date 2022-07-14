@@ -3,9 +3,9 @@
 -- Copyright (c) 2022 Branko Majic
 -- Provided under MIT license. See LICENSE for details.
 
-local config = require("scripts/config")
-local interfaces = require("scripts/interfaces")
-local pda = require("scripts/pda")
+local config = require("scripts.config")
+local interfaces = require("scripts.interfaces")
+local pda = require("scripts.pda")
 
 -- Shortcut toggling and custom inputs.
 script.on_event(
