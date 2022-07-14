@@ -9,7 +9,7 @@
 local config = {}
 
 -- Vehicles that will not be supported by the driving assistant. This is tested against the name of the vehicle. All other vehicles will be supported.
--- example: {["car"] = false, ["tank"] = false}
+-- example: {["car"] = true, ["tank"] = true}
 config.vehicle_blacklist = {}
 
 -- How many tiles ahead of location to start looking. Remember that most vehicles are 2x2, so this should be 1-2 preferably.
@@ -279,9 +279,6 @@ function config.update_scores()
     config.set_scores()
     return scores
 end
-
--- List of mods that are incompatible to pavement drive assist and will cause mod deactivation.
-config.mod_incompatibility_list = {}
 
 -- This variable determines the number of players inserted into the player_in_vehicle list if a vehicle is entered. Set this to more than 1 to simulate multiple players at once, useful for testing how many players your server is able to support until severe FPS-drops emerge.
 config.benchmark_level = 1

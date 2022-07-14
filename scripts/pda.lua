@@ -24,31 +24,6 @@ local function notification(txt, force)
     end
 end
 
---[[ currently not necessary
-local function check_compatibility()
--- check if any of the present mods matches a mod in the incompatibility list
-    for mod, version in pairs(game.active_mods) do
-        if mod_incompatibility_list[mod] then
-            return false
-        end
-    end
-    return true
-end]]
-
---[[ currently not necessary
-local function incompability_detected()
--- prints out which incompatible mods have been detected
-    for mod, version in pairs(game.active_mods) do
-        if mod_incompatibility_list[mod] then
-            notification({"DA-mod-incompatibility-notification", {"DA-prefix"}, mod, version})
-            -- most likely: Vehicle Snap. If true, then tell the player why this mod is incompatible to PDA
-            if mod == "VehicleSnap" then notification({"DA-mod-incompatibility-reason-vecsnap", {"DA-prefix"}}) end
-            notification({"DA-mod-incompatibility-advice", {"DA-prefix"}, "Pavement-Drive-Assist"})
-        end
-    end
-end
-]]
-
 --- Converts Factorios meter per tick to floored integer kilometer per hour (used for GUI interaction)
 local function mpt_to_kmph(mpt)
     return math.floor(mpt * 60 * 60 * 60 / 1000 + 0.5)
@@ -186,7 +161,7 @@ function pda.on_player_driving_changed_state(event)
         -- 3: the vehicle is a valid entity
         -- 4: the entered vehicle is of type "car"
         -- 5: the player ist the driver of the vehicle (the return value of "get_driver()" is double checked for type "LuaEntity" and type "LuaPlayer" respectively)
-        if car ~= nil and car.valid and car.type == "car" and config.vehicle_blacklist[car.name] == nil then
+        if car ~= nil and car.valid and car.type == "car" and not config.vehicle_blacklist[car.name] then
             -- if the player entered a valid car...
             local driver = car.get_driver()
             if driver ~= nil and (driver == player or driver.player == player) then
@@ -289,7 +264,7 @@ function pda.set_new_value_for_cruise_control_limit(player)
         end
 
         -- check, if the player is sitting in a vehicle and changed the cc limit below the velocity of the car
-        if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and config.vehicle_blacklist[player.vehicle.name] == nil and player.vehicle.speed > global.cruise_control_limit[player.index] then
+        if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and not config.vehicle_blacklist[player.vehicle.name] and player.vehicle.speed > global.cruise_control_limit[player.index] then
             global.cruise_control_brake_active[player.index] = true
         end
         if player.mod_settings["PDA-setting-verbose"].value then
