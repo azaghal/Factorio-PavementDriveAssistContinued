@@ -38,6 +38,7 @@ script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_e
 -- Research.
 script.on_event(defines.events.on_research_finished, pda.on_research_finished)
 script.on_event(defines.events.on_research_reversed, pda.on_research_reversed)
+script.on_event(defines.events.on_force_reset, pda.on_research_reversed)
 
 -- Vehicle pathing corrections (main functionality).
 script.on_event(defines.events.on_tick, pda.on_tick)

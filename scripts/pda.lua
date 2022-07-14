@@ -1167,14 +1167,25 @@ end
 
 --- Checks if driver assistance and cruise control technologies are available.
 --
+-- @param player LuaPlayer Player for which the check is performed.
+--
 -- @return bool true if yes, false otherwise.
 --
 function pda.is_driver_assistance_technology_available(player)
-    if settings.startup["PDA-setting-tech-required"].value then
+    if pda.is_driver_assistance_technology_required() then
         return player.force.technologies["Arci-pavement-drive-assistant"].researched
     end
 
     return true
+end
+
+
+--- Checks if driver assistance technology is required.
+--
+-- @return bool true if yes, false otherwise.
+--
+function pda.is_driver_assistance_technology_required()
+    return settings.startup["PDA-setting-tech-required"].value
 end
 
 
@@ -1355,12 +1366,23 @@ end
 -- @param event EventData Event data passed-on by the game engine.
 --
 function pda.on_research_reversed(event)
-    if event.research.name == "Arci-pavement-drive-assistant" then
-        for _, player in pairs(event.research.force.players) do
-            pda.disable_cruise_control(player)
-            pda.disable_drive_assistant(player)
-            pda.update_shortcut_availability(player)
-        end
+    local players = {}
+
+    -- Nothing to be done, bail out immediatelly.
+    if not pda.is_driver_assistance_technology_required() then
+        return
+    end
+
+    if event.name == defines.events.on_force_reset then
+        players = event.force.players
+    elseif event.research and event.research.name == "Arci-pavement-drive-assistant" then
+        players = event.research.force.players
+    end
+
+    for _, player in pairs(players) do
+        pda.disable_cruise_control(player)
+        pda.disable_drive_assistant(player)
+        pda.update_shortcut_availability(player)
     end
 end
 
