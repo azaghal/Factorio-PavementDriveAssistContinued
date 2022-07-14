@@ -979,24 +979,39 @@ end
 -- @param event EventData Event data passed-on by the game engine.
 --
 function pda.on_runtime_mod_setting_changed(event)
-    local p = event.player_index
-    local s = event.setting
+    local setting = event.setting
+
     if event.setting_type == "runtime-global" then
-        if s == "PDA-setting-assist-min-speed" then
+
+        if setting == "PDA-setting-assist-min-speed" then
             global.min_speed = utils.kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value)
         end
-        if s == "PDA-setting-game-max-speed" then
+
+        if setting == "PDA-setting-game-max-speed" then
             global.hard_speed_limit = utils.kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value)
         end
-        if s == "PDA-setting-assist-high-speed" then
+
+        if setting == "PDA-setting-assist-high-speed" then
             global.highspeed = utils.kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value)
         end
-        if s == "PDA-setting-tick-rate" then
+
+        if setting == "PDA-setting-tick-rate" then
             global.driving_assistant_tickrate = settings.global["PDA-setting-tick-rate"].value
         end
-        if string.sub(s, 1, 11) == "PDA-tileset" then
+
+        if string.sub(setting, 1, 11) == "PDA-tileset" then
             global.scores = config.update_scores()
         end
+
+        if setting == "PDA-setting-allow-cruise-control" then
+            for _, player in pairs(game.players) do
+                if not pda.is_cruise_control_allowed() then
+                    pda.disable_cruise_control(player)
+                end
+                pda.update_shortcut_availability(player)
+            end
+        end
+
     end
 end
 
