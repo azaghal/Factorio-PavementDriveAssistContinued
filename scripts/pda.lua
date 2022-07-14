@@ -1009,7 +1009,10 @@ end
 --
 function pda.on_placed_sign(event)
     local p = event.player_index
-    local e = event.created_entity
+
+    -- The .entity property is used as a fall-back for script_raised_built and script_raised_revive  events.
+    local e = event.created_entity or event.entity
+
     if e ~= nil and e.valid and e.type == "constant-combinator" then
         if e.name == "pda-road-sign-speed-unlimit" then
             e.operable = false

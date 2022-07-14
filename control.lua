@@ -32,7 +32,7 @@ script.on_event(defines.events.on_gui_closed, cruise_control_limit_gui.on_gui_cl
 script.on_event({defines.events.on_gui_confirmed, "confirm_set_cruise_control_limit"}, cruise_control_limit_gui.on_gui_confirmed)
 
 -- Entity placement and destruction.
-script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity, defines.events.script_raised_built}, pda.on_placed_sign)
+script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity, defines.events.script_raised_built, defines.events.script_raised_revive}, pda.on_placed_sign)
 script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_entity, defines.events.on_robot_mined_entity, defines.events.script_raised_destroy}, pda.on_sign_removed)
 
 -- Research.
