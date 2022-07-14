@@ -6,27 +6,24 @@ if settings.startup["PDA-setting-tech-required"].value then
                 icon = "__PavementDriveAssistContinued__/graphics/technology/tech-pda.png",
                 icon_size = 128,
                 prerequisites = {"automobilism"},
-                unit =
-                    {
-                        count = 120,
-                        ingredients =
-                            {
-                                {"automation-science-pack", 1},
-                                {"logistic-science-pack", 1}
-                            },
-                        time = 30
+                unit = {
+                    count = 120,
+                    ingredients = {
+                        {"automation-science-pack", 1},
+                        {"logistic-science-pack", 1}
                     },
-                effects =
+                    time = 30
+                },
+                effects = {
                     {
-                        {
-                            type = "nothing",
-                            effect_description  = {"pda-effect-description-pda"}
-                        },
-                        {
-                            type = "nothing",
-                            effect_description  = {"pda-effect-description-cc"}
-                        },
+                        type = "nothing",
+                        effect_description  = {"pda-effect-description-pda"}
                     },
+                    {
+                        type = "nothing",
+                        effect_description  = {"pda-effect-description-cc"}
+                    },
+                },
                 order = "e-b-a"
             }
     })
@@ -44,25 +41,22 @@ if settings.startup["PDA-setting-smart-roads-enabled"].value then
     print(serpent.line(prerequisites))
 
     data:extend({
-        {
-            type = "technology",
-            name = "Arci-smart-road",
-            icon = "__PavementDriveAssistContinued__/graphics/technology/smart-road.png",
-            icon_size = 128,
-            prerequisites = prerequisites,
-            unit =
-                {
+            {
+                type = "technology",
+                name = "Arci-smart-road",
+                icon = "__PavementDriveAssistContinued__/graphics/technology/smart-road.png",
+                icon_size = 128,
+                prerequisites = prerequisites,
+                unit = {
                     count = 150,
-                    ingredients =
-                        {
-                            {"automation-science-pack", 1},
-                            {"logistic-science-pack", 1},
-                            {"chemical-science-pack", 1}
-                        },
+                    ingredients = {
+                        {"automation-science-pack", 1},
+                        {"logistic-science-pack", 1},
+                        {"chemical-science-pack", 1}
+                    },
                     time = 60
                 },
-            effects =
-                {
+                effects = {
                     {
                         type = "unlock-recipe",
                         recipe = "pda-road-sign-speed-limit"
@@ -80,7 +74,7 @@ if settings.startup["PDA-setting-smart-roads-enabled"].value then
                         recipe = "pda-road-sensor"
                     }
                 },
-            order = "e-b-b"
-        }
+                order = "e-b-b"
+            }
     })
 end

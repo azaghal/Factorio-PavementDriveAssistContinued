@@ -50,98 +50,88 @@ if settings.startup["PDA-setting-smart-roads-enabled"].value then
                 selection_box = {{-0.8, -0.8}, {0.8, 0.8}},
                 collision_mask = { "floor-layer", "water-tile" },
                 item_slot_count = 1,
-                resistances =
+                resistances = {
                     {
-                        {
-                            type = "fire",
-                            percent = 95
-                        },
-                        {
-                            type = "explosion",
-                            percent = 90
-                        },
-                        {
-                            type = "physical",
-                            percent = 90
-                        },
+                        type = "fire",
+                        percent = 95
                     },
-                sprites =
                     {
-                        north =
-                            {
-                                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-n.png",
-                                width = 64,
-                                height = 64,
-                                frame_count = 1,
-                                shift = {0, 0},
-                            },
-                        east =
-                            {
-                                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-e.png",
-                                width = 64,
-                                height = 64,
-                                frame_count = 1,
-                                shift = {0, 0},
-                            },
-                        south =
-                            {
-                                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-s.png",
-                                width = 64,
-                                height = 64,
-                                frame_count = 1,
-                                shift = {0, 0},
-                            },
-                        west =
-                            {
-                                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-w.png",
-                                width = 64,
-                                height = 64,
-                                frame_count = 1,
-                                shift = {0, 0},
-                            },
+                        type = "explosion",
+                        percent = 90
                     },
+                    {
+                        type = "physical",
+                        percent = 90
+                    },
+                },
+                sprites = {
+                    north = {
+                        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-n.png",
+                        width = 64,
+                        height = 64,
+                        frame_count = 1,
+                        shift = {0, 0},
+                    },
+                    east = {
+                        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-e.png",
+                        width = 64,
+                        height = 64,
+                        frame_count = 1,
+                        shift = {0, 0},
+                    },
+                    south = {
+                        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-s.png",
+                        width = 64,
+                        height = 64,
+                        frame_count = 1,
+                        shift = {0, 0},
+                    },
+                    west = {
+                        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-limit-w.png",
+                        width = 64,
+                        height = 64,
+                        frame_count = 1,
+                        shift = {0, 0},
+                    },
+                },
 
-                activity_led_sprites =
-                    {
-                        north = void_activity_led_sprite(),
-                        east = void_activity_led_sprite(),
-                        south = void_activity_led_sprite(),
-                        west = void_activity_led_sprite()
-                    },
+                activity_led_sprites = {
+                    north = void_activity_led_sprite(),
+                    east = void_activity_led_sprite(),
+                    south = void_activity_led_sprite(),
+                    west = void_activity_led_sprite()
+                },
 
-                activity_led_light =
-                    {
-                        intensity = 0.8,
-                        size = 1,
-                        --color = {r = 1.0, g = 1.0, b = 1.0}
-                    },
+                activity_led_light = {
+                    intensity = 0.8,
+                    size = 1,
+                    --color = {r = 1.0, g = 1.0, b = 1.0}
+                },
 
-                activity_led_light_offsets =
+                activity_led_light_offsets = {
+                    {0, 0},
+                    {0, 0},
+                    {0, 0},
+                    {0, 0}
+                },
+                circuit_wire_connection_points = {
                     {
-                        {0, 0},
-                        {0, 0},
-                        {0, 0},
-                        {0, 0}
+                        shadow = { red = {-0.15, -0.75}, green = {0.15, -0.75}, },
+                        wire = { red = {-0.15, -0.75},  green = {0.15, -0.75}, },
                     },
-                circuit_wire_connection_points =
                     {
-                        {
-                            shadow = { red = {-0.15, -0.75}, green = {0.15, -0.75}, },
-                            wire = { red = {-0.15, -0.75},  green = {0.15, -0.75}, },
-                        },
-                        {
-                            shadow = { red = {0.95, -0.12}, green = {0.95, 0.12}, },
-                            wire = { red = {0.95, -0.12},  green = {0.95, 0.12}, },
-                        },
-                        {
-                            shadow = { red = {0.15, 0.75}, green = {-0.15, 0.75}, },
-                            wire = { red = {0.15, 0.75},  green = {-0.15, 0.75}, },
-                        },
-                        {
-                            shadow = { red = {-0.95, 0.12}, green = {-0.95, -0.12}, },
-                            wire = { red = {-0.95, 0.12},  green = {-0.95, -0.12}, },
-                        }
+                        shadow = { red = {0.95, -0.12}, green = {0.95, 0.12}, },
+                        wire = { red = {0.95, -0.12},  green = {0.95, 0.12}, },
                     },
+                    {
+                        shadow = { red = {0.15, 0.75}, green = {-0.15, 0.75}, },
+                        wire = { red = {0.15, 0.75},  green = {-0.15, 0.75}, },
+                    },
+                    {
+                        shadow = { red = {-0.95, 0.12}, green = {-0.95, -0.12}, },
+                        wire = { red = {-0.95, 0.12},  green = {-0.95, -0.12}, },
+                    }
+                },
                 circuit_wire_max_distance = 9
             },
             {
@@ -158,86 +148,76 @@ if settings.startup["PDA-setting-smart-roads-enabled"].value then
                 selection_box = {{-0.8, -0.8}, {0.8, 0.8}},
                 collision_mask = { "floor-layer", "water-tile" },
                 item_slot_count = 1,
-                resistances =
+                resistances = {
                     {
-                        {
-                            type = "fire",
-                            percent = 95
-                        },
-                        {
-                            type = "explosion",
-                            percent = 90
-                        },
-                        {
-                            type = "physical",
-                            percent = 90
-                        },
+                        type = "fire",
+                        percent = 95
                     },
-                sprites =
                     {
-                        north =
-                            {
-                                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-n.png",
-                                width = 64,
-                                height = 64,
-                                frame_count = 1,
-                                shift = {0, 0},
-                            },
-                        east =
-                            {
-                                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-e.png",
-                                width = 64,
-                                height = 64,
-                                frame_count = 1,
-                                shift = {0, 0},
-                            },
-                        south =
-                            {
-                                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-n.png",
-                                width = 64,
-                                height = 64,
-                                frame_count = 1,
-                                shift = {0, 0},
-                            },
-                        west =
-                            {
-                                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-e.png",
-                                width = 64,
-                                height = 64,
-                                frame_count = 1,
-                                shift = {0, 0},
-                            },
+                        type = "explosion",
+                        percent = 90
                     },
+                    {
+                        type = "physical",
+                        percent = 90
+                    },
+                },
+                sprites = {
+                    north = {
+                        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-n.png",
+                        width = 64,
+                        height = 64,
+                        frame_count = 1,
+                        shift = {0, 0},
+                    },
+                    east = {
+                        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-e.png",
+                        width = 64,
+                        height = 64,
+                        frame_count = 1,
+                        shift = {0, 0},
+                    },
+                    south = {
+                        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-n.png",
+                        width = 64,
+                        height = 64,
+                        frame_count = 1,
+                        shift = {0, 0},
+                    },
+                    west = {
+                        filename = "__PavementDriveAssistContinued__/graphics/entity/road-sign-speed-unlimit-e.png",
+                        width = 64,
+                        height = 64,
+                        frame_count = 1,
+                        shift = {0, 0},
+                    },
+                },
 
-                activity_led_sprites =
-                    {
-                        north = void_activity_led_sprite(),
-                        east = void_activity_led_sprite(),
-                        south = void_activity_led_sprite(),
-                        west = void_activity_led_sprite()
-                    },
+                activity_led_sprites = {
+                    north = void_activity_led_sprite(),
+                    east = void_activity_led_sprite(),
+                    south = void_activity_led_sprite(),
+                    west = void_activity_led_sprite()
+                },
 
-                activity_led_light =
-                    {
-                        intensity = 0.8,
-                        size = 1,
-                        --color = {r = 1.0, g = 1.0, b = 1.0}
-                    },
+                activity_led_light = {
+                    intensity = 0.8,
+                    size = 1,
+                    --color = {r = 1.0, g = 1.0, b = 1.0}
+                },
 
-                activity_led_light_offsets =
-                    {
-                        {0, 0},
-                        {0, 0},
-                        {0, 0},
-                        {0, 0}
-                    },
-                circuit_wire_connection_points =
-                    {
-                        void_circuit_wire_connection_point(),
-                        void_circuit_wire_connection_point(),
-                        void_circuit_wire_connection_point(),
-                        void_circuit_wire_connection_point()
-                    },
+                activity_led_light_offsets = {
+                    {0, 0},
+                    {0, 0},
+                    {0, 0},
+                    {0, 0}
+                },
+                circuit_wire_connection_points = {
+                    void_circuit_wire_connection_point(),
+                    void_circuit_wire_connection_point(),
+                    void_circuit_wire_connection_point(),
+                    void_circuit_wire_connection_point()
+                },
                 circuit_wire_max_distance = 0
 
             }
@@ -247,74 +227,66 @@ if settings.startup["PDA-setting-smart-roads-enabled"].value then
     vehicleSensor.minable.result = "pda-road-sensor"
     vehicleSensor.item_slot_count = 4
     vehicleSensor.sprites = {
-        north =
-            {
-                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-n.png",
-                width = 96,
-                height = 96,
+        north = {
+            filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-n.png",
+            width = 96,
+            height = 96,
+            frame_count = 1,
+            shift = {0, 0},
+            hr_version = {
+                scale = 0.5,
+                filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-n.png",
+                width = 192,
+                height = 192,
                 frame_count = 1,
-                shift = {0, 0},
-                hr_version =
-                    {
-                        scale = 0.5,
-                        filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-n.png",
-                        width = 192,
-                        height = 192,
-                        frame_count = 1,
-                        shift = {0, 0}
-                    }
-            },
-        east =
-            {
-                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-e.png",
-                width = 96,
-                height = 96,
-                frame_count = 1,
-                shift = {0, 0},
-                hr_version =
-                    {
-                        scale = 0.5,
-                        filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-e.png",
-                        width = 192,
-                        height = 192,
-                        frame_count = 1,
-                        shift = {0, 0}
-                    }
-            },
-        west =
-            {
-                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-w.png",
-                width = 96,
-                height = 96,
-                frame_count = 1,
-                shift = {0, 0},
-                hr_version =
-                    {
-                        scale = 0.5,
-                        filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-w.png",
-                        width = 192,
-                        height = 192,
-                        frame_count = 1,
-                        shift = {0, 0}
-                    }
-            },
-        south =
-            {
-                filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-s.png",
-                width = 96,
-                height = 96,
-                frame_count = 1,
-                shift = {0, 0},
-                hr_version =
-                    {
-                        scale = 0.5,
-                        filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-s.png",
-                        width = 192,
-                        height = 192,
-                        frame_count = 1,
-                        shift = {0, 0}
-                    }
+                shift = {0, 0}
             }
+        },
+        east = {
+            filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-e.png",
+            width = 96,
+            height = 96,
+            frame_count = 1,
+            shift = {0, 0},
+            hr_version = {
+                scale = 0.5,
+                filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-e.png",
+                width = 192,
+                height = 192,
+                frame_count = 1,
+                shift = {0, 0}
+            }
+        },
+        west = {
+            filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-w.png",
+            width = 96,
+            height = 96,
+            frame_count = 1,
+            shift = {0, 0},
+            hr_version = {
+                scale = 0.5,
+                filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-w.png",
+                width = 192,
+                height = 192,
+                frame_count = 1,
+                shift = {0, 0}
+            }
+        },
+        south = {
+            filename = "__PavementDriveAssistContinued__/graphics/entity/road-sensor-s.png",
+            width = 96,
+            height = 96,
+            frame_count = 1,
+            shift = {0, 0},
+            hr_version = {
+                scale = 0.5,
+                filename = "__PavementDriveAssistContinued__/graphics/entity/hr-road-sensor-s.png",
+                width = 192,
+                height = 192,
+                frame_count = 1,
+                shift = {0, 0}
+            }
+        }
     }
     vehicleSensor.collision_box = {{-1.4, -1.4}, {1.4, 1.4}}
     vehicleSensor.selection_box = {{-1.3, -1.3}, {1.3, 1.3}}
