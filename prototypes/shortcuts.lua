@@ -2,6 +2,7 @@ data:extend({
         {
             type = "shortcut",
             name = "pda-cruise-control-toggle",
+            associated_control_input = "toggle_cruise_control",
             order = "a",
             action = "lua",
             localised_name = {"controls.toggle_cruise_control"},
@@ -31,6 +32,7 @@ data:extend({
         {
             type = "shortcut",
             name = "pda-set-cruise-control-limit",
+            associated_control_input = "set_cruise_control_limit",
             order = "a",
             action = "lua",
             localised_name = {"controls.set_cruise_control_limit"},
@@ -60,6 +62,7 @@ data:extend({
         {
             type = "shortcut",
             name = "pda-drive-assistant-toggle",
+            associated_control_input = "toggle_drive_assistant",
             order = "a",
             action = "lua",
             localised_name = {"controls.toggle_drive_assistant"},
