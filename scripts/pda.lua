@@ -13,27 +13,48 @@ local brk = defines.riding.acceleration.braking
 local idl = defines.riding.acceleration.nothing
 local rev = defines.riding.acceleration.reversing
 
--- used to output texts to whole forces or all players
-local function notification(txt, force)
+
+--- Outputs console message to all players or all players in a force.
+--
+-- @param message string Message to show to players.
+--
+local function notification(message, force)
     if force ~= nil then
-        force.print(txt)
+        force.print(message)
     else
         for k, p in pairs (game.players) do
-            game.players[k].print(txt)
+            game.players[k].print(message)
         end
     end
 end
 
---- Converts Factorios meter per tick to floored integer kilometer per hour (used for GUI interaction)
+
+--- Converts meters per tick to kilometers per hour (used for GUI interaction).
+--
+-- @param mpt uint Value to convert (in m/t).
+--
+-- @return uint Converted value (in km/h).
+--
 local function mpt_to_kmph(mpt)
     return math.floor(mpt * 60 * 60 * 60 / 1000 + 0.5)
 end
 
+
+--- Converts kilometers per hour to meters per tick (used for GUI interaction).
+--
+-- @param mpt uint Value to convert (in km/h).
+--
+-- @return uint Converted value (in m/t).
+--
 local function kmph_to_mpt(kmph)
     return ((kmph * 1000) / 60 / 60 / 60)
 end
 
---- Get or init persistent vars
+
+--- Initialises and updates mod data.
+--
+-- No action is taken if data has been initalised already.
+--
 local function init_global()
     global = global or {}
     global.drive_assistant = global.drive_assistant or {}
@@ -67,7 +88,12 @@ local function init_global()
 end
 
 
----@param sign table
+--- Increments detector signal data for passed-in sign.
+--
+-- @TODO Document what this actually means.
+--
+-- @param sign LuaEntity Sign entity from PDA (one of the constant combinator ones, like stop sign or road sensor).
+--
 local function increment_detector_signal(sign)
     if not sign or not sign.valid then
         return
@@ -81,9 +107,15 @@ local function increment_detector_signal(sign)
     signals.set_signal(1, {count = count + 1, signal = {type="virtual", name="signal-V"}})
 end
 
----@param sign table
+
+--- Decrements detector signal data for passed-in sign.
+--
+-- @TODO Document what this actually means.
+--
+-- @param sign LuaEntity Sign entity from PDA (one of the constant combinator ones, like stop sign or road sensor).
+--
 local function decrement_detector_signal(sign)
-        if not sign or not sign.valid then
+    if not sign or not sign.valid then
         return
     end
     local signals = sign.get_or_create_control_behavior()
@@ -95,7 +127,14 @@ local function decrement_detector_signal(sign)
     signals.set_signal(1, {count = count - 1, signal = {type="virtual", name="signal-V"}})
 end
 
-function removeStopSignsFromLastSignData(player_index)
+
+--- Removes stop signs from last sign data.
+--
+-- @TODO Document what this actually means.
+--
+-- @param player_index uint Player for which to update the data.
+--
+function remove_stop_signs_form_last_sign_data(player_index)
     local sd = global.last_sign_data[player_index]
     if sd ~= nil and sd.type ~= nil and sd.type["stop"] ~= nil then
         local stops = sd.type["stop"]
@@ -106,6 +145,14 @@ function removeStopSignsFromLastSignData(player_index)
     end
 end
 
+
+--- Dregisters player from specified road sensor.
+--
+-- @TODO Document what this actually means.
+--
+-- @param sign_uid uint Unique identifier of sign entity.
+-- @param player_index uint Player that should be deregistered.
+--
 local function deregister_from_road_sensor(sign_uid, player_index)
     local sd = global.signs[sign_uid]
     local player = game.players[player_index]
@@ -145,11 +192,12 @@ local function deregister_from_road_sensor(sign_uid, player_index)
     global.vehicles_registered_to_signs[player_index] = nil
 end
 
---- Fired if a player enters or leaves a vehicle
+
+--- Event handler for player entering or leaving a vehicle.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
 function pda.on_player_driving_changed_state(event)
-    --log(serpent.block(global, {maxlevel= 4}))
-    -- local player = game.players[event.player_index]
-    -- if player.vehicle ~= nil and player.vehicle.valid and    player.vehicle.get_driver() == player then
     local p_id = event.player_index
     local player = game.players[p_id]
     if player ~= nil then
@@ -180,7 +228,7 @@ function pda.on_player_driving_changed_state(event)
                     global.emergency_brake_power[p_id] = nil
                     global.imposed_speed_limit[p_id] = nil
                     global.last_score[p_id] = 0
-                    removeStopSignsFromLastSignData(player.index)
+                    remove_stop_signs_form_last_sign_data(player.index)
                     global.last_sign_data[p_id] = nil
                     if global.vehicles_registered_to_signs[p_id] ~= nil then
                         deregister_from_road_sensor(global.vehicles_registered_to_signs[p_id].registered_to_sensor, p_id)
@@ -208,6 +256,7 @@ function pda.on_player_driving_changed_state(event)
         end
     end
 end
+
 
 --- Toggles (enables/disables) cruise control for player.
 --
@@ -241,6 +290,7 @@ function pda.set_cruise_control_limit(player)
     end
 end
 
+
 --- Sets new value for cruise control limit.
 --
 -- @param player LuaPlayer Player for which the cruise control limit is being changed.
@@ -273,20 +323,28 @@ function pda.set_new_value_for_cruise_control_limit(player)
     end
 end
 
--- handle gui interaction: player clicked on a button
+
+--- Event handler for player clicking on a button.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
 function pda.on_gui_click(event)
     local player = game.players[event.player_index]
-	if player.gui.center.pda_cc_limit_gui_frame then
-		if event.element.name == "pda_cc_limit_gui_close" then
-			player.gui.center.pda_cc_limit_gui_frame.destroy()
-		elseif event.element.name == "pda_cc_limit_gui_confirm" then
-			pda.set_new_value_for_cruise_control_limit(player)
-			player.gui.center.pda_cc_limit_gui_frame.destroy()
-		end
-	end
+    if player.gui.center.pda_cc_limit_gui_frame then
+        if event.element.name == "pda_cc_limit_gui_close" then
+            player.gui.center.pda_cc_limit_gui_frame.destroy()
+        elseif event.element.name == "pda_cc_limit_gui_confirm" then
+            pda.set_new_value_for_cruise_control_limit(player)
+            player.gui.center.pda_cc_limit_gui_frame.destroy()
+        end
+    end
 end
 
--- handle gui interaction: player confirmed entry via textfield
+
+--- Event handler for player confirming cruise control limit change.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
 function pda.on_gui_confirmed(event)
     local player = game.players[event.player_index]
 
@@ -296,15 +354,19 @@ function pda.on_gui_confirmed(event)
     end
 end
 
--- handle gui interaction: player closed cruise speed window via Escape
-function pda.on_gui_closed(event)
-   if event.element and event.element.name == "pda_cc_limit_gui_frame" then
-      local player = game.players[event.player_index]
 
-      if player.gui.center.pda_cc_limit_gui_frame then
-         player.gui.center.pda_cc_limit_gui_frame.destroy()
-      end
-   end
+--- Event handler for player dismissing cruise control limit dialog without confirmation.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
+function pda.on_gui_closed(event)
+    if event.element and event.element.name == "pda_cc_limit_gui_frame" then
+        local player = game.players[event.player_index]
+
+        if player.gui.center.pda_cc_limit_gui_frame then
+            player.gui.center.pda_cc_limit_gui_frame.destroy()
+        end
+    end
 end
 
 
@@ -339,40 +401,42 @@ function pda.toggle_drive_assistant(player)
 end
 
 
---- Guide the vehicle the player is driving depending on the surface tiles that are in front of the vehicle
----@param player_index number
+--- Guide player's vehicle along the surface tiles in front of the vehicle.
+--
+-- @param player_index uint Player for which to guide the vehicle.
+--
 local function manage_drive_assistant(player_index)
     local player = game.players[player_index]
 
-	if player.riding_state.direction == defines.riding.direction.straight and (global.imposed_speed_limit[player_index] ~= nil or math.abs(player.vehicle.speed) > global.min_speed) then
-		local car = player.vehicle
-		local dir = car.orientation
+    if player.riding_state.direction == defines.riding.direction.straight and (global.imposed_speed_limit[player_index] ~= nil or math.abs(player.vehicle.speed) > global.min_speed) then
+        local car = player.vehicle
+        local dir = car.orientation
         local scores = global.scores
         local eccent = config.eccent
         local newdir = 0
-		local pi = math.pi
-		local fsin = math.sin
-		local fcos = math.cos
+        local pi = math.pi
+        local fsin = math.sin
+        local fcos = math.cos
         local mfloor = math.floor
         --local mmin = math.min
         local get_tile = player.surface.get_tile
 
-		local dirr = dir + config.lookangle
-		local dirl = dir - config.lookangle
+        local dirr = dir + config.lookangle
+        local dirl = dir - config.lookangle
 
-		-- scores for straight, right and left (@sillyfly)
-		local ss,sr,sl = 0,0,0
-		local vs = {fsin(2*pi*dir), -fcos(2*pi*dir)}
-		local vr = {fsin(2*pi*dirr), -fcos(2*pi*dirr)}
-		local vl = {fsin(2*pi*dirl), -fcos(2*pi*dirl)}
+        -- scores for straight, right and left (@sillyfly)
+        local ss,sr,sl = 0,0,0
+        local vs = {fsin(2*pi*dir), -fcos(2*pi*dir)}
+        local vr = {fsin(2*pi*dirr), -fcos(2*pi*dirr)}
+        local vl = {fsin(2*pi*dirl), -fcos(2*pi*dirl)}
 
-		local px = player.position['x'] or player.position[1]
-		local py = player.position['y'] or player.position[2]
-		local sign = (car.speed >= 0 and 1) or -1
+        local px = player.position['x'] or player.position[1]
+        local py = player.position['y'] or player.position[2]
+        local sign = (car.speed >= 0 and 1) or -1
 
-		local sts = {px, py}
-		local str = {px + sign*vs[2]*eccent, py - sign*vs[1]*eccent}
-		local stl = {px -sign*vs[2]*eccent, py + sign*vs[1]*eccent}
+        local sts = {px, py}
+        local str = {px + sign*vs[2]*eccent, py - sign*vs[1]*eccent}
+        local stl = {px -sign*vs[2]*eccent, py + sign*vs[1]*eccent}
 
         -- linearly increases start and length of the scanned area if the car is very fast
         local lookahead_start_hs = 0
@@ -385,7 +449,7 @@ local function manage_drive_assistant(player_index)
         end
 
         for i=config.lookahead_start + lookahead_start_hs,config.lookahead_start + config.lookahead_length + lookahead_length_hs do
-			local d = i*sign
+            local d = i*sign
             local rstx = str[1] + vs[1]*d
             local rsty = str[2] + vs[2]*d
             local lstx = stl[1] + vs[1]*d
@@ -394,30 +458,15 @@ local function manage_drive_assistant(player_index)
             local rty = py + vr[2]*d
             local ltx = px + vl[1]*d
             local lty = py + vl[2]*d
-			local rst = scores[get_tile(rstx, rsty).name]
-			local lst = scores[get_tile(lstx, lsty).name]
-			local rt = scores[get_tile(rtx, rty).name]
-			local lt = scores[get_tile(ltx, lty).name]
+            local rst = scores[get_tile(rstx, rsty).name]
+            local lst = scores[get_tile(lstx, lsty).name]
+            local rt = scores[get_tile(rtx, rty).name]
+            local lt = scores[get_tile(ltx, lty).name]
 
             ss = ss + (((rst or 0) + (lst or 0))/2.0)
-			sr = sr + (rt or 0)
-			sl = sl + (lt or 0)
-            --error("test")
-            --[[
-            new_scan[rstx] = (new_scan ~= nil and new_scan[rstx]) or {}
-            new_scan[rstx][rsty] = rst
-            new_scan[lstx] = (new_scan ~= nil and new_scan[lstx]) or {}
-            new_scan[lstx][lsty] = lst
-            new_scan[rtx] = (new_scan ~= nil and new_scan[rtx]) or {}
-            new_scan[rtx][rty] = rt
-            new_scan[ltx] = (new_scan ~= nil and new_scan[ltx]) or {}
-            new_scan[ltx][lty] = lt
-            ]]
- 		end
-		--[[if debug then
-			player.print("x:" .. px .. "->" .. px+vs[1]*(lookahead_start + lookahead_length) .. ", y:" .. py .. "->" .. py+vs[2]*(lookahead_start + lookahead_length))
-			player.print("S: " .. ss .. " R: " .. sr .. " L: " .. sl)
-		end]]
+            sr = sr + (rt or 0)
+            sl = sl + (lt or 0)
+        end
 
         -- check if the score indicates that the vehicle leaved paved area
         local ls = global.last_score[player_index] or 0
@@ -434,30 +483,38 @@ local function manage_drive_assistant(player_index)
             player.riding_state = {acceleration = brk, direction = player.riding_state.direction}
             global.road_departure_brake_active[player_index] = true
         end
-		global.last_score[player_index] = ts
+        global.last_score[player_index] = ts
 
         -- set new direction depending on the scores (@sillyfly)
         if sr > ss and sr > sl and (sr + ss) > 0 then
             newdir = dir + (config.changeangle*sr*2)/(sr+ss)
-			--newdir = dir + mmin((config.changeangle*sr*2)/(sr+ss), car.prototype.rotation_speed)-- donfig.max_changeangle * global.driving_assistant_tickrate)
+            -- @TODO: Figure out what to do with this bit of code.
+            --newdir = dir + mmin((config.changeangle*sr*2)/(sr+ss), car.prototype.rotation_speed)-- donfig.max_changeangle * global.driving_assistant_tickrate)
         elseif sl > ss and sl > sr and (sl + ss) > 0 then
             newdir = dir - (config.changeangle*sl*2)/(sl+ss)
-			--newdir = dir - mmin((config.changeangle*sl*2)/(sl+ss), car.prototype.rotation_speed)--config.max_changeangle * global.driving_assistant_tickrate)
-		else
-           newdir = dir
+            -- @TODO: Figure out what to do with this bit of code.
+            --newdir = dir - mmin((config.changeangle*sl*2)/(sl+ss), car.prototype.rotation_speed)--config.max_changeangle * global.driving_assistant_tickrate)
+        else
+            newdir = dir
         end
 
         -- Snap car to nearest 1/64 to avoid oscillation (@GotLag)
-		--car.orientation = newdir
-		car.orientation = mfloor(newdir * 64 + 0.5) / 64
+        --car.orientation = newdir
+        car.orientation = mfloor(newdir * 64 + 0.5) / 64
 
         -- no score reset in curves -> allow the player to guide his vehicle off road manually
-	elseif player.riding_state.direction ~= defines.riding.direction.straight then
+    elseif player.riding_state.direction ~= defines.riding.direction.straight then
         global.last_score[player_index] = 0
     end
 end
 
----@param sign table
+
+--- Create logic table for a sign.
+--
+-- @TODO Document what this actually means.
+--
+-- @param sign LuaEntity Sign entity from PDA (one of the constant combinator ones, like stop sign or road sensor).
+--
 local function create_sign_logic_table(sign)
     if not sign or not sign.valid then
         return
@@ -472,14 +529,26 @@ local function create_sign_logic_table(sign)
     global.signs[sign.unit_number] = data
 end
 
----@param sign_uid number
+
+--- Deletes logic table for a sign.
+--
+-- @TODO Document what this actually means.
+--
+-- @param sign uint Unique ID of sign entity from PDA (one of the constant combinator ones, like stop sign or road sensor).
+--
 local function delete_sign_logic_table(sign_uid)
     global.signs[sign_uid] = nil
 end
 
----@param sign table
----@param player_index number
----@param velocity number
+
+--- Registers player with a road sensor.
+--
+-- @TODO Document what this actually means.
+--
+-- @param sign LuaEntity Road sensor sign entity.
+-- @param player_index uint Player that should be registered with the sign.
+-- @param velocity uint Velocity of vehicle that the player is driving.
+--
 local function register_to_road_sensor(sign, player_index, velocity)
     if not sign or not sign.valid then
         return
@@ -546,6 +615,16 @@ local function register_to_road_sensor(sign, player_index, velocity)
     end
 end
 
+
+--- Updates player's vehicle data (if registered with a sign).
+--
+-- @TODO Document what this actually means. Document parameter "params" with more detail.
+--
+-- @param player_index uint Player that should be registered with the sign.
+-- @param params table Table specifying what should be updated (command/queue_position).
+--
+-- @return bool true, if updates were made, false otherwise.
+--
 local function update_vehicle_registered_to_sign(player_index, params)
     local vreg = global.vehicles_registered_to_signs[player_index]
     local player = game.players[player_index]
@@ -563,7 +642,7 @@ local function update_vehicle_registered_to_sign(player_index, params)
     end
 
     if params.command == 1 and (vreg.passed_stop_positions <= vreg.expected_stop_positions - vreg.queue_position) then
-    -- stop command: start to decelerate the vehicle, but only if a stop position is expected
+        -- stop command: start to decelerate the vehicle, but only if a stop position is expected
         global.imposed_speed_limit[player_index] = vreg.local_speed_limit
         if car.speed > 0 then
             -- vehicle is not already waiting -> brake
@@ -573,7 +652,7 @@ local function update_vehicle_registered_to_sign(player_index, params)
             end
         end
     elseif params.command == 0 then
-    -- go
+        -- go
         if vreg.passed_stop_positions == vreg.expected_stop_positions and vreg.queue_position == 1 then
             deregister_from_road_sensor(vreg.registered_to_sensor, player_index)
         else
@@ -592,12 +671,19 @@ local function update_vehicle_registered_to_sign(player_index, params)
             player.riding_state = {acceleration = acc, direction = player.riding_state.direction}
         end
     elseif params.command == -1 then
-    -- ignore this sign
+        -- ignore this sign
         deregister_from_road_sensor(vreg.registered_to_sensor, player_index)
     end
     return true
 end
 
+
+--- Updates road sensor data.
+--
+-- @param sign_uid uint Unique identifier of road sensor sign entity.
+--
+-- @return bool true, if updates were made, false otherwise.
+--
 local function update_road_sensor_data(sign_uid)
     local sign = global.signs[sign_uid]
     if not sign then
@@ -664,6 +750,17 @@ local function update_road_sensor_data(sign_uid)
     return true
 end
 
+
+--- Retrieves the speed limit value from a sign.
+--
+-- @TODO Document what this actually means.
+--
+-- Takes into account both the value of the sign itself, and any connected circuits. Value priority is: red wire > green wire > not connected.
+--
+-- @param sign LuaEntity Sign entity from PDA (one of the constant combinator ones, like stop sign or road sensor).
+--
+-- @return uint Speed limit for a sign.
+--
 local function get_speed_limit_value(sign)
     local sign = sign.get_or_create_control_behavior()
     local sign_value = 0
@@ -676,11 +773,11 @@ local function get_speed_limit_value(sign)
     if network_red ~= nil and network_red.signals ~= nil and #network_red.signals > 0 then
         local networksignal = network_red.signals[1]
         if networksignal.signal ~= nil then sign_value = networksignal.count end
-    -- 2nd: if there is no res wire, check if a green wire is connected (with >=1 signals, including the one of the sign itself)
+        -- 2nd: if there is no res wire, check if a green wire is connected (with >=1 signals, including the one of the sign itself)
     elseif network_green ~= nil and network_green.signals ~= nil and #network_green.signals > 0 then
         local networksignal = network_green.signals[1]
         if networksignal.signal ~= nil then sign_value = networksignal.count end
-    -- 3rd: if the sign is not connected to any circuit network, read its own signal
+        -- 3rd: if the sign is not connected to any circuit network, read its own signal
     elseif sign.get_signal(1).signal ~= nil then
         local localsignal = sign.get_signal(1)
         if localsignal.signal ~= nil then sign_value = localsignal.count end
@@ -688,54 +785,70 @@ local function get_speed_limit_value(sign)
     return sign_value
 end
 
-function updateLastSignData(player_index, newSign_uid, newSignType, stopSignEntity)
+
+--- Updates last sign data.
+--
+-- @TODO Document what this actually means.
+--
+--
+-- @param player_index uint Player for which to update the data.
+-- @param new_sign_uid uint Unique ID of sign entity from PDA (one of the constant combinator ones, like stop sign or road sensor).
+-- @param new_sign_type string type of sign. One of: stop, sensor, limit, unlimit.
+--
+function update_last_sign_data(player_index, new_sign_uid, new_sign_type, stopSignEntity)
     -- up to four signs will be cached if the player drives over multiple signs at once
     local last = global.last_sign_data[player_index]
     if last.type == nil then last.type = {} end
-    if last.type[newSignType] == nil then last.type[newSignType] = {} end
-    last.ignore[newSign_uid] = true
-    if last.type[newSignType].id_1 == nil then
-        last.type[newSignType].id_1 = newSign_uid
+    if last.type[new_sign_type] == nil then last.type[new_sign_type] = {} end
+    last.ignore[new_sign_uid] = true
+    if last.type[new_sign_type].id_1 == nil then
+        last.type[new_sign_type].id_1 = new_sign_uid
         if stopSignEntity ~= nil then
-            last.type[newSignType].entity_1 = stopSignEntity
+            last.type[new_sign_type].entity_1 = stopSignEntity
         end
-    elseif last.type[newSignType].id_2 == nil then
-        last.type[newSignType].id_2 = newSign_uid
+    elseif last.type[new_sign_type].id_2 == nil then
+        last.type[new_sign_type].id_2 = new_sign_uid
         if stopSignEntity ~= nil then
-            last.type[newSignType].entity_2 = stopSignEntity
+            last.type[new_sign_type].entity_2 = stopSignEntity
         end
-    elseif last.type[newSignType].id_3 == nil then
-        last.type[newSignType].id_3 = newSign_uid
+    elseif last.type[new_sign_type].id_3 == nil then
+        last.type[new_sign_type].id_3 = new_sign_uid
         if stopSignEntity ~= nil then
-            last.type[newSignType].entity_3 = stopSignEntity
+            last.type[new_sign_type].entity_3 = stopSignEntity
         end
-    elseif last.type[newSignType].id_4 == nil then
-        last.type[newSignType].id_4 = newSign_uid
+    elseif last.type[new_sign_type].id_4 == nil then
+        last.type[new_sign_type].id_4 = new_sign_uid
         if stopSignEntity ~= nil then
-            last.type[newSignType].entity_4 = stopSignEntity
+            last.type[new_sign_type].entity_4 = stopSignEntity
         end
     else
         -- delete old element one; old element two is now element one; new element is now element two
-        last.ignore[last.type[newSignType].id_1] = nil
-        last.type[newSignType].id_1, last.type[newSignType].id_2, last.type[newSignType].id_3, last.type[newSignType].id_4 =
-        last.type[newSignType].id_2, last.type[newSignType].id_3, last.type[newSignType].id_4, newSign_uid
+        last.ignore[last.type[new_sign_type].id_1] = nil
+        last.type[new_sign_type].id_1, last.type[new_sign_type].id_2, last.type[new_sign_type].id_3, last.type[new_sign_type].id_4 =
+            last.type[new_sign_type].id_2, last.type[new_sign_type].id_3, last.type[new_sign_type].id_4, new_sign_uid
         if stopSignEntity ~= nil then
-            decrement_detector_signal(last.type[newSignType].entity_1)
-            last.type[newSignType].entity_1, last.type[newSignType].entity_2, last.type[newSignType].entity_3, last.type[newSignType].entity_4 =
-            last.type[newSignType].entity_2, last.type[newSignType].entity_3, last.type[newSignType].entity_4, stopSignEntity
+            decrement_detector_signal(last.type[new_sign_type].entity_1)
+            last.type[new_sign_type].entity_1, last.type[new_sign_type].entity_2, last.type[new_sign_type].entity_3, last.type[new_sign_type].entity_4 =
+                last.type[new_sign_type].entity_2, last.type[new_sign_type].entity_3, last.type[new_sign_type].entity_4, stopSignEntity
         end
     end
 end
 
 
---- Sign detection and processing
---- @param player_index number
+--- Processes signs.
+--
+-- @TODO Document what this actually means.
+--
+-- @param player_index uint Player for which to process the signs.
+--
+-- @return bool true, if signs were processed, false otherwise.
+--
 local function process_signs(player_index)
     local cc_active = global.cruise_control[player_index]
     local player = game.players[player_index]
     local px = player.position['x'] or player.position[1]
-	local py = player.position['y'] or player.position[2]
-	local car = player.vehicle
+    local py = player.position['y'] or player.position[2]
+    local car = player.vehicle
     local vreg = global.vehicles_registered_to_signs[player_index]
     local sign_scanner = player.surface.find_entities_filtered{area = {{px-1, py-1},{px+1, py+1}}, type="constant-combinator"}
     if #sign_scanner > 0 then
@@ -747,11 +860,11 @@ local function process_signs(player_index)
             if not global.last_sign_data[player_index].ignore[sign_scanner[i].unit_number] then
                 if sign_scanner[i].name == "pda-road-sign-stop" then
                     -- detect stop signs even if cruise control is inactive
-                    updateLastSignData(player_index, sign_scanner[i].unit_number, "stop", sign_scanner[i])
+                    update_last_sign_data(player_index, sign_scanner[i].unit_number, "stop", sign_scanner[i])
                     increment_detector_signal(sign_scanner[i])
                     local pass_stop_sign = false
                     if vreg then
-                    -- if this vehicle is currently registered to a sensor
+                        -- if this vehicle is currently registered to a sensor
                         vreg.passed_stop_positions = vreg.passed_stop_positions + 1
                         if vreg.command ~= 1 then
                             pass_stop_sign = true
@@ -783,7 +896,7 @@ local function process_signs(player_index)
                     -- other signs are only processed if cruise control is active
                     return false
                 elseif sign_scanner[i].name == "pda-road-sensor" then
-                    updateLastSignData(player_index, sign_scanner[i].unit_number, "sensor")
+                    update_last_sign_data(player_index, sign_scanner[i].unit_number, "sensor")
                     if vreg == nil then
                         -- this vehicle does now listen to this road sensor
                         register_to_road_sensor(sign_scanner[i], player_index, car.speed)
@@ -795,7 +908,7 @@ local function process_signs(player_index)
                         return true
                     end
                 elseif sign_scanner[i].name == "pda-road-sign-speed-limit" then
-                    updateLastSignData(player_index, sign_scanner[i].unit_number, "limit")
+                    update_last_sign_data(player_index, sign_scanner[i].unit_number, "limit")
                     local sign_value = get_speed_limit_value(sign_scanner[i])
                     -- read signal value only if a signal is set
                     if sign_value ~= 0 then
@@ -821,7 +934,7 @@ local function process_signs(player_index)
                     end
                     return true
                 elseif sign_scanner[i].name == "pda-road-sign-speed-unlimit" then
-                    updateLastSignData(player_index, sign_scanner[i].unit_number, "unlimit")
+                    update_last_sign_data(player_index, sign_scanner[i].unit_number, "unlimit")
                     if vreg == nil then
                         global.imposed_speed_limit[player_index] = nil
                     else
@@ -835,15 +948,17 @@ local function process_signs(player_index)
             end
         end
     elseif global.last_sign_data[player_index] ~= nil then
-        removeStopSignsFromLastSignData(player_index)
+        remove_stop_signs_form_last_sign_data(player_index)
         global.last_sign_data[player_index] = nil
     end
     return false
 end
 
---- Check if vehicle speed needs to be adjusted (only if cruise control is active).
---- Wont do anything if player stands still or is braking.
---- @param player_index number
+
+--- Updates vehicle speed if cruise control is active.
+--
+-- @param player_index uint Player for which to update vehicle speed.
+--
 local function manage_cruise_control(player_index)
     local player = game.players[player_index]
     local speed = player.vehicle.speed
@@ -855,12 +970,12 @@ local function manage_cruise_control(player_index)
     else
         target_speed = global.cruise_control_limit[player_index]
     end
-	if speed ~= 0 and player.riding_state.acceleration ~= brk and global.emergency_brake_power[player_index] == nil then
+    if speed ~= 0 and player.riding_state.acceleration ~= brk and global.emergency_brake_power[player_index] == nil then
         if math.abs(speed) > target_speed then
             player.riding_state = {acceleration = idl, direction = player.riding_state.direction}
             if speed > 0 then
                 player.vehicle.speed = target_speed
-            -- check for reverse gear
+                -- check for reverse gear
             else
                 player.vehicle.speed = -target_speed
             end
@@ -870,8 +985,12 @@ local function manage_cruise_control(player_index)
     end
 end
 
--- on game start
-function pda.on_init(data)
+
+--- Handler for game initialisation event.
+--
+-- Can be safely invoked during mod configuration changes as well (non-destructive).
+--
+function pda.on_init()
     init_global()
 
     for _, player in pairs(game.players) do
@@ -889,7 +1008,14 @@ function pda.on_init(data)
     end
 end
 
--- joining players that drove vehicles while leaving the game are in the "offline_players_in_vehicles" list and will be put back to normal
+
+--- Handler for players joining the game.
+--
+-- Player that drove vehicle while leaving the game (and placed into global.offline_players_in_vehicles table) will get
+-- re-added to correct data structures.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
 function pda.on_player_joined_game(event)
     local p = event.player_index
     if config.debug then
@@ -932,16 +1058,23 @@ function pda.on_player_joined_game(event)
         kmph_to_mpt(game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value)
 end
 
--- puts leaving players currently driving a vehicle in the "offline_players_in_vehicles" list
+
+--- Handler for players leaving the game.
+--
+-- Takes care of "deregistering" the player from PDA-related vehicle management if player is driving a vehicle when
+-- leaving the game. Such players are registered in the global.offline_players_in_vehicles variable.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
 function pda.on_player_left_game(event)
-   local p = event.player_index
+    local p = event.player_index
     if config.debug then notification(tostring("on-left triggered by player "..p)) end
     for i=#global.players_in_vehicles, 1, -1 do
         if global.players_in_vehicles[i] == p then
             table.insert(global.offline_players_in_vehicles, p)
             table.remove(global.players_in_vehicles, i)
             -- deregister from stop signs and sensors - this would otherwise break their logic
-            removeStopSignsFromLastSignData(p)
+            remove_stop_signs_form_last_sign_data(p)
             global.last_sign_data[p] = nil
             if global.vehicles_registered_to_signs[p] ~= nil then
                 deregister_from_road_sensor(global.vehicles_registered_to_signs[p].registered_to_sensor, p)
@@ -950,8 +1083,14 @@ function pda.on_player_left_game(event)
     end
 end
 
--- adjust global variables if mod settings have been changed
-function pda.on_settings_changed(event)
+
+--- Handler for mod runtime setting changes.
+--
+-- Updates global variables as necessary.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
+function pda.on_runtime_mod_setting_changed(event)
     local p = event.player_index
     local s = event.setting
     if event.setting_type == "runtime-global" then
@@ -967,13 +1106,19 @@ function pda.on_settings_changed(event)
         if s == "PDA-setting-tick-rate" then
             global.driving_assistant_tickrate = settings.global["PDA-setting-tick-rate"].value
         end
-		if string.sub(s, 1, 11) == "PDA-tileset" then
-			global.scores = config.update_scores()
-		end
+        if string.sub(s, 1, 11) == "PDA-tileset" then
+            global.scores = config.update_scores()
+        end
     end
 end
 
--- put default signals into new speed limit signs and disable unlimit signs on placement
+
+--- Handler for placement of PDA sign entities.
+--
+-- Takes care of setting default signals and disabling unlimit signs on placement.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
 function pda.on_placed_sign(event)
     local p = event.player_index
     local e = event.created_entity
@@ -1006,6 +1151,13 @@ function pda.on_placed_sign(event)
     end
 end
 
+
+--- Handler invoked when a PDA sign gets removed.
+--
+-- Takes care of updating all mod data that might be referencing the sign.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
 function pda.on_sign_removed(event)
     local p = event.player_index
     local e = event.entity
@@ -1020,10 +1172,17 @@ function pda.on_sign_removed(event)
     end
 end
 
+
+--- Main routine that adjusts vehicle bearing and speed on each (configured) tick.
+--
+-- Takes care of updating vehicle speed and bearing for each vehicle. Keep in mind that API recommends against running
+-- heavy code on every tick. Therefore the code will take into account the driving assistant tick rate, and process
+-- every n-th player in vehicles (n = driving_assistant_tickrate). Sole exception is "cruise control" every tick in
+-- order to gain maximum acceleration.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
 function pda.on_tick(event)
--- Main routine (remember the api and the "no heavy code in the on_tick event" advice? ^^)
-    -- Process every n-th player in vehicles (n = driving_assistant_tickrate)
-    -- Exception: Process "cruise control" every tick to gain maximum acceleration
     local ptick = global.playertick
     local pinvec = #global.players_in_vehicles
 
@@ -1059,12 +1218,12 @@ function pda.on_tick(event)
             return
         end
         if hard_speed_limit > 0 then
-        -- check if a vehicle is faster than the global speed limit
+            -- check if a vehicle is faster than the global speed limit
             local speed = car.speed
             if speed > 0 and speed > hard_speed_limit then
                 game.players[p].vehicle.speed = hard_speed_limit
             elseif speed < 0 and speed < -hard_speed_limit then
-            -- reverse
+                -- reverse
                 car.speed = -hard_speed_limit
             end
         end
@@ -1090,7 +1249,7 @@ function pda.on_tick(event)
             else
                 player.riding_state = {acceleration = brk, direction = player.riding_state.direction}
             end
-        -- ...otherwise proceed to handle cruise control
+            -- ...otherwise proceed to handle cruise control
         elseif global.cruise_control_brake_active[p] then
             if (car.speed < global.cruise_control_limit[p]) and global.imposed_speed_limit[p] == nil or (global.imposed_speed_limit[p] ~= nil and car.speed < global.imposed_speed_limit[p]) then
                 global.cruise_control_brake_active[p] = false
@@ -1098,7 +1257,7 @@ function pda.on_tick(event)
             else
                 player.riding_state = {acceleration = brk, direction = player.riding_state.direction}
             end
-        -- ...otherwise proceed to handle cruise control
+            -- ...otherwise proceed to handle cruise control
         elseif pda.is_cruise_control_allowed() and global.cruise_control[p] then
             manage_cruise_control(p)
         end
@@ -1263,7 +1422,7 @@ function pda.disable_cruise_control(player)
 
     -- Drop player's vehicle from stop signs vehicle tracking.
     global.last_sign_data[player.index] = nil
-    removeStopSignsFromLastSignData(player.index)
+    remove_stop_signs_form_last_sign_data(player.index)
 
     -- Deregister player's vehicle from road sensors.
     if global.vehicles_registered_to_signs[player.index] then

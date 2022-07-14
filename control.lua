@@ -32,7 +32,7 @@ script.on_event(
 -- Data initialisation and configuration changes/updates.
 script.on_init(pda.on_init)
 script.on_configuration_changed(pda.on_init)
-script.on_event(defines.events.on_runtime_mod_setting_changed, pda.on_settings_changed)
+script.on_event(defines.events.on_runtime_mod_setting_changed, pda.on_runtime_mod_setting_changed)
 
 -- Players joing/leaving game and getting in and out of vehicles.
 script.on_event(defines.events.on_player_driving_changed_state, pda.on_player_driving_changed_state)
