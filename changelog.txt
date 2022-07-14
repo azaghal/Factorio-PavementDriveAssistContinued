@@ -3,6 +3,7 @@ Version: 999.999.999
 Date: 99.99.9999.
   Changes:
     - Moved setting for requiring technology requirement for driving assistant and cruise control into startup settings.
+    - Setting cruise control limit no longer activates cruise control itself.
   Features:
     - Added startup setting for disabling the smart roads functionality (does not affect driving assistant nor cruise control).
     - Cruise control limit dialog works with standard confirm controls now (default "e" control binding).

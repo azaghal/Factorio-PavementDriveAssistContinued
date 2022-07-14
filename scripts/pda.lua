@@ -269,10 +269,6 @@ function pda.set_cruise_control_limit(player, limit)
     if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and not config.vehicle_blacklist[player.vehicle.name] and player.vehicle.speed > global.cruise_control_limit[player.index] then
         global.cruise_control_brake_active[player.index] = true
     end
-
-    if player.mod_settings["PDA-setting-verbose"].value then
-        player.print({"DA-cruise-control-active", utils.mpt_to_kmph(global.cruise_control_limit[player.index])})
-    end
 end
 
 
