@@ -361,8 +361,8 @@ local function manage_drive_assistant(player_index)
             if player.mod_settings["PDA-setting-sound-alert"].value then
                 player.play_sound{path = "pda-warning-1"}
                 --player.surface.create_entity({name = "pda-warning-1", position = player.position})
-            elseif player.mod_settings["PDA-setting-verbose"].value then
-                player.print({"DA-road-departure-warning"})
+            else
+                pda.notify_player(player, {"DA-road-departure-warning"})
             end
             player.riding_state = {acceleration = BRAKING, direction = player.riding_state.direction}
             global.road_departure_brake_active[player_index] = true
@@ -1244,9 +1244,7 @@ function pda.enable_drive_assistant(player)
 
     player.set_shortcut_toggled("pda-drive-assistant-toggle", true)
 
-    if player.mod_settings["PDA-setting-verbose"].value then
-        player.print({"DA-drive-assistant-active"})
-    end
+    pda.notify_player(player, {"DA-drive-assistant-active"})
 end
 
 
@@ -1266,9 +1264,7 @@ function pda.disable_drive_assistant(player)
 
     player.set_shortcut_toggled("pda-drive-assistant-toggle", false)
 
-    if player.mod_settings["PDA-setting-verbose"].value then
-        player.print({"DA-drive-assistant-inactive"})
-    end
+    pda.notify_player(player, {"DA-drive-assistant-inactive"})
 end
 
 
@@ -1317,9 +1313,7 @@ function pda.enable_cruise_control(player)
 
     player.set_shortcut_toggled("pda-cruise-control-toggle", true)
 
-    if player.mod_settings["PDA-setting-verbose"].value then
-        player.print({"DA-cruise-control-active", utils.mpt_to_kmph(global.cruise_control_limit[player.index])})
-    end
+    pda.notify_player(player, {"DA-cruise-control-active", utils.mpt_to_kmph(global.cruise_control_limit[player.index])})
 end
 
 
@@ -1351,9 +1345,7 @@ function pda.disable_cruise_control(player)
 
     player.set_shortcut_toggled("pda-cruise-control-toggle", false)
 
-    if player.mod_settings["PDA-setting-verbose"].value then
-        player.print({"DA-cruise-control-inactive"})
-    end
+    pda.notify_player(player, {"DA-cruise-control-inactive"})
 end
 
 
@@ -1450,6 +1442,20 @@ end
 --
 function pda.is_player_in_car_vehicle(player)
     return player.vehicle and player.vehicle.valid and player.vehicle.type == "car"
+end
+
+
+--- Notifies player via console.
+--
+-- Notification is only sent if player has requested output of information to console.
+--
+-- @param player LuaPlayer Playet that should be notified.
+-- @param message LocalisedString Message to show to player.
+--
+function pda.notify_player(player, message)
+    if player.mod_settings["PDA-setting-verbose"].value then
+        player.print(message)
+    end
 end
 
 
