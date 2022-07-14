@@ -3,8 +3,8 @@
 -- Copyright (c) 2022 Branko Majic
 -- Provided under MIT license. See LICENSE for details.
 
-local cruise_control_limit_gui = require("gui.cruise_control_limit")
-local config = require("config")
+local config = require("scripts.config")
+local utils = require("scripts.utils")
 
 local pda = {}
 
@@ -29,28 +29,6 @@ local function notification(message, force)
 end
 
 
---- Converts meters per tick to kilometers per hour (used for GUI interaction).
---
--- @param mpt uint Value to convert (in m/t).
---
--- @return uint Converted value (in km/h).
---
-local function mpt_to_kmph(mpt)
-    return math.floor(mpt * 60 * 60 * 60 / 1000 + 0.5)
-end
-
-
---- Converts kilometers per hour to meters per tick (used for GUI interaction).
---
--- @param mpt uint Value to convert (in km/h).
---
--- @return uint Converted value (in m/t).
---
-local function kmph_to_mpt(kmph)
-    return ((kmph * 1000) / 60 / 60 / 60)
-end
-
-
 --- Initialises and updates mod data.
 --
 -- No action is taken if data has been initalised already.
@@ -71,9 +49,9 @@ local function init_global()
     global.road_departure_brake_active = global.road_departure_brake_active or {}
     global.cruise_control_brake_active = global.cruise_control_brake_active or {}
     global.emergency_brake_power = global.emergency_brake_power or {}
-    global.min_speed = global.min_speed or kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value) or 0.1
-    global.hard_speed_limit = global.hard_speed_limit or kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value) or 0
-    global.highspeed = global.highspeed or kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value) or 0.5
+    global.min_speed = global.min_speed or utils.kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value) or 0.1
+    global.hard_speed_limit = global.hard_speed_limit or utils.kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value) or 0
+    global.highspeed = global.highspeed or utils.kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value) or 0.5
     global.driving_assistant_tickrate = global.driving_assistant_tickrate or settings.global["PDA-setting-tick-rate"].value or 2
     global.scores = config.get_scores()
 
@@ -82,7 +60,7 @@ local function init_global()
     for player_index in pairs(game.players) do
         global.cruise_control_limit[player_index] =
             global.cruise_control_limit[player_index] or
-            kmph_to_mpt(game.players[player_index].mod_settings["PDA-setting-personal-limit-sign-speed"].value)
+            utils.kmph_to_mpt(game.players[player_index].mod_settings["PDA-setting-personal-limit-sign-speed"].value)
     end
 
 end
@@ -270,120 +248,31 @@ function pda.toggle_cruise_control(player)
     end
 end
 
---- Displays dialog for setting the cruise control limit.
---
--- @param player LuaPlayer Player for which the dialog should be shown.
---
-function pda.set_cruise_control_limit(player)
-    if pda.is_driver_assistance_technology_available(player) then
-        if pda.is_cruise_control_allowed() then
-            -- open the gui if its not already open, otherwise close it
-            if not player.gui.center.pda_cc_limit_gui_frame then
-                cruise_control_limit_gui.build(player)
-                player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = tostring(mpt_to_kmph(global.cruise_control_limit[player.index]))
-                player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.select_all()
-                player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.focus()
-            else
-                player.gui.center.pda_cc_limit_gui_frame.destroy()
-            end
-        end
-    end
-end
 
-
---- Sets new value for cruise control limit.
+--- Sets cruise control limit value.
 --
--- @param player LuaPlayer Player for which the cruise control limit is being changed.
+-- @param player LuaPlayer Player for which to set the value.
+-- @param limit uint Value to set the cruise control limit to.
 --
-function pda.set_new_value_for_cruise_control_limit(player)
-
+function pda.set_cruise_control_limit(player, limit)
     local hard_speed_limit = global.hard_speed_limit
-    -- check if input is a valid number
-    if tonumber(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text) ~= nil then
-        global.cruise_control_limit[player.index] = kmph_to_mpt(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text)
-        -- check for negative values
-        if global.cruise_control_limit[player.index] < 0 then
-            global.cruise_control_limit[player.index] = -global.cruise_control_limit[player.index]
-        end
-        -- set value to max speed limit, if active
-        if (hard_speed_limit > 0) and (global.cruise_control_limit[player.index] > hard_speed_limit) then
-            global.cruise_control_limit[player.index] = hard_speed_limit
-        elseif global.cruise_control_limit[player.index] > (299792458 / 60) then
-            -- FTL travel on planetary surfaces should be avoided:
-            global.cruise_control_limit[player.index] = 299792458 / 60
-        end
 
-        -- check, if the player is sitting in a vehicle and changed the cc limit below the velocity of the car
-        if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and not config.vehicle_blacklist[player.vehicle.name] and player.vehicle.speed > global.cruise_control_limit[player.index] then
-            global.cruise_control_brake_active[player.index] = true
-        end
-        if player.mod_settings["PDA-setting-verbose"].value then
-            player.print({"DA-cruise-control-active", mpt_to_kmph(global.cruise_control_limit[player.index])})
-        end
+    global.cruise_control_limit[player.index] = limit
+    -- set value to max speed limit, if active
+    if (hard_speed_limit > 0) and (global.cruise_control_limit[player.index] > hard_speed_limit) then
+        global.cruise_control_limit[player.index] = hard_speed_limit
+    elseif global.cruise_control_limit[player.index] > (299792458 / 60) then
+        -- FTL travel on planetary surfaces should be avoided:
+        global.cruise_control_limit[player.index] = 299792458 / 60
     end
-end
 
-
---- Event handler for player clicking on a button.
---
--- @param event EventData Event data passed-on by the game engine.
---
-function pda.on_gui_click(event)
-    local player = game.players[event.player_index]
-    if player.gui.center.pda_cc_limit_gui_frame then
-        if event.element.name == "pda_cc_limit_gui_close" then
-            player.gui.center.pda_cc_limit_gui_frame.destroy()
-        elseif event.element.name == "pda_cc_limit_gui_confirm" then
-            pda.set_new_value_for_cruise_control_limit(player)
-            player.gui.center.pda_cc_limit_gui_frame.destroy()
-        end
+    -- check, if the player is sitting in a vehicle and changed the cc limit below the velocity of the car
+    if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and not config.vehicle_blacklist[player.vehicle.name] and player.vehicle.speed > global.cruise_control_limit[player.index] then
+        global.cruise_control_brake_active[player.index] = true
     end
-end
 
-
---- Event handler for player confirming cruise control limit change.
---
--- @param event EventData Event data passed-on by the game engine.
---
-function pda.on_gui_confirmed(event)
-    local player = game.players[event.player_index]
-
-    if player.opened and player.opened.name == "pda_cc_limit_gui_frame" then
-        pda.set_new_value_for_cruise_control_limit(player)
-        player.gui.center.pda_cc_limit_gui_frame.destroy()
-    end
-end
-
-
---- Event handler for player dismissing cruise control limit dialog without confirmation.
---
--- @param event EventData Event data passed-on by the game engine.
---
-function pda.on_gui_closed(event)
-    if event.element and event.element.name == "pda_cc_limit_gui_frame" then
-        local player = game.players[event.player_index]
-
-        if player.gui.center.pda_cc_limit_gui_frame then
-            player.gui.center.pda_cc_limit_gui_frame.destroy()
-        end
-    end
-end
-
-
---- Event handler for activating shortcuts.
---
--- @param event EventData Event data passed-on by the game engine.
---
-function pda.on_lua_shortcut(event)
-    local player = game.players[event.player_index]
-    local shortcut = event.prototype_name
-
-    if shortcut == "pda-cruise-control-toggle" then
-        pda.toggle_cruise_control(player)
-    elseif shortcut == "pda-drive-assistant-toggle" then
-        pda.toggle_drive_assistant(player)
-    elseif shortcut == "pda-set-cruise-control-limit" then
-        pda.set_cruise_control_limit(player)
+    if player.mod_settings["PDA-setting-verbose"].value then
+        player.print({"DA-cruise-control-active", utils.mpt_to_kmph(global.cruise_control_limit[player.index])})
     end
 end
 
@@ -592,7 +481,7 @@ local function register_to_road_sensor(sign, player_index, velocity)
         vec.waiting_at_stop_position = false
         vec.queue_position = sign_data.vehicles_registered + 1
         vec.previous_speed_limit = global.imposed_speed_limit[player_index]
-        vec.local_speed_limit = (found["signal-L"] ~= nil and kmph_to_mpt(found["signal-L"])) or (global.min_speed + 0.024)
+        vec.local_speed_limit = (found["signal-L"] ~= nil and utils.kmph_to_mpt(found["signal-L"])) or (global.min_speed + 0.024)
 
         global.vehicles_registered_to_signs[player_index] = vec
         sign_data.vehicles_registered = sign_data.vehicles_registered + 1
@@ -913,13 +802,13 @@ local function process_signs(player_index)
                     -- read signal value only if a signal is set
                     if sign_value ~= 0 then
                         if vreg == nil then
-                            global.imposed_speed_limit[player_index] = kmph_to_mpt(sign_value)
+                            global.imposed_speed_limit[player_index] = utils.kmph_to_mpt(sign_value)
                             if car.speed > global.imposed_speed_limit[player_index] then
                                 -- activate brake to deccelerate the vehicle
                                 global.cruise_control_brake_active[player_index] = true
                             end
                         else -- if this vehicle is currently in a sensor controlled section
-                            vreg.previous_speed_limit = kmph_to_mpt(sign_value)
+                            vreg.previous_speed_limit = utils.kmph_to_mpt(sign_value)
                             if vreg.command == 0 then
                                 global.imposed_speed_limit[player_index] = vreg.previous_speed_limit
                                 if global.imposed_speed_limit[player_index] ~= nil and car.speed > 0 and car.speed > global.imposed_speed_limit[player_index] then
@@ -1055,7 +944,7 @@ function pda.on_player_joined_game(event)
     -- Ensure that cruise control limit is set to non-nil value for joining players.
     global.cruise_control_limit[p] =
         global.cruise_control_limit[p] or
-        kmph_to_mpt(game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value)
+        utils.kmph_to_mpt(game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value)
 end
 
 
@@ -1095,13 +984,13 @@ function pda.on_runtime_mod_setting_changed(event)
     local s = event.setting
     if event.setting_type == "runtime-global" then
         if s == "PDA-setting-assist-min-speed" then
-            global.min_speed = kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value)
+            global.min_speed = utils.kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value)
         end
         if s == "PDA-setting-game-max-speed" then
-            global.hard_speed_limit = kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value)
+            global.hard_speed_limit = utils.kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value)
         end
         if s == "PDA-setting-assist-high-speed" then
-            global.highspeed = kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value)
+            global.highspeed = utils.kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value)
         end
         if s == "PDA-setting-tick-rate" then
             global.driving_assistant_tickrate = settings.global["PDA-setting-tick-rate"].value
@@ -1405,7 +1294,7 @@ function pda.enable_cruise_control(player)
     player.set_shortcut_toggled("pda-cruise-control-toggle", true)
 
     if player.mod_settings["PDA-setting-verbose"].value then
-        player.print({"DA-cruise-control-active", mpt_to_kmph(global.cruise_control_limit[player.index])})
+        player.print({"DA-cruise-control-active", utils.mpt_to_kmph(global.cruise_control_limit[player.index])})
     end
 end
 
@@ -1470,7 +1359,7 @@ function pda.on_research_reversed(event)
         for _, player in pairs(event.research.force.players) do
             pda.disable_cruise_control(player)
             pda.disable_drive_assistant(player)
-            pda.update_shortcuts(player)
+            pda.update_shortcut_availability(player)
         end
     end
 end
@@ -1496,5 +1385,24 @@ function pda.update_shortcut_availability(player)
 
     player.set_shortcut_available("pda-set-cruise-control-limit", pda.is_driver_assistance_technology_available(player) and pda.is_cruise_control_allowed())
 end
+
+
+--- Handler for toggle_cruise_control custom input.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
+function pda.on_toggle_cruise_control(event)
+    pda.toggle_cruise_control(game.players[event.player_index])
+end
+
+
+--- Handler for toggle_drive_assistant custom input.
+--
+-- @param event EventData Event data passed-on by the game engine.
+--
+function pda.on_toggle_drive_assistant(event)
+    pda.toggle_drive_assistant(game.players[event.player_index])
+end
+
 
 return pda
