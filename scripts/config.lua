@@ -5,35 +5,35 @@
 
 -- ###  ADVANCED SETTINGS  ###
 
-Config = {}
+local config = {}
 
 -- Vehicles that will not be supported by the driving assistant. This is tested against the name of the vehicle. All other vehicles will be supported.
 -- example: {["car"] = false, ["tank"] = false}
-Config.vehicle_blacklist = {}
+config.vehicle_blacklist = {}
 
 -- How many tiles ahead of location to start looking. Remember that most vehicles are 2x2, so this should be 1-2 preferably.
-Config.lookahead_start = 2
+config.lookahead_start = 2
 
 -- How many tiles ahead to look at. Setting this too larger values may cause lags, but increases precision.
-Config.lookahead_length = 4
+config.lookahead_length = 4
 
 -- Angle to look for tiles on each side. 1/24 (= 360/24 = 15 degrees) seems to work nicely.
-Config.lookangle = 1/24
+config.lookangle = 1/24
 
 -- Use 1/64 angles for better sprite orientation (@GotLag).
-Config.changeangle = 1/64
+config.changeangle = 1/64
 
 -- Maximum turning rate per scan. Multiplied with tick rate. WIP
--- Config.max_changeangle = 1/128
+-- config.max_changeangle = 1/128
 
 -- Straight lookahead eccentricity (to avoid driving on the edge of a paved path)
-Config.eccent = 1
+config.eccent = 1
 
 -- Adds to lookahead_start if vehicle is in highspeed mode.
-Config.hs_start_extension = 1
+config.hs_start_extension = 1
 
 -- Adds to lookahead_length if vehicle is in highspeed mode.
-Config.hs_length_extension = 2
+config.hs_length_extension = 2
 
 local scores_values = {
 	asphalt = settings.global["PDA-tileset-score-asphalt"].value,
@@ -48,7 +48,7 @@ local scores_values = {
 
 local scores = {}
 
-function Config.set_scores()
+function config.set_scores()
 scores = {
 	-- Score for each tile type. Tiles not included will be given zero score. Negative scores: try to avoid this type of tile.
 	-- If you want to customize/override the tile scores, just replace the value/scores_value reference
@@ -259,14 +259,14 @@ scores = {
 }
 end
 
-function Config.get_scores()
+function config.get_scores()
 	if #scores == 0 then
-		Config.set_scores()
+		config.set_scores()
 	end
 	return scores
 end
 
-function Config.update_scores()
+function config.update_scores()
 	scores_values = {
 		asphalt = settings.global["PDA-tileset-score-asphalt"].value,
 		ref_concrete = settings.global["PDA-tileset-score-refined-concrete"].value,
@@ -276,17 +276,17 @@ function Config.update_scores()
 		wood = settings.global["PDA-tileset-score-wood"].value,
 		road_lines = settings.global["PDA-tileset-score-asphalt-road-lines"].value
 	}
-	Config.set_scores()
+	config.set_scores()
 	return scores
 end
 
 -- List of mods that are incompatible to pavement drive assist and will cause mod deactivation.
-Config.mod_incompatibility_list = {}
+config.mod_incompatibility_list = {}
 
 -- This variable determines the number of players inserted into the player_in_vehicle list if a vehicle is entered. Set this to more than 1 to simulate multiple players at once, useful for testing how many players your server is able to support until severe FPS-drops emerge.
-Config.benchmark_level = 1
+config.benchmark_level = 1
 
 -- Debugging flag. Setting to true will spam your console with debugging messages.
-Config.debug = false
+config.debug = false
 
-return Config
+return config

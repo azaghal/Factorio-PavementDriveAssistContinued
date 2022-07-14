@@ -4,29 +4,29 @@
 
 -- This is the interface script.
 
-require "pda"
-require "config"
+local pda = require("pda")
+local config = require("config")
 
-local pda_interface = {}
+local interfaces = {}
 
-function pda_interface.get_state_of_cruise_control(id)
+function interfaces.get_state_of_cruise_control(id)
     local player = game.players[id]
     return global.cruise_control[player.index]
 end
 
-function pda_interface.set_state_of_cruise_control(id, state)
+function interfaces.set_state_of_cruise_control(id, state)
     local player = game.players[id]
     if ((state == false) or (state == true)) then
         global.cruise_control[player.index] = state
     end
 end
 
-function pda_interface.get_cruise_control_limit(id)
+function interfaces.get_cruise_control_limit(id)
     local player = game.players[id]
     return global.cruise_control_limit[player.index]
 end
 
-function pda_interface.set_cruise_control_limit(id, limit)
+function interfaces.set_cruise_control_limit(id, limit)
     local player = game.players[id]
     local hard_speed_limit = global.hard_speed_limit
     if tonumber(limit) ~= nil then
@@ -41,16 +41,16 @@ function pda_interface.set_cruise_control_limit(id, limit)
     return limit
 end
 
-function pda_interface.get_state_of_driving_assistant(id)
+function interfaces.get_state_of_driving_assistant(id)
     local player = game.players[id]
     return global.drive_assistant[player.index]
 end
 
-function pda_interface.set_state_of_driving_assistant(id, state)
+function interfaces.set_state_of_driving_assistant(id, state)
     local player = game.players[id]
     if ((state == false) or (state == true)) then
         global.drive_assistant[player.index] = state
     end
 end
 
-remote.add_interface("PDA", pda_interface)
+return interfaces

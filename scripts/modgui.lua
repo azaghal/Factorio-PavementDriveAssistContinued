@@ -3,9 +3,9 @@
 
 -- This is the gui design script. The design was heavily inspired by @GotLag's "Renamer".
 
-PDA_Modgui = {}
+local modgui = {}
 
-function PDA_Modgui.create_cc_limit_gui(player)
+function modgui.create_cc_limit_gui(player)
     local frame = player.gui.center.add
     {
         type="frame",
@@ -42,3 +42,5 @@ function PDA_Modgui.create_cc_limit_gui(player)
     -- can close it by pressing Escape key).
     player.opened = frame
 end
+
+return modgui

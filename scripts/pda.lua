@@ -3,10 +3,10 @@
 -- Copyright (c) 2022 Branko Majic
 -- Provided under MIT license. See LICENSE for details.
 
-require "modgui"
-require "config"
+local modgui = require("modgui")
+local config = require("config")
 
-pda = {}
+local pda = {}
 
 local acc = defines.riding.acceleration.accelerating
 local brk = defines.riding.acceleration.braking
@@ -79,7 +79,7 @@ local function init_global()
     global.hard_speed_limit = global.hard_speed_limit or kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value) or 0
     global.highspeed = global.highspeed or kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value) or 0.5
     global.driving_assistant_tickrate = global.driving_assistant_tickrate or settings.global["PDA-setting-tick-rate"].value or 2
-    global.scores = Config.get_scores()
+    global.scores = config.get_scores()
 
     -- Ensure that cruise control limit is set to non-nil value for existing players.
     -- Needed when upgrading from versions <= 3.1.0.
@@ -186,12 +186,12 @@ function pda.on_player_driving_changed_state(event)
         -- 3: the vehicle is a valid entity
         -- 4: the entered vehicle is of type "car"
         -- 5: the player ist the driver of the vehicle (the return value of "get_driver()" is double checked for type "LuaEntity" and type "LuaPlayer" respectively)
-        if car ~= nil and car.valid and car.type == "car" and Config.vehicle_blacklist[car.name] == nil then
+        if car ~= nil and car.valid and car.type == "car" and config.vehicle_blacklist[car.name] == nil then
             -- if the player entered a valid car...
             local driver = car.get_driver()
             if driver ~= nil and (driver == player or driver.player == player) then
                 -- ... and entered as the driver not as a passenger ...
-                for i = 1, Config.benchmark_level do
+                for i = 1, config.benchmark_level do
                     -- ... then insert player (or multiple instances of the same player, if benchmark_level > 1) in list
                     table.insert(global.players_in_vehicles, p_id)
                 end
@@ -221,13 +221,13 @@ function pda.on_player_driving_changed_state(event)
         pda.update_shortcut_availability(player)
 
         if #global.players_in_vehicles > 0 then
-            if Config.debug then
+            if config.debug then
                 for i=1, #global.players_in_vehicles, 1 do
                     notification(tostring(i..".: Player index"..global.players_in_vehicles[i].." ("..game.players[global.players_in_vehicles[i]].name..")"))
                 end
             end
         else
-            if Config.debug then
+            if config.debug then
                 notification("List empty.")
             end
         end
@@ -255,7 +255,7 @@ function pda.set_cruise_control_limit(player)
         if pda.is_cruise_control_allowed() then
             -- open the gui if its not already open, otherwise close it
             if not player.gui.center.pda_cc_limit_gui_frame then
-                PDA_Modgui.create_cc_limit_gui(player)
+                modgui.create_cc_limit_gui(player)
                 player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text = tostring(mpt_to_kmph(global.cruise_control_limit[player.index]))
                 player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.select_all()
                 player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.focus()
@@ -289,7 +289,7 @@ function pda.set_new_value_for_cruise_control_limit(player)
         end
 
         -- check, if the player is sitting in a vehicle and changed the cc limit below the velocity of the car
-        if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and Config.vehicle_blacklist[player.vehicle.name] == nil and player.vehicle.speed > global.cruise_control_limit[player.index] then
+        if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and config.vehicle_blacklist[player.vehicle.name] == nil and player.vehicle.speed > global.cruise_control_limit[player.index] then
             global.cruise_control_brake_active[player.index] = true
         end
         if player.mod_settings["PDA-setting-verbose"].value then
@@ -375,7 +375,7 @@ local function manage_drive_assistant(player_index)
 		local car = player.vehicle
 		local dir = car.orientation
         local scores = global.scores
-        local eccent = Config.eccent
+        local eccent = config.eccent
         local newdir = 0
 		local pi = math.pi
 		local fsin = math.sin
@@ -384,8 +384,8 @@ local function manage_drive_assistant(player_index)
         --local mmin = math.min
         local get_tile = player.surface.get_tile
 
-		local dirr = dir + Config.lookangle
-		local dirl = dir - Config.lookangle
+		local dirr = dir + config.lookangle
+		local dirl = dir - config.lookangle
 
 		-- scores for straight, right and left (@sillyfly)
 		local ss,sr,sl = 0,0,0
@@ -407,11 +407,11 @@ local function manage_drive_assistant(player_index)
 
         if car.speed > global.highspeed then
             local speed_factor = car.speed / global.highspeed
-            lookahead_start_hs = mfloor (Config.hs_start_extension * speed_factor + 0.5)
-            lookahead_length_hs = mfloor (Config.hs_length_extension * speed_factor + 0.5)
+            lookahead_start_hs = mfloor (config.hs_start_extension * speed_factor + 0.5)
+            lookahead_length_hs = mfloor (config.hs_length_extension * speed_factor + 0.5)
         end
 
-        for i=Config.lookahead_start + lookahead_start_hs,Config.lookahead_start + Config.lookahead_length + lookahead_length_hs do
+        for i=config.lookahead_start + lookahead_start_hs,config.lookahead_start + config.lookahead_length + lookahead_length_hs do
 			local d = i*sign
             local rstx = str[1] + vs[1]*d
             local rsty = str[2] + vs[2]*d
@@ -465,11 +465,11 @@ local function manage_drive_assistant(player_index)
 
         -- set new direction depending on the scores (@sillyfly)
         if sr > ss and sr > sl and (sr + ss) > 0 then
-            newdir = dir + (Config.changeangle*sr*2)/(sr+ss)
-			--newdir = dir + mmin((Config.changeangle*sr*2)/(sr+ss), car.prototype.rotation_speed)-- Config.max_changeangle * global.driving_assistant_tickrate)
+            newdir = dir + (config.changeangle*sr*2)/(sr+ss)
+			--newdir = dir + mmin((config.changeangle*sr*2)/(sr+ss), car.prototype.rotation_speed)-- donfig.max_changeangle * global.driving_assistant_tickrate)
         elseif sl > ss and sl > sr and (sl + ss) > 0 then
-            newdir = dir - (Config.changeangle*sl*2)/(sl+ss)
-			--newdir = dir - mmin((Config.changeangle*sl*2)/(sl+ss), car.prototype.rotation_speed)--Config.max_changeangle * global.driving_assistant_tickrate)
+            newdir = dir - (config.changeangle*sl*2)/(sl+ss)
+			--newdir = dir - mmin((config.changeangle*sl*2)/(sl+ss), car.prototype.rotation_speed)--config.max_changeangle * global.driving_assistant_tickrate)
 		else
            newdir = dir
         end
@@ -919,7 +919,7 @@ end
 -- joining players that drove vehicles while leaving the game are in the "offline_players_in_vehicles" list and will be put back to normal
 function pda.on_player_joined_game(event)
     local p = event.player_index
-    if Config.debug then
+    if config.debug then
         notification(tostring("on-joined triggered by player "..p))
         notification(tostring("connected players: "..#game.connected_players))
         notification(tostring("players in offline_mode: "..#global.offline_players_in_vehicles))
@@ -945,13 +945,13 @@ function pda.on_player_joined_game(event)
     end
     -- set player back to normal
     for i=#global.offline_players_in_vehicles, 1, -1 do
-        if Config.debug then notification(tostring(i..". test - is offline player "..global.offline_players_in_vehicles[i].." now online player: "..p.." ?")) end
+        if config.debug then notification(tostring(i..". test - is offline player "..global.offline_players_in_vehicles[i].." now online player: "..p.." ?")) end
         if global.offline_players_in_vehicles[i] == p then
             table.insert(global.players_in_vehicles, p)
             table.remove(global.offline_players_in_vehicles, i)
         end
     end
-    if Config.debug then notification(tostring("num players now in offline_mode: "..#global.offline_players_in_vehicles)) end
+    if config.debug then notification(tostring("num players now in offline_mode: "..#global.offline_players_in_vehicles)) end
 
     -- Ensure that cruise control limit is set to non-nil value for joining players.
     global.cruise_control_limit[p] =
@@ -962,7 +962,7 @@ end
 -- puts leaving players currently driving a vehicle in the "offline_players_in_vehicles" list
 function pda.on_player_left_game(event)
    local p = event.player_index
-    if Config.debug then notification(tostring("on-left triggered by player "..p)) end
+    if config.debug then notification(tostring("on-left triggered by player "..p)) end
     for i=#global.players_in_vehicles, 1, -1 do
         if global.players_in_vehicles[i] == p then
             table.insert(global.offline_players_in_vehicles, p)
@@ -995,7 +995,7 @@ function pda.on_settings_changed(event)
             global.driving_assistant_tickrate = settings.global["PDA-setting-tick-rate"].value
         end
 		if string.sub(s, 1, 11) == "PDA-tileset" then
-			global.scores = Config.update_scores()
+			global.scores = config.update_scores()
 		end
     end
 end
@@ -1190,7 +1190,7 @@ function pda.enable_drive_assistant(player)
     -- Player is not in a valid vehicle.
     if not player.vehicle or not player.vehicle.valid or player.vehicle.type ~= "car" then
         return
-    elseif Config.vehicle_blacklist[player.vehicle.name] then
+    elseif config.vehicle_blacklist[player.vehicle.name] then
         player.print({"DA-vehicle-blacklisted"})
         return
     end
@@ -1248,7 +1248,7 @@ function pda.enable_cruise_control(player)
     -- Player is not in a valid vehicle.
     if not player.vehicle or not player.vehicle.valid or player.vehicle.type ~= "car" then
         return
-    elseif Config.vehicle_blacklist[player.vehicle.name] then
+    elseif config.vehicle_blacklist[player.vehicle.name] then
         player.print({"DA-vehicle-blacklisted"})
         return
     end
@@ -1354,7 +1354,7 @@ function pda.update_shortcut_availability(player)
     local driver_assistance = pda.is_driver_assistance_technology_available(player)
     local cruise_control = pda.is_driver_assistance_technology_available(player) and pda.is_cruise_control_allowed()
 
-    if player.vehicle and player.vehicle.valid and player.vehicle.type == "car" and not Config.vehicle_blacklist[player.vehicle.name] then
+    if player.vehicle and player.vehicle.valid and player.vehicle.type == "car" and not config.vehicle_blacklist[player.vehicle.name] then
         player.set_shortcut_available("pda-drive-assistant-toggle", driver_assistance)
         player.set_shortcut_available("pda-cruise-control-toggle", cruise_control)
     else
@@ -1364,3 +1364,5 @@ function pda.update_shortcut_availability(player)
 
     player.set_shortcut_available("pda-set-cruise-control-limit", pda.is_driver_assistance_technology_available(player) and pda.is_cruise_control_allowed())
 end
+
+return pda
