@@ -134,7 +134,7 @@ end
 function cruise_control_limit_gui.on_gui_confirmed(event)
     local player = game.players[event.player_index]
 
-    if player.opened and player.opened.name == "pda_cc_limit_gui_frame" then
+    if player.opened and player.opened == player.gui.center.pda_cc_limit_gui_frame then
         local limit = cruise_control_limit_gui.get_cruise_control_limit(player)
         pda.set_cruise_control_limit(player, utils.kmph_to_mpt(limit))
         player.gui.center.pda_cc_limit_gui_frame.destroy()
