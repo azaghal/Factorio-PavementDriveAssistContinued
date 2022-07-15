@@ -138,6 +138,7 @@ function cruise_control_limit_gui.on_gui_confirmed(event)
         local limit = cruise_control_limit_gui.get_cruise_control_limit(player)
         pda.set_cruise_control_limit(player, utils.kmph_to_mpt(limit))
         player.gui.center.pda_cc_limit_gui_frame.destroy()
+        player.play_sound({ path = "utility/confirm" })
     end
 end
 

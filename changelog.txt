@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 999.999.999
 Date: 99.99.9999.
+  Features:
+    - Play confirmation sound when changing the cruise control limit via GUI.
   Bugfixes:
     - Fixed crash when player uses the confirm window control while an equipment grid window is open.
 ---------------------------------------------------------------------------------------------------
