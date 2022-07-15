@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
-Version: 999.999.999
-Date: 99.99.9999.
+Version: 4.0.1
+Date: 15.07.2022.
   Features:
     - Play confirmation sound when changing the cruise control limit via GUI.
   Bugfixes:
