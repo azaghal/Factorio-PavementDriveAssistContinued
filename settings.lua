@@ -69,39 +69,6 @@ data:extend({
             maximum_value = 10000,
             order = "g",
         },
-
-        -- Per-player settings
-        -- ===================
-        {
-            type = "bool-setting",
-            name = "PDA-setting-verbose",
-            setting_type = "runtime-per-user",
-            default_value = true,
-            order = "a",
-        },
-        {
-            type = "bool-setting",
-            name = "PDA-setting-sound-alert",
-            setting_type = "runtime-per-user",
-            default_value = true,
-            order = "b",
-        },
-        {
-            type = "bool-setting",
-            name = "PDA-setting-alt-toggle-mode",
-            setting_type = "runtime-per-user",
-            default_value = true,
-            order = "c",
-        },
-        {
-            type = "int-setting",
-            name = "PDA-setting-personal-limit-sign-speed",
-            setting_type = "runtime-per-user",
-            default_value = 60,
-            minimum_value = 0,
-            maximum_value = 10000,
-            order = "d",
-        },
         {
             type = "double-setting",
             name = "PDA-tileset-score-asphalt",
@@ -164,5 +131,38 @@ data:extend({
             minimum_value = -2,
             maximum_value = 2,
             order = "h-g",
+        },
+
+        -- Per-player settings
+        -- ===================
+        {
+            type = "bool-setting",
+            name = "PDA-setting-verbose",
+            setting_type = "runtime-per-user",
+            default_value = true,
+            order = "a",
+        },
+        {
+            type = "bool-setting",
+            name = "PDA-setting-sound-alert",
+            setting_type = "runtime-per-user",
+            default_value = true,
+            order = "b",
+        },
+        {
+            type = "bool-setting",
+            name = "PDA-setting-alt-toggle-mode",
+            setting_type = "runtime-per-user",
+            default_value = true,
+            order = "c",
+        },
+        {
+            type = "int-setting",
+            name = "PDA-setting-personal-limit-sign-speed",
+            setting_type = "runtime-per-user",
+            default_value = 60,
+            minimum_value = 0,
+            maximum_value = 10000,
+            order = "d",
         }
 })
