@@ -100,8 +100,11 @@ Driving across an *end of speed limit* sign or disabling the *cruise control* re
 -   **Fine-tune CPU usage**
     > It is always possible to reduce the tick rate of the *driving assistant* or to disable *cruise control* in case of issues via configuration file. Opposite is true as well - precision can be incresaed to up to 60 scans per second, effectively doubling the CPU load.
 
+-   **Assign new tiles and reassign existing tiles to specific tilesets**
+    > In spite of mod coming with an extensive default listing of various tiles, sometimes it is useful to either add an unsupported tile or to assign an existing tile to a different tileset/category. There is a number of map settings which can be used for this purpose exactly. Keep in mind that the tiles must be listed using the internal game names.
+
 -   **List tilesets and tileset assignments**
-    > Use the `/pda-list-tilests` and `/pda-show-tileset` commands to list available tilesets and show what tiles have been assigned to specific tilesets. This can be helpful for understanding why the driving assistant is picking specific tiles/paths over others.
+    > Use the `/pda-list-tilests` and `/pda-show-tileset` commands to list available tilesets and show what tiles have been assigned to them. This can be helpful for understanding why the driving assistant is picking specific tiles/paths over others, and for figuring out what names should be used when overriding default tileset assignments for tiles.
 
 
 ### Mod integration

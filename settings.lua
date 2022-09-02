@@ -69,6 +69,8 @@ data:extend({
             maximum_value = 10000,
             order = "g",
         },
+
+        -- Tileset scores.
         {
             type = "double-setting",
             name = "PDA-tileset-score-asphalt",
@@ -131,6 +133,72 @@ data:extend({
             minimum_value = -2,
             maximum_value = 2,
             order = "h-g",
+        },
+
+        -- Tileset overrides.
+        {
+            type = "string-setting",
+            name = "PDA-tileset-override-asphalt",
+            setting_type = "runtime-global",
+            default_value = "",
+            allow_blank = true,
+            order = "i-a"
+        },
+        {
+            type = "string-setting",
+            name = "PDA-tileset-override-refined-concrete",
+            setting_type = "runtime-global",
+            default_value = "",
+            allow_blank = true,
+            order = "i-b"
+        },
+        {
+            type = "string-setting",
+            name = "PDA-tileset-override-concrete",
+            setting_type = "runtime-global",
+            default_value = "",
+            allow_blank = true,
+            order = "i-c"
+        },
+        {
+            type = "string-setting",
+            name = "PDA-tileset-override-stone",
+            setting_type = "runtime-global",
+            default_value = "",
+            allow_blank = true,
+            order = "i-d"
+        },
+        {
+            type = "string-setting",
+            name = "PDA-tileset-override-gravel",
+            setting_type = "runtime-global",
+            default_value = "",
+            allow_blank = true,
+            order = "i-e"
+        },
+        {
+            type = "string-setting",
+            name = "PDA-tileset-override-wood",
+            setting_type = "runtime-global",
+            default_value = "",
+            allow_blank = true,
+            order = "i-f"
+        },
+        {
+            type = "string-setting",
+            name = "PDA-tileset-override-road-marking",
+            setting_type = "runtime-global",
+            default_value = "",
+            allow_blank = true,
+            order = "i-g"
+        },
+        {
+            type = "string-setting",
+            name = "PDA-tileset-override-unassigned",
+            setting_type = "runtime-global",
+            default_value = "",
+            allow_blank = true,
+            order = "i-h"
         },
 
         -- Per-player settings

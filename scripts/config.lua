@@ -62,7 +62,7 @@ config.available_tilesets = {
     "gravel",
     "wood",
     "road-marking",
-    "ignore",
+    "unassigned",
 }
 
 -- Default assignment of tilesets to tiles. Tiles without assignments are given zero score. Negative scores signal that
@@ -287,6 +287,9 @@ config.tileset_scores = {}
 -- Scores assigned to each tile. Maps tile names to score values.
 config.tile_scores = {}
 
+-- Overrides for individual tilesets configured via mod settings. Maps tile names to tileset names.
+config.tileset_overrides = {}
+
 
 --- Updates dynamic configuration (dependant on mod settings).
 --
@@ -295,6 +298,7 @@ config.tile_scores = {}
 --   - config.tilesets
 --   - config.tileset_scores
 --   - config.tile_scores
+--   - config.tileset_overrides
 --
 function config.update()
 
@@ -302,6 +306,7 @@ function config.update()
     config.tilesets = {}
     config.tileset_scores = {}
     config.tile_scores = {}
+    config.tileset_overrides = {}
 
     -- Initialise tilset lists.
     for _, tileset in pairs(config.available_tilesets) do
@@ -317,12 +322,24 @@ function config.update()
         ["gravel"] = settings.global["PDA-tileset-score-gravel"].value,
         ["wood"] = settings.global["PDA-tileset-score-wood"].value,
         ["road-markings"] = settings.global["PDA-tileset-score-asphalt-road-lines"].value,
+        ["unassigned"] = 0
     }
 
-    -- Calculate tileset lists and individual tile scores.
+    -- Assign tile scores and tileset membership based on user-provided settings.
+    for _, tileset in pairs(config.available_tilesets) do
+        local setting_value = settings.global["PDA-tileset-override-" .. tileset].value
+        for tile in string.gmatch(setting_value, "[^,]+") do
+            config.tile_scores[tile] = config.tileset_score[tileset]
+            table.insert(config.tilesets[tileset], tile)
+        end
+    end
+
+    -- Apply default tile scores and tileset membership.
     for tile, tileset in pairs(config.default_tile_assignments) do
-        config.tile_scores[tile] = config.tileset_score[tileset]
-        table.insert(config.tilesets[tileset], tile)
+        if not config.tile_scores[tile] then
+            config.tile_scores[tile] = config.tileset_score[tileset]
+            table.insert(config.tilesets[tileset], tile)
+        end
     end
 
     -- Sort the tiles in tilesets (useful for command outputs).

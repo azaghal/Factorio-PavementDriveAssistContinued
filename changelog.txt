@@ -2,6 +2,7 @@
 Version: 999.999.999
 Date: 99.99.9999.
   Features:
+    - Add new tiles and reassign pre-configured tiles to desired tilesets via settings.
     - Commands for listing available tilesets and what tiles belong to a tileset.
 ---------------------------------------------------------------------------------------------------
 Version: 4.0.1
