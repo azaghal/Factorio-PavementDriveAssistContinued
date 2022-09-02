@@ -6,6 +6,7 @@
 local config = require("scripts.config")
 local interfaces = require("scripts.interfaces")
 local pda = require("scripts.pda")
+local mod_commands = require("scripts.commands")
 
 local cruise_control_limit_gui = require("scripts.gui.cruise_control_limit")
 local shortcuts = require("scripts.gui.shortcuts")
@@ -45,3 +46,8 @@ script.on_event(defines.events.on_tick, pda.on_tick)
 
 -- Interfaces for interacting with PDA.
 remote.add_interface("PDA", interfaces)
+
+-- Command registration
+for _, mod_command in pairs(mod_commands) do
+    commands.add_command(mod_command.name, mod_command.help, mod_command.func)
+end

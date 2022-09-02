@@ -53,7 +53,11 @@ local function init_global()
     global.hard_speed_limit = global.hard_speed_limit or utils.kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value) or 0
     global.highspeed = global.highspeed or utils.kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value) or 0.5
     global.driving_assistant_tickrate = global.driving_assistant_tickrate or settings.global["PDA-setting-tick-rate"].value or 2
-    global.scores = config.get_scores()
+
+    -- Update dynamic configuration before storing the scores and tileset lists.
+    config.update()
+    global.scores = config.tile_scores
+    global.tilesets = config.tilesets
 
     -- Ensure that cruise control limit is set to non-nil value for existing players.
     -- Needed when upgrading from versions <= 3.1.0.
@@ -996,7 +1000,9 @@ function pda.on_runtime_mod_setting_changed(event)
         end
 
         if string.sub(setting, 1, 11) == "PDA-tileset" then
-            global.scores = config.update_scores()
+            config.update()
+            global.scores = config.tile_scores
+            global.tilesets = config.tilesets
         end
 
         if setting == "PDA-setting-allow-cruise-control" then
@@ -1459,6 +1465,30 @@ function pda.notify_player(player, message)
             create_at_cursor = true
         }
     end
+end
+
+
+--- Lists available tilesets.
+--
+-- @param player LuaPlayer Player for which to list the tilesets.
+--
+function pda.list_tilesets(player)
+    player.print({"info.pda-available-tilesets", table.concat(config.available_tilesets, ", ")})
+end
+
+
+--- Shows information about a tileset to player.
+--
+-- @param player LuaPlayer Player to show the information to.
+-- @param tileset string Name of tileset to show the information about.
+--
+function pda.show_tileset(player, tileset)
+    if not global.tilesets[tileset] then
+        player.print({"error.pda-no-such-tileset"})
+        return
+    end
+
+    player.print({"info.pda-tileset-tiles", tileset, table.concat(global.tilesets[tileset], ", ")})
 end
 
 

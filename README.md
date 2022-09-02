@@ -79,7 +79,6 @@ Driving across an *end of speed limit* sign or disabling the *cruise control* re
 
 ### Additional features
 
-
 -   **Road departure warning**
     > Provides acoustic or console output warning if the vehicle is leaving paved area, e.g. at a dead end or in very sharp curves. If not steered manually, an emergency brake will be activated to stop the vehicle.
 
@@ -100,6 +99,9 @@ Driving across an *end of speed limit* sign or disabling the *cruise control* re
 
 -   **Fine-tune CPU usage**
     > It is always possible to reduce the tick rate of the *driving assistant* or to disable *cruise control* in case of issues via configuration file. Opposite is true as well - precision can be incresaed to up to 60 scans per second, effectively doubling the CPU load.
+
+-   **List tilesets and tileset assignments**
+    > Use the `/pda-list-tilests` and `/pda-show-tileset` commands to list available tilesets and show what tiles have been assigned to specific tilesets. This can be helpful for understanding why the driving assistant is picking specific tiles/paths over others.
 
 
 ### Mod integration
