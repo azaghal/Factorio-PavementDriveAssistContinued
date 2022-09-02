@@ -80,30 +80,39 @@ Driving across an *end of speed limit* sign or disabling the *cruise control* re
 ### Additional features
 
 -   **Road departure warning**
+
     > Provides acoustic or console output warning if the vehicle is leaving paved area, e.g. at a dead end or in very sharp curves. If not steered manually, an emergency brake will be activated to stop the vehicle.
 
 -   **Highspeed support**
+
     > If vehicle reaches speeds over 100 kmph (customisable in configuration file) the "path finder" will increase its search area in front of it, allowing safe ride for speeds up to 350 kmph. It is highly recommended to design roads with appropriate curve radii before traveling at such high speeds!
 
 -   **Native mod support**
+
     > All kinds of vehicles are supported, as long as they are valid "car"-type entities.
 
 -   **Blacklist vehicles**
+
     > Vehicles can be explicitly black-listed based on type, in which case the mod will completely ignore them.
 
 -   **Global speed limit**
+
     > Global speed limit can be set for all player-controlled vehicles.
 
 -   **Optimised code for multiplayer**
+
     > Running a huge server? That's not an issue - the main routine causes almost zero load as long as no one is driving, and up to 10 players are able to drive simultaneously at any given time without causing any serious lag! Some benchmarks on an older laptop have resulted in 25 simulated players driving at 130 km/h and active cruise control causing only a 10 UPS drop.
 
 -   **Fine-tune CPU usage**
+
     > It is always possible to reduce the tick rate of the *driving assistant* or to disable *cruise control* in case of issues via configuration file. Opposite is true as well - precision can be incresaed to up to 60 scans per second, effectively doubling the CPU load.
 
 -   **Assign new tiles and reassign existing tiles to specific tilesets**
+
     > In spite of mod coming with an extensive default listing of various tiles, sometimes it is useful to either add an unsupported tile or to assign an existing tile to a different tileset/category. There is a number of map settings which can be used for this purpose exactly. Keep in mind that the tiles must be listed using the internal game names.
 
 -   **List tilesets and tileset assignments**
+
     > Use the `/pda-list-tilests` and `/pda-show-tileset` commands to list available tilesets and show what tiles have been assigned to them. This can be helpful for understanding why the driving assistant is picking specific tiles/paths over others, and for figuring out what names should be used when overriding default tileset assignments for tiles.
 
 
