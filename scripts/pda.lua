@@ -1484,11 +1484,26 @@ end
 --
 function pda.show_tileset(player, tileset)
     if not global.tilesets[tileset] then
-        player.print({"error.pda-no-such-tileset"})
+        player.print({"error.pda-parameter-no-such-tileset"})
         return
     end
 
-    player.print({"info.pda-tileset-tiles", tileset, table.concat(global.tilesets[tileset], ", ")})
+    -- Create a list of tiles with icons for better visual feedback. Only include tiles which are available in the game
+    -- for more concise output.
+    local tiles = global.tilesets[tileset]
+    local iconified_tiles = {}
+
+    for _, tile in pairs(tiles) do
+        if game.tile_prototypes[tile] then
+            table.insert(iconified_tiles, "[img=tile." .. tile .. "] " .. tile)
+        end
+    end
+
+    if table_size(iconified_tiles) == 0 then
+        player.print({"info.pda-tileset-empty", tileset})
+    else
+        player.print({"info.pda-tileset-tiles", tileset, table.concat(iconified_tiles, ", ")})
+    end
 end
 
 

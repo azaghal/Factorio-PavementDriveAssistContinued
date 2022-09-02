@@ -31,7 +31,7 @@ end
 commands.show_tileset = {}
 commands.show_tileset.name = "pda-show-tileset"
 commands.show_tileset.help = [[
-Shows information about the passed-in tileset (listing the tiles that belong to it). Useful for overriding tile membership via mod settings.
+Lists tiles assigned to passed-in tileset. Only tiles available in current game are shown.
 Usage:
     /pda-show-tileset TILESET
 Parameters:
