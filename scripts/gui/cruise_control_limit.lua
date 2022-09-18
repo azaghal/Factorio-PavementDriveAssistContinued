@@ -75,10 +75,15 @@ end
 --
 -- @param player LuaPlayer Player for which to retrieve the value.
 --
--- @return uint Cruise control limit set by player via dialog.
+-- @return uint|nil Cruise control limit set by player via dialog, or nil if player provided invalid (empty) value.
 --
 function cruise_control_limit_gui.get_cruise_control_limit(player)
-    return math.abs(tonumber(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text))
+    -- Make sure the player-provided value is not empty prior to doing conversion.
+    if player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text ~= "" then
+        return math.abs(tonumber(player.gui.center.pda_cc_limit_gui_frame.pda_cc_limit_gui_textfield.text))
+    end
+
+    return nil
 end
 
 
@@ -120,6 +125,12 @@ function cruise_control_limit_gui.on_gui_click(event)
             player.gui.center.pda_cc_limit_gui_frame.destroy()
         elseif event.element.name == "pda_cc_limit_gui_confirm" then
             local limit = cruise_control_limit_gui.get_cruise_control_limit(player)
+
+            if not limit then
+                player.print({"error.pda-invalid-cruise-control-limit"})
+                return
+            end
+
             pda.set_cruise_control_limit(player, utils.kmph_to_mpt(limit))
             player.gui.center.pda_cc_limit_gui_frame.destroy()
         end
@@ -136,6 +147,12 @@ function cruise_control_limit_gui.on_gui_confirmed(event)
 
     if player.opened and player.opened == player.gui.center.pda_cc_limit_gui_frame then
         local limit = cruise_control_limit_gui.get_cruise_control_limit(player)
+
+        if not limit then
+            player.print({"error.pda-invalid-cruise-control-limit"})
+            return
+        end
+
         pda.set_cruise_control_limit(player, utils.kmph_to_mpt(limit))
         player.gui.center.pda_cc_limit_gui_frame.destroy()
         player.play_sound({ path = "utility/confirm" })
