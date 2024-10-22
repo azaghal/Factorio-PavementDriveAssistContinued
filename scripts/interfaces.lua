@@ -19,7 +19,7 @@ local interfaces = {}
 --
 function interfaces.get_state_of_cruise_control(id)
     local player = game.players[id]
-    return global.cruise_control[player.index]
+    return storage.cruise_control[player.index]
 end
 
 
@@ -46,7 +46,7 @@ end
 --
 function interfaces.get_cruise_control_limit(id)
     local player = game.players[id]
-    return global.cruise_control_limit[player.index]
+    return storage.cruise_control_limit[player.index]
 end
 
 
@@ -57,7 +57,7 @@ end
 --
 function interfaces.set_cruise_control_limit(id, limit)
     local player = game.players[id]
-    local hard_speed_limit = global.hard_speed_limit
+    local hard_speed_limit = storage.hard_speed_limit
     if tonumber(limit) ~= nil then
         if limit < 0 then
             limit = -limit
@@ -65,7 +65,7 @@ function interfaces.set_cruise_control_limit(id, limit)
         if (hard_speed_limit > 0) and (limit > hard_speed_limit) then
             limit = hard_speed_limit
         end
-        global.cruise_control_limit[player.index] = limit
+        storage.cruise_control_limit[player.index] = limit
     end
     return limit
 end
@@ -77,7 +77,7 @@ end
 --
 function interfaces.get_state_of_driving_assistant(id)
     local player = game.players[id]
-    return global.drive_assistant[player.index]
+    return storage.drive_assistant[player.index]
 end
 
 

@@ -107,7 +107,7 @@ function cruise_control_limit_gui.on_set_cruise_control_limit(event)
 
     if pda.is_driver_assistance_technology_available(player) then
         if pda.is_cruise_control_allowed() then
-            cruise_control_limit_gui.toggle(player, utils.mpt_to_kmph(global.cruise_control_limit[player.index]))
+            cruise_control_limit_gui.toggle(player, utils.mpt_to_kmph(storage.cruise_control_limit[player.index]))
         end
     end
 end

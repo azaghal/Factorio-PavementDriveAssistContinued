@@ -7,27 +7,10 @@ data:extend({
             action = "lua",
             localised_name = {"controls.toggle_cruise_control"},
             toggleable = true,
-            icon = {
-                filename = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-32px.png",
-                priority = "extra-high-no-scale",
-                size = 32,
-                scale = 1,
-                flags = {"icon"}
-            },
-            small_icon = {
-                filename = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-24px.png",
-                priority = "extra-high-no-scale",
-                size = 24,
-                scale = 1,
-                flags = {"icon"}
-            },
-            disabled_small_icon = {
-                filename = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-24px-white.png",
-                priority = "extra-high-no-scale",
-                size = 24,
-                scale = 1,
-                flags = {"icon"}
-            },
+            icon = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-32px.png",
+            icon_size = 32,
+            small_icon = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-24px.png",
+            small_icon_size = 24,
         },
         {
             type = "shortcut",
@@ -37,27 +20,10 @@ data:extend({
             action = "lua",
             localised_name = {"controls.set_cruise_control_limit"},
             style = "green",
-            icon = {
-                filename = "__PavementDriveAssistContinued__/graphics/shortcuts/set-cc-32px-white.png",
-                priority = "extra-high-no-scale",
-                size = 32,
-                scale = 1,
-                flags = {"icon"}
-            },
-            small_icon = {
-                filename = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-24px.png",
-                priority = "extra-high-no-scale",
-                size = 24,
-                scale = 1,
-                flags = {"icon"}
-            },
-            disabled_small_icon = {
-                filename = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-24px-white.png",
-                priority = "extra-high-no-scale",
-                size = 24,
-                scale = 1,
-                flags = {"icon"}
-            },
+            icon = "__PavementDriveAssistContinued__/graphics/shortcuts/set-cc-32px-white.png",
+            icon_size = 32,
+            small_icon = "__PavementDriveAssistContinued__/graphics/shortcuts/cc-24px.png",
+            small_icon_size = 24,
         },
         {
             type = "shortcut",
@@ -67,26 +33,9 @@ data:extend({
             action = "lua",
             localised_name = {"controls.toggle_drive_assistant"},
             toggleable = true,
-            icon = {
-                filename = "__PavementDriveAssistContinued__/graphics/shortcuts/pda-32px.png",
-                priority = "extra-high-no-scale",
-                size = 32,
-                scale = 1,
-                flags = {"icon"}
-            },
-            small_icon = {
-                filename = "__PavementDriveAssistContinued__/graphics/shortcuts/pda-24px.png",
-                priority = "extra-high-no-scale",
-                size = 24,
-                scale = 1,
-                flags = {"icon"}
-            },
-            disabled_small_icon = {
-                filename = "__PavementDriveAssistContinued__/graphics/shortcuts/pda-24px-white.png",
-                priority = "extra-high-no-scale",
-                size = 24,
-                scale = 1,
-                flags = {"icon"}
-            },
+            icon = "__PavementDriveAssistContinued__/graphics/shortcuts/pda-32px.png",
+            icon_size = 32,
+            small_icon = "__PavementDriveAssistContinued__/graphics/shortcuts/pda-24px.png",
+            small_icon_size = 24,
         },
 })

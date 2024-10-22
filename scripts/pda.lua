@@ -35,35 +35,35 @@ end
 --
 local function init_global()
     global = global or {}
-    global.drive_assistant = global.drive_assistant or {}
-    global.cruise_control = global.cruise_control or {}
-    global.cruise_control_limit = global.cruise_control_limit or {}
-    global.imposed_speed_limit = global.imposed_speed_limit or {}
-    global.players_in_vehicles = global.players_in_vehicles or {}
-    global.offline_players_in_vehicles = global.offline_players_in_vehicles or {}
-    global.playertick = global.playertick or 0
-    global.last_score = global.last_score or {}
-    global.last_sign_data = global.last_sign_data or {}
-    global.active_signs = global.active_signs or {}
-    global.vehicles_registered_to_signs = global.vehicles_registered_to_signs or {}
-    global.road_departure_brake_active = global.road_departure_brake_active or {}
-    global.cruise_control_brake_active = global.cruise_control_brake_active or {}
-    global.emergency_brake_power = global.emergency_brake_power or {}
-    global.min_speed = global.min_speed or utils.kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value) or 0.1
-    global.hard_speed_limit = global.hard_speed_limit or utils.kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value) or 0
-    global.highspeed = global.highspeed or utils.kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value) or 0.5
-    global.driving_assistant_tickrate = global.driving_assistant_tickrate or settings.global["PDA-setting-tick-rate"].value or 2
+    storage.drive_assistant = storage.drive_assistant or {}
+    storage.cruise_control = storage.cruise_control or {}
+    storage.cruise_control_limit = storage.cruise_control_limit or {}
+    storage.imposed_speed_limit = storage.imposed_speed_limit or {}
+    storage.players_in_vehicles = storage.players_in_vehicles or {}
+    storage.offline_players_in_vehicles = storage.offline_players_in_vehicles or {}
+    storage.playertick = storage.playertick or 0
+    storage.last_score = storage.last_score or {}
+    storage.last_sign_data = storage.last_sign_data or {}
+    storage.active_signs = storage.active_signs or {}
+    storage.vehicles_registered_to_signs = storage.vehicles_registered_to_signs or {}
+    storage.road_departure_brake_active = storage.road_departure_brake_active or {}
+    storage.cruise_control_brake_active = storage.cruise_control_brake_active or {}
+    storage.emergency_brake_power = storage.emergency_brake_power or {}
+    storage.min_speed = storage.min_speed or utils.kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value) or 0.1
+    storage.hard_speed_limit = storage.hard_speed_limit or utils.kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value) or 0
+    storage.highspeed = storage.highspeed or utils.kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value) or 0.5
+    storage.driving_assistant_tickrate = storage.driving_assistant_tickrate or settings.global["PDA-setting-tick-rate"].value or 2
 
     -- Update dynamic configuration before storing the scores and tileset lists.
     config.update()
-    global.scores = config.tile_scores
-    global.tilesets = config.tilesets
+    storage.scores = config.tile_scores
+    storage.tilesets = config.tilesets
 
     -- Ensure that cruise control limit is set to non-nil value for existing players.
     -- Needed when upgrading from versions <= 3.1.0.
     for player_index in pairs(game.players) do
-        global.cruise_control_limit[player_index] =
-            global.cruise_control_limit[player_index] or
+        storage.cruise_control_limit[player_index] =
+            storage.cruise_control_limit[player_index] or
             utils.kmph_to_mpt(game.players[player_index].mod_settings["PDA-setting-personal-limit-sign-speed"].value)
     end
 
@@ -117,7 +117,7 @@ end
 -- @param player_index uint Player for which to update the data.
 --
 function remove_stop_signs_form_last_sign_data(player_index)
-    local sd = global.last_sign_data[player_index]
+    local sd = storage.last_sign_data[player_index]
     if sd ~= nil and sd.type ~= nil and sd.type["stop"] ~= nil then
         local stops = sd.type["stop"]
         local entities = {stops.entity_1, stops.entity_2, stops.entity_3, stops.entity_4}
@@ -136,10 +136,10 @@ end
 -- @param player_index uint Player that should be deregistered.
 --
 local function deregister_from_road_sensor(sign_uid, player_index)
-    local sd = global.signs[sign_uid]
+    local sd = storage.signs[sign_uid]
     local player = game.players[player_index]
     local qpos = 0
-    local vreg = global.vehicles_registered_to_signs[player_index]
+    local vreg = storage.vehicles_registered_to_signs[player_index]
     local car = player.vehicle
     for i, pid in pairs(sd.vehicle_queue) do
         if pid == player_index then
@@ -152,7 +152,7 @@ local function deregister_from_road_sensor(sign_uid, player_index)
         --game.print("S"..player_index.." deregistriert ["..sd.vehicles_registered.." Fahrzeuge verbleiben]")
         decrement_detector_signal(sd.entity)
         if sd.vehicles_registered == 0 then
-            global.active_signs[sign_uid] = nil
+            storage.active_signs[sign_uid] = nil
         else
             sd.queue_update_pending = true
             -- the queue of this sign needs to be updated on next tick
@@ -160,18 +160,18 @@ local function deregister_from_road_sensor(sign_uid, player_index)
     else
         --game.print("FATAL: "..player_index.." nicht deregistriert [S-QPOS = "..qpos.." / V-QPOS = "..vreg.queue_position.." ?]")
     end
-    global.emergency_brake_power[player_index] = nil -- stop braking for any stop position
-    global.imposed_speed_limit[player_index] = vreg.previous_speed_limit
+    storage.emergency_brake_power[player_index] = nil -- stop braking for any stop position
+    storage.imposed_speed_limit[player_index] = vreg.previous_speed_limit
     if car and car.valid then
-        if global.imposed_speed_limit[player_index] ~= nil and car.speed > 0 and car.speed > global.imposed_speed_limit[player_index] then
+        if storage.imposed_speed_limit[player_index] ~= nil and car.speed > 0 and car.speed > storage.imposed_speed_limit[player_index] then
             -- keep brake active to deccelerate the vehicle
-            global.cruise_control_brake_active[player_index] = true
+            storage.cruise_control_brake_active[player_index] = true
         else
-            global.cruise_control_brake_active[player_index] = false
+            storage.cruise_control_brake_active[player_index] = false
             player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
         end
     end
-    global.vehicles_registered_to_signs[player_index] = nil
+    storage.vehicles_registered_to_signs[player_index] = nil
 end
 
 
@@ -199,26 +199,26 @@ function pda.on_player_driving_changed_state(event)
         if driver and (driver == player or driver.player == player) then
             for i = 1, config.benchmark_level do
                 -- Insert player (or multiple instances of the same player, if benchmark_level > 1) into list
-                table.insert(global.players_in_vehicles, player.index)
+                table.insert(storage.players_in_vehicles, player.index)
             end
         end
     else
         -- Remove player from all possible lists.
-        for i=#global.players_in_vehicles, 1, -1 do
-            if global.players_in_vehicles[i] == player.index then
+        for i=#storage.players_in_vehicles, 1, -1 do
+            if storage.players_in_vehicles[i] == player.index then
                 -- Reset emergency brake state, imposed speed limit and scores (e.g. if the vehicle got destroyed, is is no longer necessary)
-                global.road_departure_brake_active[player.index] = false
-                global.emergency_brake_power[player.index] = nil
-                global.imposed_speed_limit[player.index] = nil
-                global.last_score[player.index] = 0
+                storage.road_departure_brake_active[player.index] = false
+                storage.emergency_brake_power[player.index] = nil
+                storage.imposed_speed_limit[player.index] = nil
+                storage.last_score[player.index] = 0
                 remove_stop_signs_form_last_sign_data(player.index)
-                global.last_sign_data[player.index] = nil
+                storage.last_sign_data[player.index] = nil
 
-                if global.vehicles_registered_to_signs[player.index] ~= nil then
-                    deregister_from_road_sensor(global.vehicles_registered_to_signs[player.index].registered_to_sensor, player.index)
+                if storage.vehicles_registered_to_signs[player.index] ~= nil then
+                    deregister_from_road_sensor(storage.vehicles_registered_to_signs[player.index].registered_to_sensor, player.index)
                 end
 
-                table.remove(global.players_in_vehicles, i)
+                table.remove(storage.players_in_vehicles, i)
             end
         end
     end
@@ -228,9 +228,9 @@ function pda.on_player_driving_changed_state(event)
 
     -- Show some additional debug output if requested.
     if config.debug then
-        if #global.players_in_vehicles > 0 then
-            for i=1, #global.players_in_vehicles, 1 do
-                notification(tostring(i..".: Player index"..global.players_in_vehicles[i].." ("..game.players[global.players_in_vehicles[i]].name..")"))
+        if #storage.players_in_vehicles > 0 then
+            for i=1, #storage.players_in_vehicles, 1 do
+                notification(tostring(i..".: Player index"..storage.players_in_vehicles[i].." ("..game.players[storage.players_in_vehicles[i]].name..")"))
             end
         else
             notification("List empty.")
@@ -244,7 +244,7 @@ end
 -- @param event LuaPlayer Player for which to toggle the cruise control.
 --
 function pda.toggle_cruise_control(player)
-    if global.cruise_control[player.index] and pda.is_player_in_car_vehicle(player) then
+    if storage.cruise_control[player.index] and pda.is_player_in_car_vehicle(player) then
         pda.disable_cruise_control(player)
     else
         pda.enable_cruise_control(player)
@@ -258,20 +258,20 @@ end
 -- @param limit uint Value to set the cruise control limit to.
 --
 function pda.set_cruise_control_limit(player, limit)
-    local hard_speed_limit = global.hard_speed_limit
+    local hard_speed_limit = storage.hard_speed_limit
 
-    global.cruise_control_limit[player.index] = limit
+    storage.cruise_control_limit[player.index] = limit
     -- set value to max speed limit, if active
-    if (hard_speed_limit > 0) and (global.cruise_control_limit[player.index] > hard_speed_limit) then
-        global.cruise_control_limit[player.index] = hard_speed_limit
-    elseif global.cruise_control_limit[player.index] > (299792458 / 60) then
+    if (hard_speed_limit > 0) and (storage.cruise_control_limit[player.index] > hard_speed_limit) then
+        storage.cruise_control_limit[player.index] = hard_speed_limit
+    elseif storage.cruise_control_limit[player.index] > (299792458 / 60) then
         -- FTL travel on planetary surfaces should be avoided:
-        global.cruise_control_limit[player.index] = 299792458 / 60
+        storage.cruise_control_limit[player.index] = 299792458 / 60
     end
 
     -- check, if the player is sitting in a vehicle and changed the cc limit below the velocity of the car
-    if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and not config.vehicle_blacklist[player.vehicle.name] and player.vehicle.speed > global.cruise_control_limit[player.index] then
-        global.cruise_control_brake_active[player.index] = true
+    if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.type == "car" and not config.vehicle_blacklist[player.vehicle.name] and player.vehicle.speed > storage.cruise_control_limit[player.index] then
+        storage.cruise_control_brake_active[player.index] = true
     end
 end
 
@@ -281,7 +281,7 @@ end
 -- @param player LuaPlayer Player for which to toggle the driving assistant.
 --
 function pda.toggle_drive_assistant(player)
-    if global.drive_assistant[player.index] and pda.is_player_in_car_vehicle(player) then
+    if storage.drive_assistant[player.index] and pda.is_player_in_car_vehicle(player) then
         pda.disable_drive_assistant(player)
     else
         pda.enable_drive_assistant(player)
@@ -296,10 +296,10 @@ end
 local function manage_drive_assistant(player_index)
     local player = game.players[player_index]
 
-    if player.riding_state.direction == defines.riding.direction.straight and (global.imposed_speed_limit[player_index] ~= nil or math.abs(player.vehicle.speed) > global.min_speed) then
+    if player.riding_state.direction == defines.riding.direction.straight and (storage.imposed_speed_limit[player_index] ~= nil or math.abs(player.vehicle.speed) > storage.min_speed) then
         local car = player.vehicle
         local dir = car.orientation
-        local scores = global.scores
+        local scores = storage.scores
         local eccent = config.eccent
         local newdir = 0
         local pi = math.pi
@@ -330,8 +330,8 @@ local function manage_drive_assistant(player_index)
         local lookahead_start_hs = 0
         local lookahead_length_hs = 0
 
-        if car.speed > global.highspeed then
-            local speed_factor = car.speed / global.highspeed
+        if car.speed > storage.highspeed then
+            local speed_factor = car.speed / storage.highspeed
             lookahead_start_hs = mfloor (config.hs_start_extension * speed_factor + 0.5)
             lookahead_length_hs = mfloor (config.hs_length_extension * speed_factor + 0.5)
         end
@@ -357,10 +357,10 @@ local function manage_drive_assistant(player_index)
         end
 
         -- check if the score indicates that the vehicle leaved paved area
-        local ls = global.last_score[player_index] or 0
+        local ls = storage.last_score[player_index] or 0
         local ts = ss+sr+sl
 
-        if ts < ls and ts == 0 and not global.road_departure_brake_active[player_index] then
+        if ts < ls and ts == 0 and not storage.road_departure_brake_active[player_index] then
             -- warn the player and activate emergency brake
             if player.mod_settings["PDA-setting-sound-alert"].value then
                 player.play_sound{path = "pda-warning-1"}
@@ -369,19 +369,19 @@ local function manage_drive_assistant(player_index)
                 pda.notify_player(player, {"DA-road-departure-warning"})
             end
             player.riding_state = {acceleration = BRAKING, direction = player.riding_state.direction}
-            global.road_departure_brake_active[player_index] = true
+            storage.road_departure_brake_active[player_index] = true
         end
-        global.last_score[player_index] = ts
+        storage.last_score[player_index] = ts
 
         -- set new direction depending on the scores (@sillyfly)
         if sr > ss and sr > sl and (sr + ss) > 0 then
             newdir = dir + (config.changeangle*sr*2)/(sr+ss)
             -- @TODO: Figure out what to do with this bit of code.
-            --newdir = dir + mmin((config.changeangle*sr*2)/(sr+ss), car.prototype.rotation_speed)-- donfig.max_changeangle * global.driving_assistant_tickrate)
+            --newdir = dir + mmin((config.changeangle*sr*2)/(sr+ss), car.prototype.rotation_speed)-- donfig.max_changeangle * storage.driving_assistant_tickrate)
         elseif sl > ss and sl > sr and (sl + ss) > 0 then
             newdir = dir - (config.changeangle*sl*2)/(sl+ss)
             -- @TODO: Figure out what to do with this bit of code.
-            --newdir = dir - mmin((config.changeangle*sl*2)/(sl+ss), car.prototype.rotation_speed)--config.max_changeangle * global.driving_assistant_tickrate)
+            --newdir = dir - mmin((config.changeangle*sl*2)/(sl+ss), car.prototype.rotation_speed)--config.max_changeangle * storage.driving_assistant_tickrate)
         else
             newdir = dir
         end
@@ -392,7 +392,7 @@ local function manage_drive_assistant(player_index)
 
         -- no score reset in curves -> allow the player to guide his vehicle off road manually
     elseif player.riding_state.direction ~= defines.riding.direction.straight then
-        global.last_score[player_index] = 0
+        storage.last_score[player_index] = 0
     end
 end
 
@@ -413,8 +413,8 @@ local function create_sign_logic_table(sign)
     data.vehicles_registered = 0
     data.status = -1 -- will be updated if a vehicle drives across this sign
     data.queue_update_pending = false
-    if global.signs == nil then global.signs = {} end
-    global.signs[sign.unit_number] = data
+    if storage.signs == nil then storage.signs = {} end
+    storage.signs[sign.unit_number] = data
 end
 
 
@@ -425,7 +425,7 @@ end
 -- @param sign uint Unique ID of sign entity from PDA (one of the constant combinator ones, like stop sign or road sensor).
 --
 local function delete_sign_logic_table(sign_uid)
-    global.signs[sign_uid] = nil
+    storage.signs[sign_uid] = nil
 end
 
 
@@ -470,31 +470,31 @@ local function register_to_road_sensor(sign, player_index, velocity)
     end
     local vec = {}
     vec.command = found["signal-C"] or 0 -- -1 = ignore; 0 = go, but listen to this sign; 1 = stop, but listen to this sign
-    --global.signs[sign.unit_number].status = data.command
+    --storage.signs[sign.unit_number].status = data.command
     if vec.command ~= -1 then
         increment_detector_signal(sign)
-        local sign_data = global.signs[sign.unit_number]
+        local sign_data = storage.signs[sign.unit_number]
         vec.registered_to_sensor = sign.unit_number
         vec.expected_stop_positions = found["signal-S"] or 0
         vec.passed_stop_positions = 0
         vec.waiting_at_stop_position = false
         vec.queue_position = sign_data.vehicles_registered + 1
-        vec.previous_speed_limit = global.imposed_speed_limit[player_index]
-        vec.local_speed_limit = (found["signal-L"] ~= nil and utils.kmph_to_mpt(found["signal-L"])) or (global.min_speed + 0.024)
+        vec.previous_speed_limit = storage.imposed_speed_limit[player_index]
+        vec.local_speed_limit = (found["signal-L"] ~= nil and utils.kmph_to_mpt(found["signal-L"])) or (storage.min_speed + 0.024)
 
-        global.vehicles_registered_to_signs[player_index] = vec
+        storage.vehicles_registered_to_signs[player_index] = vec
         sign_data.vehicles_registered = sign_data.vehicles_registered + 1
         sign_data.vehicle_queue[#sign_data.vehicle_queue + 1] = player_index
         if sign_data.vehicles_registered > 0 then
             -- this sign is now active and needs to be updated every few ticks
-            if global.active_signs == nil then global.active_signs = {} end
-            global.active_signs[sign.unit_number] = true
+            if storage.active_signs == nil then storage.active_signs = {} end
+            storage.active_signs[sign.unit_number] = true
         end
         if vec.command == 1 and vec.expected_stop_positions > 0 then
             -- stop command: start to decelerate the vehicle, but only if a stop position is expected
-            global.imposed_speed_limit[player_index] = vec.local_speed_limit
-            if velocity > global.imposed_speed_limit[player_index] then
-                global.cruise_control_brake_active[player_index] = true
+            storage.imposed_speed_limit[player_index] = vec.local_speed_limit
+            if velocity > storage.imposed_speed_limit[player_index] then
+                storage.cruise_control_brake_active[player_index] = true
             end
         end
         return true
@@ -514,7 +514,7 @@ end
 -- @return bool true, if updates were made, false otherwise.
 --
 local function update_vehicle_registered_to_sign(player_index, params)
-    local vreg = global.vehicles_registered_to_signs[player_index]
+    local vreg = storage.vehicles_registered_to_signs[player_index]
     local player = game.players[player_index]
     local car = player.vehicle
     if car == nil or not car.valid then
@@ -531,12 +531,12 @@ local function update_vehicle_registered_to_sign(player_index, params)
 
     if params.command == 1 and (vreg.passed_stop_positions <= vreg.expected_stop_positions - vreg.queue_position) then
         -- stop command: start to decelerate the vehicle, but only if a stop position is expected
-        global.imposed_speed_limit[player_index] = vreg.local_speed_limit
+        storage.imposed_speed_limit[player_index] = vreg.local_speed_limit
         if car.speed > 0 then
             -- vehicle is not already waiting -> brake
-            if car.speed > global.imposed_speed_limit[player_index] then
+            if car.speed > storage.imposed_speed_limit[player_index] then
                 -- activate brake to deccelerate the vehicle
-                global.cruise_control_brake_active[player_index] = true
+                storage.cruise_control_brake_active[player_index] = true
             end
         end
     elseif params.command == 0 then
@@ -544,13 +544,13 @@ local function update_vehicle_registered_to_sign(player_index, params)
         if vreg.passed_stop_positions == vreg.expected_stop_positions and vreg.queue_position == 1 then
             deregister_from_road_sensor(vreg.registered_to_sensor, player_index)
         else
-            global.emergency_brake_power[player_index] = nil -- stop braking for any stop position
-            global.imposed_speed_limit[player_index] = vreg.previous_speed_limit
-            if global.imposed_speed_limit[player_index] ~= nil and car.speed > 0 and car.speed > global.imposed_speed_limit[player_index] then
+            storage.emergency_brake_power[player_index] = nil -- stop braking for any stop position
+            storage.imposed_speed_limit[player_index] = vreg.previous_speed_limit
+            if storage.imposed_speed_limit[player_index] ~= nil and car.speed > 0 and car.speed > storage.imposed_speed_limit[player_index] then
                 -- keep brake active to deccelerate the vehicle
-                global.cruise_control_brake_active[player_index] = true
+                storage.cruise_control_brake_active[player_index] = true
             else
-                global.cruise_control_brake_active[player_index] = false
+                storage.cruise_control_brake_active[player_index] = false
                 player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
             end
         end
@@ -573,11 +573,11 @@ end
 -- @return bool true, if updates were made, false otherwise.
 --
 local function update_road_sensor_data(sign_uid)
-    local sign = global.signs[sign_uid]
+    local sign = storage.signs[sign_uid]
     if not sign then
         return false
     else
-        sign = global.signs[sign_uid].entity
+        sign = storage.signs[sign_uid].entity
         if not sign or not sign.valid then
             return false
         end
@@ -610,7 +610,7 @@ local function update_road_sensor_data(sign_uid)
         end
     end
     local new_command = found["signal-C"] or 0
-    local sd = global.signs[sign.unit_number]
+    local sd = storage.signs[sign.unit_number]
     if sd.status ~= new_command then
         sd.status = new_command
         for _, pid in pairs(sd.vehicle_queue) do
@@ -685,7 +685,7 @@ end
 --
 function update_last_sign_data(player_index, new_sign_uid, new_sign_type, stopSignEntity)
     -- up to four signs will be cached if the player drives over multiple signs at once
-    local last = global.last_sign_data[player_index]
+    local last = storage.last_sign_data[player_index]
     if last.type == nil then last.type = {} end
     if last.type[new_sign_type] == nil then last.type[new_sign_type] = {} end
     last.ignore[new_sign_uid] = true
@@ -732,20 +732,20 @@ end
 -- @return bool true, if signs were processed, false otherwise.
 --
 local function process_signs(player_index)
-    local cc_active = global.cruise_control[player_index]
+    local cc_active = storage.cruise_control[player_index]
     local player = game.players[player_index]
     local px = player.position['x'] or player.position[1]
     local py = player.position['y'] or player.position[2]
     local car = player.vehicle
-    local vreg = global.vehicles_registered_to_signs[player_index]
+    local vreg = storage.vehicles_registered_to_signs[player_index]
     local sign_scanner = player.surface.find_entities_filtered{area = {{px-1, py-1},{px+1, py+1}}, type="constant-combinator"}
     if #sign_scanner > 0 then
         -- sign detected
-        if global.last_sign_data[player_index] == nil then
-            global.last_sign_data[player_index] = {["ignore"] = {}}
+        if storage.last_sign_data[player_index] == nil then
+            storage.last_sign_data[player_index] = {["ignore"] = {}}
         end
         for i = 1, #sign_scanner do
-            if not global.last_sign_data[player_index].ignore[sign_scanner[i].unit_number] then
+            if not storage.last_sign_data[player_index].ignore[sign_scanner[i].unit_number] then
                 if sign_scanner[i].name == "pda-road-sign-stop" then
                     -- detect stop signs even if cruise control is inactive
                     update_last_sign_data(player_index, sign_scanner[i].unit_number, "stop", sign_scanner[i])
@@ -766,16 +766,16 @@ local function process_signs(player_index)
                     end
                     if not pass_stop_sign and car.speed > 0 then
                         local brake_power
-                        if not global.emergency_brake_power[player_index] then
+                        if not storage.emergency_brake_power[player_index] then
                             local v_ms = car.speed * 60
                             local brake_distance_m = 4
                             local brake_time_s = brake_distance_m / v_ms
                             --brake_distance = (speed ^ 2) / 2 * brake_power
                             local brake_retardation_ms2 = ((v_ms ^ 2) / (2 * brake_distance_m))
                             brake_power = brake_retardation_ms2 / (60 ^ 2)
-                            global.emergency_brake_power[player_index] = brake_power
+                            storage.emergency_brake_power[player_index] = brake_power
                         end
-                        global.imposed_speed_limit[player_index] = 0 -- global.min_speed + 0.024 -- min speed + 5 km/h
+                        storage.imposed_speed_limit[player_index] = 0 -- storage.min_speed + 0.024 -- min speed + 5 km/h
                         player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
                         -- activate brake to deccelerate the vehicle
                     end
@@ -801,20 +801,20 @@ local function process_signs(player_index)
                     -- read signal value only if a signal is set
                     if sign_value ~= 0 then
                         if vreg == nil then
-                            global.imposed_speed_limit[player_index] = utils.kmph_to_mpt(sign_value)
-                            if car.speed > global.imposed_speed_limit[player_index] then
+                            storage.imposed_speed_limit[player_index] = utils.kmph_to_mpt(sign_value)
+                            if car.speed > storage.imposed_speed_limit[player_index] then
                                 -- activate brake to deccelerate the vehicle
-                                global.cruise_control_brake_active[player_index] = true
+                                storage.cruise_control_brake_active[player_index] = true
                             end
                         else -- if this vehicle is currently in a sensor controlled section
                             vreg.previous_speed_limit = utils.kmph_to_mpt(sign_value)
                             if vreg.command == 0 then
-                                global.imposed_speed_limit[player_index] = vreg.previous_speed_limit
-                                if global.imposed_speed_limit[player_index] ~= nil and car.speed > 0 and car.speed > global.imposed_speed_limit[player_index] then
+                                storage.imposed_speed_limit[player_index] = vreg.previous_speed_limit
+                                if storage.imposed_speed_limit[player_index] ~= nil and car.speed > 0 and car.speed > storage.imposed_speed_limit[player_index] then
                                     -- keep brake active to deccelerate the vehicle
-                                    global.cruise_control_brake_active[player_index] = true
+                                    storage.cruise_control_brake_active[player_index] = true
                                 else
-                                    global.cruise_control_brake_active[player_index] = false
+                                    storage.cruise_control_brake_active[player_index] = false
                                     player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
                                 end
                             end
@@ -824,20 +824,20 @@ local function process_signs(player_index)
                 elseif sign_scanner[i].name == "pda-road-sign-speed-unlimit" then
                     update_last_sign_data(player_index, sign_scanner[i].unit_number, "unlimit")
                     if vreg == nil then
-                        global.imposed_speed_limit[player_index] = nil
+                        storage.imposed_speed_limit[player_index] = nil
                     else
                         vreg.previous_speed_limit = nil
                         if vreg.command == 0 then
-                            global.imposed_speed_limit[player_index] = vreg.previous_speed_limit
+                            storage.imposed_speed_limit[player_index] = vreg.previous_speed_limit
                         end
                     end
                     return true
                 end
             end
         end
-    elseif global.last_sign_data[player_index] ~= nil then
+    elseif storage.last_sign_data[player_index] ~= nil then
         remove_stop_signs_form_last_sign_data(player_index)
-        global.last_sign_data[player_index] = nil
+        storage.last_sign_data[player_index] = nil
     end
     return false
 end
@@ -853,12 +853,12 @@ local function manage_cruise_control(player_index)
     local target_speed = 0
 
     -- check if there is a speed limit that is more restrictive than the set limit for cruise control
-    if global.imposed_speed_limit[player_index] ~= nil and (global.imposed_speed_limit[player_index] < global.cruise_control_limit[player_index]) then
-        target_speed = global.imposed_speed_limit[player_index]
+    if storage.imposed_speed_limit[player_index] ~= nil and (storage.imposed_speed_limit[player_index] < storage.cruise_control_limit[player_index]) then
+        target_speed = storage.imposed_speed_limit[player_index]
     else
-        target_speed = global.cruise_control_limit[player_index]
+        target_speed = storage.cruise_control_limit[player_index]
     end
-    if speed ~= 0 and player.riding_state.acceleration ~= BRAKING and global.emergency_brake_power[player_index] == nil then
+    if speed ~= 0 and player.riding_state.acceleration ~= BRAKING and storage.emergency_brake_power[player_index] == nil then
         if math.abs(speed) > target_speed then
             player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
             if speed > 0 then
@@ -899,7 +899,7 @@ end
 
 --- Handler for players joining the game.
 --
--- Player that drove vehicle while leaving the game (and placed into global.offline_players_in_vehicles table) will get
+-- Player that drove vehicle while leaving the game (and placed into storage.offline_players_in_vehicles table) will get
 -- re-added to correct data structures.
 --
 -- @param event EventData Event data passed-on by the game engine.
@@ -909,40 +909,40 @@ function pda.on_player_joined_game(event)
     if config.debug then
         notification(tostring("on-joined triggered by player "..p))
         notification(tostring("connected players: "..#game.connected_players))
-        notification(tostring("players in offline_mode: "..#global.offline_players_in_vehicles))
+        notification(tostring("players in offline_mode: "..#storage.offline_players_in_vehicles))
     end
-    if global.offline_players_in_vehicles == nil then
-        global.offline_players_in_vehicles = {}
+    if storage.offline_players_in_vehicles == nil then
+        storage.offline_players_in_vehicles = {}
     end
     -- safety check (important for first player connecting to a game)
     -- if players are still in the "players_in_vehicles" list despite the fact they are not online then they will be put in offline mode
     if #game.connected_players == 1 then
-        for i=#global.players_in_vehicles, 1, -1 do
+        for i=#storage.players_in_vehicles, 1, -1 do
             local offline = true
             for j=1, #game.connected_players, 1 do
-                if global.players_in_vehicles[i] == game.connected_players[j].index then
+                if storage.players_in_vehicles[i] == game.connected_players[j].index then
                     offline = false
                 end
             end
             if offline then
-                table.insert(global.offline_players_in_vehicles, global.players_in_vehicles[i])
-                table.remove(global.players_in_vehicles, i)
+                table.insert(storage.offline_players_in_vehicles, storage.players_in_vehicles[i])
+                table.remove(storage.players_in_vehicles, i)
             end
         end
     end
     -- set player back to normal
-    for i=#global.offline_players_in_vehicles, 1, -1 do
-        if config.debug then notification(tostring(i..". test - is offline player "..global.offline_players_in_vehicles[i].." now online player: "..p.." ?")) end
-        if global.offline_players_in_vehicles[i] == p then
-            table.insert(global.players_in_vehicles, p)
-            table.remove(global.offline_players_in_vehicles, i)
+    for i=#storage.offline_players_in_vehicles, 1, -1 do
+        if config.debug then notification(tostring(i..". test - is offline player "..storage.offline_players_in_vehicles[i].." now online player: "..p.." ?")) end
+        if storage.offline_players_in_vehicles[i] == p then
+            table.insert(storage.players_in_vehicles, p)
+            table.remove(storage.offline_players_in_vehicles, i)
         end
     end
-    if config.debug then notification(tostring("num players now in offline_mode: "..#global.offline_players_in_vehicles)) end
+    if config.debug then notification(tostring("num players now in offline_mode: "..#storage.offline_players_in_vehicles)) end
 
     -- Ensure that cruise control limit is set to non-nil value for joining players.
-    global.cruise_control_limit[p] =
-        global.cruise_control_limit[p] or
+    storage.cruise_control_limit[p] =
+        storage.cruise_control_limit[p] or
         utils.kmph_to_mpt(game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value)
 end
 
@@ -950,22 +950,22 @@ end
 --- Handler for players leaving the game.
 --
 -- Takes care of "deregistering" the player from PDA-related vehicle management if player is driving a vehicle when
--- leaving the game. Such players are registered in the global.offline_players_in_vehicles variable.
+-- leaving the game. Such players are registered in the storage.offline_players_in_vehicles variable.
 --
 -- @param event EventData Event data passed-on by the game engine.
 --
 function pda.on_player_left_game(event)
     local p = event.player_index
     if config.debug then notification(tostring("on-left triggered by player "..p)) end
-    for i=#global.players_in_vehicles, 1, -1 do
-        if global.players_in_vehicles[i] == p then
-            table.insert(global.offline_players_in_vehicles, p)
-            table.remove(global.players_in_vehicles, i)
+    for i=#storage.players_in_vehicles, 1, -1 do
+        if storage.players_in_vehicles[i] == p then
+            table.insert(storage.offline_players_in_vehicles, p)
+            table.remove(storage.players_in_vehicles, i)
             -- deregister from stop signs and sensors - this would otherwise break their logic
             remove_stop_signs_form_last_sign_data(p)
-            global.last_sign_data[p] = nil
-            if global.vehicles_registered_to_signs[p] ~= nil then
-                deregister_from_road_sensor(global.vehicles_registered_to_signs[p].registered_to_sensor, p)
+            storage.last_sign_data[p] = nil
+            if storage.vehicles_registered_to_signs[p] ~= nil then
+                deregister_from_road_sensor(storage.vehicles_registered_to_signs[p].registered_to_sensor, p)
             end
         end
     end
@@ -984,25 +984,25 @@ function pda.on_runtime_mod_setting_changed(event)
     if event.setting_type == "runtime-global" then
 
         if setting == "PDA-setting-assist-min-speed" then
-            global.min_speed = utils.kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value)
+            storage.min_speed = utils.kmph_to_mpt(settings.global["PDA-setting-assist-min-speed"].value)
         end
 
         if setting == "PDA-setting-game-max-speed" then
-            global.hard_speed_limit = utils.kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value)
+            storage.hard_speed_limit = utils.kmph_to_mpt(settings.global["PDA-setting-game-max-speed"].value)
         end
 
         if setting == "PDA-setting-assist-high-speed" then
-            global.highspeed = utils.kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value)
+            storage.highspeed = utils.kmph_to_mpt(settings.global["PDA-setting-assist-high-speed"].value)
         end
 
         if setting == "PDA-setting-tick-rate" then
-            global.driving_assistant_tickrate = settings.global["PDA-setting-tick-rate"].value
+            storage.driving_assistant_tickrate = settings.global["PDA-setting-tick-rate"].value
         end
 
         if string.sub(setting, 1, 11) == "PDA-tileset" then
             config.update()
-            global.scores = config.tile_scores
-            global.tilesets = config.tilesets
+            storage.scores = config.tile_scores
+            storage.tilesets = config.tilesets
         end
 
         if setting == "PDA-setting-allow-cruise-control" then
@@ -1071,7 +1071,7 @@ function pda.on_sign_removed(event)
     local e = event.entity
     if e.type == "constant-combinator" then
         if e.name == "pda-road-sensor" then
-            for _, pid in pairs(global.signs[e.unit_number].vehicle_queue) do
+            for _, pid in pairs(storage.signs[e.unit_number].vehicle_queue) do
                 -- all vehicles currently controlled by this sign are set to ignore this sign now
                 update_vehicle_registered_to_sign(pid, {command = -1})
             end
@@ -1091,21 +1091,21 @@ end
 -- @param event EventData Event data passed-on by the game engine.
 --
 function pda.on_tick(event)
-    local ptick = global.playertick
-    local pinvec = #global.players_in_vehicles
+    local ptick = storage.playertick
+    local pinvec = #storage.players_in_vehicles
 
-    if ptick < global.driving_assistant_tickrate then
+    if ptick < storage.driving_assistant_tickrate then
         ptick = ptick + 1
     else
         ptick = 1
     end
-    global.playertick = ptick
+    storage.playertick = ptick
 
     if game.tick%5 == 0 then
         -- check every 5 ticks if road sensors need to be updated
-        for sign_uid, _ in pairs(global.active_signs) do
+        for sign_uid, _ in pairs(storage.active_signs) do
             if not update_road_sensor_data(sign_uid) then
-                global.active_signs[sign_uid] = nil
+                storage.active_signs[sign_uid] = nil
             end
         end
     end
@@ -1117,8 +1117,8 @@ function pda.on_tick(event)
 
     -- process cruise control, check for hard_speed_limit and road_departure_brake_active (every tick)
     for i=1, pinvec, 1 do
-        local hard_speed_limit = global.hard_speed_limit
-        local p = global.players_in_vehicles[i]
+        local hard_speed_limit = storage.hard_speed_limit
+        local p = storage.players_in_vehicles[i]
         local player = game.players[p]
         local car = game.players[p].vehicle
         -- if vehicle == nil don't process the player (i.e. if the character bound to the player changed)
@@ -1138,49 +1138,49 @@ function pda.on_tick(event)
         -- evaluate any road signs in front of this vehicle
         process_signs(p)
         -- check if forced braking is active...
-        if global.emergency_brake_power[p] then
+        if storage.emergency_brake_power[p] then
             if player.riding_state.acceleration == (ACCELERATING) or car.speed <= 0 then
-                global.emergency_brake_power[p] = nil
-                global.imposed_speed_limit[p] = nil
+                storage.emergency_brake_power[p] = nil
+                storage.imposed_speed_limit[p] = nil
                 car.speed = 0
-                if global.vehicles_registered_to_signs[p] ~= nil then
-                    global.vehicles_registered_to_signs[p].waiting_at_stop_position = true
+                if storage.vehicles_registered_to_signs[p] ~= nil then
+                    storage.vehicles_registered_to_signs[p].waiting_at_stop_position = true
                 end
             else
                 player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
-                car.speed = math.max(car.speed - global.emergency_brake_power[p], 0)
+                car.speed = math.max(car.speed - storage.emergency_brake_power[p], 0)
             end
-        elseif global.road_departure_brake_active[p] then
+        elseif storage.road_departure_brake_active[p] then
             if player.riding_state.acceleration == (ACCELERATING) or car.speed == 0 then
-                global.road_departure_brake_active[p] = false
+                storage.road_departure_brake_active[p] = false
                 player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
             else
                 player.riding_state = {acceleration = BRAKING, direction = player.riding_state.direction}
             end
             -- ...otherwise proceed to handle cruise control
-        elseif global.cruise_control_brake_active[p] then
-            if (car.speed < global.cruise_control_limit[p]) and global.imposed_speed_limit[p] == nil or (global.imposed_speed_limit[p] ~= nil and car.speed < global.imposed_speed_limit[p]) then
-                global.cruise_control_brake_active[p] = false
+        elseif storage.cruise_control_brake_active[p] then
+            if (car.speed < storage.cruise_control_limit[p]) and storage.imposed_speed_limit[p] == nil or (storage.imposed_speed_limit[p] ~= nil and car.speed < storage.imposed_speed_limit[p]) then
+                storage.cruise_control_brake_active[p] = false
                 player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
             else
                 player.riding_state = {acceleration = BRAKING, direction = player.riding_state.direction}
             end
             -- ...otherwise proceed to handle cruise control
-        elseif pda.is_cruise_control_allowed() and global.cruise_control[p] then
+        elseif pda.is_cruise_control_allowed() and storage.cruise_control[p] then
             manage_cruise_control(p)
         end
     end
     -- process driving assistant (every "driving_assistant_tickrate" ticks)
-    for i=ptick, pinvec, global.driving_assistant_tickrate do
+    for i=ptick, pinvec, storage.driving_assistant_tickrate do
         -- if vehicle == nil don't process the player
-        if game.players[global.players_in_vehicles[i]].vehicle == nil then
+        if game.players[storage.players_in_vehicles[i]].vehicle == nil then
             return
         end
-        if (pinvec >= i) and global.drive_assistant[global.players_in_vehicles[i]] then
-            manage_drive_assistant(global.players_in_vehicles[i])
+        if (pinvec >= i) and storage.drive_assistant[storage.players_in_vehicles[i]] then
+            manage_drive_assistant(storage.players_in_vehicles[i])
         end
     end
-    --global.playertick = ptick
+    --storage.playertick = ptick
 end
 
 
@@ -1234,7 +1234,7 @@ end
 --
 function pda.enable_drive_assistant(player)
     -- Nothing to be done, bail out immediatelly.
-    if not pda.is_driver_assistance_technology_available(player) or global.drive_assistant[player.index] then
+    if not pda.is_driver_assistance_technology_available(player) or storage.drive_assistant[player.index] then
         return
     end
 
@@ -1246,7 +1246,7 @@ function pda.enable_drive_assistant(player)
         return
     end
 
-    global.drive_assistant[player.index] = true
+    storage.drive_assistant[player.index] = true
 
     player.set_shortcut_toggled("pda-drive-assistant-toggle", true)
 
@@ -1260,13 +1260,13 @@ end
 --
 function pda.disable_drive_assistant(player)
     -- Nothing to be done, bail out immediatelly.
-    if not global.drive_assistant[player.index] then
+    if not storage.drive_assistant[player.index] then
         return
     end
 
-    global.drive_assistant[player.index] = false
-    global.road_departure_brake_active[player.index] = false
-    global.last_score[player.index] = 0
+    storage.drive_assistant[player.index] = false
+    storage.road_departure_brake_active[player.index] = false
+    storage.last_score[player.index] = 0
 
     player.set_shortcut_toggled("pda-drive-assistant-toggle", false)
 
@@ -1288,7 +1288,7 @@ function pda.enable_cruise_control(player)
     end
 
     -- Nothing to be done, bail out immediatelly.
-    if not pda.is_driver_assistance_technology_available(player) or global.cruise_control[player.index] then
+    if not pda.is_driver_assistance_technology_available(player) or storage.cruise_control[player.index] then
         return
     end
 
@@ -1300,26 +1300,26 @@ function pda.enable_cruise_control(player)
         return
     end
 
-    global.cruise_control[player.index] = true
+    storage.cruise_control[player.index] = true
 
     -- Set cruise control limit to current vehicle speed if fixed control limit is not enabled.
     if not pda.is_fixed_cruise_control_limit_enabled(player) then
         -- Store absolute value as vehicle speed (less than zero means player is reversing the car).
         if player.vehicle.speed > 0 then
-            global.cruise_control_limit[player.index] = player.vehicle.speed
+            storage.cruise_control_limit[player.index] = player.vehicle.speed
         else
-            global.cruise_control_limit[player.index] = -player.vehicle.speed
+            storage.cruise_control_limit[player.index] = -player.vehicle.speed
         end
     else
         -- Slow down the vehicle to current cruise control limit.
-        if player.vehicle.speed > global.cruise_control_limit[player.index] then
-            global.cruise_control_brake_active[player.index] = true
+        if player.vehicle.speed > storage.cruise_control_limit[player.index] then
+            storage.cruise_control_brake_active[player.index] = true
         end
     end
 
     player.set_shortcut_toggled("pda-cruise-control-toggle", true)
 
-    pda.notify_player(player, {"DA-cruise-control-active", utils.mpt_to_kmph(global.cruise_control_limit[player.index])})
+    pda.notify_player(player, {"DA-cruise-control-active", utils.mpt_to_kmph(storage.cruise_control_limit[player.index])})
 end
 
 
@@ -1329,25 +1329,25 @@ end
 --
 function pda.disable_cruise_control(player)
     -- Nothing to be done, bail out immediatelly.
-    if not global.cruise_control[player.index] then
+    if not storage.cruise_control[player.index] then
         return
     end
 
     -- Drop player's vehicle from stop signs vehicle tracking.
-    global.last_sign_data[player.index] = nil
+    storage.last_sign_data[player.index] = nil
     remove_stop_signs_form_last_sign_data(player.index)
 
     -- Deregister player's vehicle from road sensors.
-    if global.vehicles_registered_to_signs[player.index] then
-        deregister_from_road_sensor(global.vehicles_registered_to_signs[player.index].registered_to_sensor, player.index)
+    if storage.vehicles_registered_to_signs[player.index] then
+        deregister_from_road_sensor(storage.vehicles_registered_to_signs[player.index].registered_to_sensor, player.index)
     end
 
     -- Reset riding_state to stop acceleration.
     player.riding_state = {acceleration = IDLING, direction = player.riding_state.direction}
 
-    global.cruise_control[player.index] = false
-    global.cruise_control_brake_active[player.index] = false
-    global.imposed_speed_limit[player.index] = nil
+    storage.cruise_control[player.index] = false
+    storage.cruise_control_brake_active[player.index] = false
+    storage.imposed_speed_limit[player.index] = nil
 
     player.set_shortcut_toggled("pda-cruise-control-toggle", false)
 
@@ -1483,14 +1483,14 @@ end
 -- @param tileset string Name of tileset to show the information about.
 --
 function pda.show_tileset(player, tileset)
-    if not global.tilesets[tileset] then
+    if not storage.tilesets[tileset] then
         player.print({"error.pda-parameter-no-such-tileset"})
         return
     end
 
     -- Create a list of tiles with icons for better visual feedback. Only include tiles which are available in the game
     -- for more concise output.
-    local tiles = global.tilesets[tileset]
+    local tiles = storage.tilesets[tileset]
     local iconified_tiles = {}
 
     for _, tile in pairs(tiles) do

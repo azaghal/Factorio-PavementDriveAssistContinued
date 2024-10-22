@@ -48,7 +48,9 @@ if settings.startup["PDA-setting-smart-roads-enabled"].value then
                 corpse = "small-remnants",
                 collision_box = {{-0.85, -0.85}, {0.85, 0.85}},
                 selection_box = {{-0.8, -0.8}, {0.8, 0.8}},
-                collision_mask = { "floor-layer", "water-tile" },
+                collision_mask = {
+                    layers = { floor = true, water_tile = true }
+                },
                 item_slot_count = 1,
                 resistances = {
                     {
@@ -146,7 +148,9 @@ if settings.startup["PDA-setting-smart-roads-enabled"].value then
                 corpse = "small-remnants",
                 collision_box = {{-0.85, -0.85}, {0.85, 0.85}},
                 selection_box = {{-0.8, -0.8}, {0.8, 0.8}},
-                collision_mask = { "floor-layer", "water-tile" },
+                collision_mask = {
+                    layers = { floor = true, water_tile = true }
+                },
                 item_slot_count = 1,
                 resistances = {
                     {
