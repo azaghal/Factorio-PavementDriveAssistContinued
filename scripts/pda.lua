@@ -650,36 +650,47 @@ end
 
 --- Retrieves the speed limit value from a sign.
 --
--- @TODO Document what this actually means.
+-- Speed limit can be set on the sign itself, or via connected ciruict networks. Only one source is taken into the
+-- account. Priorites are as follows: red circuit network > green circuit network > only sign itself.
 --
--- Takes into account both the value of the sign itself, and any connected circuits. Value priority is: red wire > green wire > not connected.
+-- NOTE: Keep in mind that the PDA sign entity itself is part of the eventual red/green circuiot network and contributes
+-- its signal to it as well.
 --
 -- @param sign LuaEntity Sign entity from PDA (one of the constant combinator ones, like stop sign or road sensor).
 --
 -- @return uint Speed limit for a sign.
 --
 local function get_speed_limit_value(sign)
-    local sign = sign.get_or_create_control_behavior()
-    local sign_value = 0
+    local control_behavior = sign.get_or_create_control_behavior()
+    local network_red = control_behavior.get_circuit_network(defines.wire_connector_id.circuit_red)
+    local network_green = control_behavior.get_circuit_network(defines.wire_connector_id.circuit_green)
+
+    local speed_limit = 0
+
     -- wire priority: red wire > green wire > not connected
     -- signal priority: lexicographic order (0,1,2,...,9,A,B,C,... ,Y,Z)
     -- the signal of the sign itself is part of its circuit networks! Additional signals of the same type on this networks will be cummulated (e.g. a "L=60" on the sign and a signal "L=30" on the red network will add up to "L=90")
-    local network_red = sign.get_circuit_network(defines.wire_type.red)
-    local network_green = sign.get_circuit_network(defines.wire_type.green)
-    -- 1st: check if a red wire is connected (with >=1 signals, including the one of the sign itself)
-    if network_red ~= nil and network_red.signals ~= nil and #network_red.signals > 0 then
-        local networksignal = network_red.signals[1]
-        if networksignal.signal ~= nil then sign_value = networksignal.count end
-        -- 2nd: if there is no res wire, check if a green wire is connected (with >=1 signals, including the one of the sign itself)
-    elseif network_green ~= nil and network_green.signals ~= nil and #network_green.signals > 0 then
-        local networksignal = network_green.signals[1]
-        if networksignal.signal ~= nil then sign_value = networksignal.count end
-        -- 3rd: if the sign is not connected to any circuit network, read its own signal
-    elseif sign.get_signal(1).signal ~= nil then
-        local localsignal = sign.get_signal(1)
-        if localsignal.signal ~= nil then sign_value = localsignal.count end
+
+    -- 1st: check if a red wire is connected with at least one signal.
+    if network_red and network_red.signals then
+        speed_limit = network_red.signals[1].count
+    -- 2nd: if there is no red wire, check if a green wire is connected with at least one signal.
+    elseif network_green and network_green.signals then
+        speed_limit = network_green.signals[1].count
+    -- 3rd: if the sign is not connected to any circuit network, read its own signal.
+    else
+        for _, section in pairs(control_behavior.sections) do
+            if section.active then
+                local signal = section.get_slot(1)
+                if signal then
+                    speed_limit = signal.min
+                    break
+                end
+            end
+        end
     end
-    return sign_value
+
+    return speed_limit
 end
 
 
@@ -1044,14 +1055,17 @@ function pda.on_placed_sign(event)
             e.operable = false
             e.get_control_behavior().enabled = false
         elseif e.name == "pda-road-sign-speed-limit" then
-            -- on placement: if the sign had no specified signal value, set it to the default value.
-            if e.get_or_create_control_behavior().get_signal(1).signal == nil then
-                -- if placed by robots, use map setting, otherwise use personal setting
-                local limit = settings.global["PDA-setting-server-limit-sign-speed"].value
-                if p ~= nil then
-                    limit = game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value
-                end
-                e.get_or_create_control_behavior().parameters = {{index = 1, count = limit, signal = {type="virtual", name="signal-L"}}}
+            -- If the sign had no specified signal value, set it to default value.
+            local control_behavior = e.get_or_create_control_behavior()
+            -- @TODO: Looks kinda weird/ugly, not sure if players would benefit from setting up multiple sections with same signal.
+            for _, section in pairs(control_behavior.sections) do
+                local slot = section.get_slot(1)
+                slot.min =
+                    slot.min or
+                    p and game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value or
+                    settings.global["PDA-setting-server-limit-sign-speed"].value
+                slot.value =  {comparator = "=", name = "signal-L", quality = "normal", type = "virtual"}
+                section.set_slot(1, slot)
             end
         elseif e.name == "pda-road-sensor" then
             create_sign_logic_table(e)
