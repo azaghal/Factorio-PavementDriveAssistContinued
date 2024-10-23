@@ -70,43 +70,52 @@ local function init_global()
 end
 
 
---- Increments detector signal data for passed-in sign.
---
--- @TODO Document what this actually means.
+--- Increments vehicle detector signal for passed-in sign.
 --
 -- @param sign LuaEntity Sign entity from PDA (one of the constant combinator ones, like stop sign or road sensor).
 --
 local function increment_detector_signal(sign)
+
+    -- Make sure the sign entity is still valid.
     if not sign or not sign.valid then
         return
     end
-    local signals = sign.get_or_create_control_behavior()
-    local count = 0
-    local s = signals.get_signal(1)
-    if s ~= nil and s.signal ~= nil then
-        count = s.count
+
+    local control_behavior = sign.get_or_create_control_behavior()
+
+    -- Increment the vehicle count signal in each control behavior section. Default to using the first slot only to
+    -- avoid scanning for matching signal in each section.
+    for _, section in pairs(control_behavior.sections) do
+        local slot = section.get_slot(1)
+        slot.min = slot.min and slot.min + 1 or 1
+        slot.value = slot.value or {comparator = "=", name = "signal-V", quality = "normal", type = "virtual"}
+        section.set_slot(1, slot)
     end
-    signals.set_signal(1, {count = count + 1, signal = {type="virtual", name="signal-V"}})
+
 end
 
 
---- Decrements detector signal data for passed-in sign.
---
--- @TODO Document what this actually means.
+--- Decrements vehicle detector signal for passed-in sign.
 --
 -- @param sign LuaEntity Sign entity from PDA (one of the constant combinator ones, like stop sign or road sensor).
 --
 local function decrement_detector_signal(sign)
+
+    -- Make sure the sign entity is still valid.
     if not sign or not sign.valid then
         return
     end
-    local signals = sign.get_or_create_control_behavior()
-    local count = 1
-    local s = signals.get_signal(1)
-    if s ~= nil and s.signal ~= nil then
-        count = s.count
+
+    local control_behavior = sign.get_or_create_control_behavior()
+
+    -- Decrement the vehicle count signal in each control behavior section. Default to using the first slot only to
+    -- avoid scanning for matching signal in each section.
+    for _, section in pairs(control_behavior.sections) do
+        local slot = section.get_slot(1)
+        slot.min = slot.min and slot.min - 1 or 0
+        slot.value = slot.value or {comparator = "=", name = "signal-V", quality = "normal", type = "virtual"}
+        section.set_slot(1, slot)
     end
-    signals.set_signal(1, {count = count - 1, signal = {type="virtual", name="signal-V"}})
 end
 
 
