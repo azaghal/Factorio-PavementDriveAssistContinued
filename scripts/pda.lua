@@ -968,6 +968,8 @@ function pda.on_player_joined_game(event)
     storage.cruise_control_limit[p] =
         storage.cruise_control_limit[p] or
         utils.kmph_to_mpt(game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value)
+
+    pda.update_shortcut_availability(game.players[p])
 end
 
 

@@ -6,6 +6,7 @@ Date: 9999-99-99
   Features:
     - Added support for game version 2.0. Initial support might be a bit buggy, especially around logic circuiot handling.
   Bugfixes:
+    - Fixed shortcut availability for joining players.
 ---------------------------------------------------------------------------------------------------
 Version: 4.1.1
 Date: 2022-09-18
