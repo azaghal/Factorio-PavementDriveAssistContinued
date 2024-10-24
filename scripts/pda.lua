@@ -453,8 +453,8 @@ local function register_to_road_sensor(sign, player_index, velocity)
     local found = {}
     local find = {["signal-S"] = true, ["signal-C"] = true, ["signal-L"] = true}
     local signals = sign.get_or_create_control_behavior()
-    local network_red = signals.get_circuit_network(defines.wire_type.red)
-    local network_green = signals.get_circuit_network(defines.wire_type.green)
+    local network_red = signals.get_circuit_network(defines.wire_connector_id.circuit_red)
+    local network_green = signals.get_circuit_network(defines.wire_connector_id.circuit_green)
     if network_red ~= nil and network_red.signals ~= nil then
         for _, s in pairs(network_red.signals) do
             if find[s.signal.name] then
@@ -596,8 +596,8 @@ local function update_road_sensor_data(sign_uid)
     local found = {}
     local find = {["signal-C"] = true}
     local signals = sign.get_or_create_control_behavior()
-    local network_red = signals.get_circuit_network(defines.wire_type.red)
-    local network_green = signals.get_circuit_network(defines.wire_type.green)
+    local network_red = signals.get_circuit_network(defines.wire_connector_id.circuit_red)
+    local network_green = signals.get_circuit_network(defines.wire_connector_id.circuit_red)
     if network_red ~= nil and network_red.signals ~= nil then
         for _, s in pairs(network_red.signals) do
             if find[s.signal.name] then
