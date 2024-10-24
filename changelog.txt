@@ -4,7 +4,7 @@ Date: 9999-99-99
   Changes:
     - Dropped support for game version 1.1.
   Features:
-    - Added support for game version 2.0. Initial support might be a bit buggy, especially around logic circuiot handling.
+    - Added support for game version 2.0. Initial support might be a bit buggy, especially around logic circuit handling due to significant changes to base game combinators.
   Bugfixes:
     - Fixed shortcut availability for joining players.
 ---------------------------------------------------------------------------------------------------
