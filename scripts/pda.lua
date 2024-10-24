@@ -470,10 +470,12 @@ local function register_to_road_sensor(sign, player_index, velocity)
             end
         end
     else
-        for _, s in pairs(signals.parameters) do
-            if find[s.signal.name] then
-                found[s.signal.name] = s.count
-                find[s.signal.name] = false
+        for _, section in pairs(signals.sections) do
+            for _, s in pairs(section.filters) do
+                if find[s.value.name] then
+                    found[s.value.name] = s.min
+                    find[s.value.name] = false
+                end
             end
         end
     end
@@ -611,10 +613,12 @@ local function update_road_sensor_data(sign_uid)
             end
         end
     else
-        for _, s in pairs(signals.parameters) do
-            if find[s.signal.name] then
-                found[s.signal.name] = s.count
-                find[s.signal.name] = false
+        for _, section in pairs(signals.sections) do
+            for _, s in pairs(section.filters) do
+                if find[s.value.name] then
+                    found[s.value.name] = s.min
+                    find[s.value.name] = false
+                end
             end
         end
     end
@@ -1070,14 +1074,28 @@ function pda.on_placed_sign(event)
         elseif e.name == "pda-road-sensor" then
             create_sign_logic_table(e)
             local limit = p ~= nil and game.players[p].mod_settings["PDA-setting-personal-limit-sign-speed"].value or settings.global["PDA-setting-server-limit-sign-speed"].value
-            local params = e.get_or_create_control_behavior().parameters
-            e.get_or_create_control_behavior().parameters =
-                {
-                    {index = 1, count = 0, signal = {type="virtual", name="signal-V"}},
-                    {index = 2, count = (params[2].signal.name == "signal-C" and params[2].count) or -1, signal = {type="virtual", name="signal-C"}},
-                    {index = 3, count = (params[3].signal.name == "signal-S" and params[3].count) or 0, signal = {type="virtual", name="signal-S"}},
-                    {index = 4, count = (params[4].signal.name == "signal-L" and params[4].count) or limit, signal = {type="virtual", name="signal-L"}}
+            local control_behavior = e.get_or_create_control_behavior()
+
+            for _, section in pairs(control_behavior.sections) do
+                section.filters = {
+                    {
+                        value = { type = "virtual", name = "signal-V", comparator = "=", quality = "normal" },
+                        min = 0
+                    },
+                    {
+                        value = { type = "virtual", name = "signal-C", comparator = "=", quality = "normal" },
+                        min = section.filters[2] and section.filters[2].value.name == "signal-C" and section.filters[2].min or -1
+                    },
+                    {
+                        value = { type = "virtual", name = "signal-S", comparator = "=", quality = "normal" },
+                        min = section.filters[3] and section.filters[3].value.name == "signal-S" and section.filters[3].min or 0
+                    },
+                    {
+                        value = { type = "virtual", name = "signal-L", comparator = "=", quality = "normal" },
+                        min = section.filters[4] and section.filters[4].value.name == "signal-L" and section.filters[4].min or limit
+                    }
                 }
+            end
         end
     end
 end
