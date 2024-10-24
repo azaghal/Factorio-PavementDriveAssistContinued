@@ -88,7 +88,7 @@ local function increment_detector_signal(sign)
     for _, section in pairs(control_behavior.sections) do
         local slot = section.get_slot(1)
         slot.min = slot.min and slot.min + 1 or 1
-        slot.value = slot.value or {comparator = "=", name = "signal-V", quality = "normal", type = "virtual"}
+        slot.value =  { comparator = "=", name = "signal-V", quality = "normal", type = "virtual" }
         section.set_slot(1, slot)
     end
 
@@ -113,7 +113,7 @@ local function decrement_detector_signal(sign)
     for _, section in pairs(control_behavior.sections) do
         local slot = section.get_slot(1)
         slot.min = slot.min and slot.min - 1 or 0
-        slot.value = slot.value or {comparator = "=", name = "signal-V", quality = "normal", type = "virtual"}
+        slot.value =  { comparator = "=", name = "signal-V", quality = "normal", type = "virtual" }
         section.set_slot(1, slot)
     end
 end
@@ -472,7 +472,7 @@ local function register_to_road_sensor(sign, player_index, velocity)
     else
         for _, section in pairs(signals.sections) do
             for _, s in pairs(section.filters) do
-                if find[s.value.name] then
+                if s.value and find[s.value.name] then
                     found[s.value.name] = s.min
                     find[s.value.name] = false
                 end
@@ -615,7 +615,7 @@ local function update_road_sensor_data(sign_uid)
     else
         for _, section in pairs(signals.sections) do
             for _, s in pairs(section.filters) do
-                if find[s.value.name] then
+                if s.value and find[s.value.name] then
                     found[s.value.name] = s.min
                     find[s.value.name] = false
                 end
@@ -1084,15 +1084,15 @@ function pda.on_placed_sign(event)
                     },
                     {
                         value = { type = "virtual", name = "signal-C", comparator = "=", quality = "normal" },
-                        min = section.filters[2] and section.filters[2].value.name == "signal-C" and section.filters[2].min or -1
+                        min = section.filters[2] and section.filters[2].value and section.filters[2].value.name == "signal-C" and section.filters[2].min or -1
                     },
                     {
                         value = { type = "virtual", name = "signal-S", comparator = "=", quality = "normal" },
-                        min = section.filters[3] and section.filters[3].value.name == "signal-S" and section.filters[3].min or 0
+                        min = section.filters[3] and section.filters[3].value and section.filters[3].value.name == "signal-S" and section.filters[3].min or 0
                     },
                     {
                         value = { type = "virtual", name = "signal-L", comparator = "=", quality = "normal" },
-                        min = section.filters[4] and section.filters[4].value.name == "signal-L" and section.filters[4].min or limit
+                        min = section.filters[4] and section.filters[4].value and section.filters[4].value.name == "signal-L" and section.filters[4].min or limit
                     }
                 }
             end
