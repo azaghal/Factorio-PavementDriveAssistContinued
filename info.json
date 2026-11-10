@@ -10,6 +10,7 @@
         "? base >= 2.1",
         "? AsphaltPaving",
         "? AsphaltRoads",
+        "? AsphaltRoadsPatched",
         "! PavementDriveAssist"
     ]
 }

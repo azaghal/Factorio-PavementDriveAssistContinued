@@ -119,7 +119,8 @@ Driving across an *end of speed limit* sign or disabling the *cruise control* re
 ### Mod integration
 
 -   [Asphalt Roads](https://mods.factorio.com/mod/AsphaltPaving) was specifically designed to work with Pavement Drive Assist. Asphalt is preconfigured as the primary road tile and vehicles will try to avoid crossing lane marking tiles (roads with separated lanes will therefore allow safe two-way traffic). Unfortunately, Asphalt Roads has not been updated yet for Factorio 1.1.
--   [Asphalt Paving](https://mods.factorio.com/mod/AsphaltPaving) is a fully compatible drop-in replacement for Asphalt Roads with support for Factorio 1.1.
+-   [Asphalt Paving](https://mods.factorio.com/mod/AsphaltPaving) is a fully compatible drop-in replacement for Asphalt Roads with support for Factorio 1.1. Unfortunately, it has not received updates for Factorio 2.0 and 2.1.
+-   [Asphalt Roads Patched](https://mods.factorio.com/mod/AsphaltRoadsPatched) is a fully compatible drop-in replacement for Asphalt Roads with support for Factorio 2.0/2.1.
 -   [Color Coding](https://mods.factorio.com/mod/color-coding)
 -   [5Dim's mod - New Decoration](https://mods.factorio.com/mod/5dim_decoration)
 -   [More Floors](https://mods.factorio.com/mod/More_Floors)
